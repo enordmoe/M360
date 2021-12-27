@@ -1,2 +1,2 @@
 # M360
-Repository with materials for Applied Statistics II class
+Repository with notes and resources for Applied Statistics II class.
