@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Chapter 0: What is a Statistical Model?</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Applied Statistics II" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+    <link rel="stylesheet" href="scrollingbox.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Chapter 0: What is a Statistical Model?
+## Part 1
+### Applied Statistics II
+
+---
+
+
+
+
+
+
+# Outline 
+
+* Four-step modeling process
+
+* General statistical model
+
+* Constant model
+
+  * Mean, median
+  
+* Residuals
+
+  * Absolute deviations
+  * Squared deviations
+
+* Comparing two means
+  * Visualizations
+  * `\(t\)`-test
+  
+* Effect size
+
+
+---
+
+# Outline
+
+* Review of functions
+
+* Vector basics  
+
+* Atomic vectors  
+
+* Using atomic vectors  
+
+* Lists
+
+---
+
+## Function Review: Question 1  
+
+Q: What belongs in the blank?   
+
+A: (a) `from`, (b) `of`, (c) `in`, or (d) `%in%`  
+
+&lt;!-- Answer is "in" --&gt;
+
+
+```r
+sales &lt;- list(
+    jan = c(9, 2, 10), 
+    feb = c(19, 13, 11))
+
+x &lt;- vector("double", 2)
+*for (i ____ seq_along(sales)) {
+    x[i] &lt;- mean(sales[[i]])
+}
+x
+```
+
+Output:  
+```
+[1]  7.00000 14.33333
+```
+
+---
+## Function Review: Question 2 
+
+Q: Complete the code to produce the output   
+
+A: (a) `for` (b) `do` (c) `with` (d) `foreach`  
+
+&lt;!-- Answer is "for" --&gt;
+
+```r
+x &lt;- c(13, 12, 14, 15)
+
+*---- (i in x) {
+    if(i %% 2 == 0) {
+        print(paste(i, "is an even number"))
+    } else {
+        print(paste(i, "is an odd number"))
+    }
+}
+```
+
+Output:  
+
+```
+[1] "13 is an odd number"
+[1] "12 is an even number"
+[1] "14 is an even number"
+[1] "15 is an odd number"
+```
+---
+## Function Review: Question 3
+
+Q: Complete the code to produce the output  
+
+A: (a) `ifelse` (b) `if` (c) `when`
+
+&lt;!-- Answer is "if" --&gt;
+
+
+```r
+score &lt;- 94
+*_____ (score &gt; 60) {
+    print("Above 60!")
+} else {
+    print("At or below 60!")
+}
+```
+
+Output:  
+
+```
+[1] "pass!"
+```
+
+---
+
+## Function Review: Question 4 
+
+Q: Complete the code to produce the output  
+
+A: (a) `when` (b) `if` (c) `ifelse`
+
+&lt;!-- Answer is "if" --&gt;
+
+```r
+day &lt;- "sat"
+*____ (day == "sat") {
+    print("It is Saturday!")
+}
+```
+
+Output:  
+
+```
+[1] "It is Saturday!"
+```
+
+---
+
+## Function Review: Question 5
+
+What will be the output?
+
+&lt;!-- Answer: c(3,3) --&gt;
+
+
+```r
+x &lt;- 2
+
+add &lt;- function() {
+    x + 1
+}
+
+x1 &lt;- add()
+x2 &lt;- add()
+
+c(x1, x2)
+```
+
+Output: (a) `c(3, 4)` (b) `c(3, 3)` (c) `c(2, 3)` (d) An error
+
+
+---
+
+##  Vectors  
+
+* Component parts of tibbles  
+
+* Use in writing functions  
+
+* Several kinds to know about
+
+---
+
+## Types of Vectors  
+
+1. Atomic
+
+    + Common types:  Logical, Integer, Double, Character    
+    
+    + Homogenous:  all same type
+--
+2. Lists  
+
+    + Recursive  
+    
+    + Heterogeneous: can contain multiple types
+
+---
+
+## Hierarchy of Vector Types  
+
+&lt;img src="figures/data-structures-overview.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+.footnote[
+Source: R4DS
+]
+
+
+---
+
+## Properties of Vectors  
+
+Two key properties of every vector:  
+
+1.  **type**: e.g. logical, character, ...  
+
+2. **length**: number of elements  
+
+---
+
+## Atomic vector examples Part 1
+
+
+```r
+# logical vectors are simplest - only 3 values (T, F, NA)
+1:10 %% 3 == 0   # `%%` = mod / divisible by
+c(TRUE, TRUE, FALSE, NA)
+
+# numeric vectors = double + integer
+typeof(1)
+typeof(1L)
+
+# note that all doubles are approximations because of floating point
+x &lt;- sqrt(2) ^ 2
+x
+x - 2
+sqrt(2)^2 == 2
+near(2, sqrt(2)^2) 
+```
+
+---
+
+## Atomic vector examples Part 2
+
+* Types of NA values vary by vector type:
+
+
+```r
+# doubles have 4 special values (e.g. NaN = Not a Number)
+c(-1, 0, 1, NA) / 0
+# check with helper functions and not ==
+is.na(c(-1, 0, 1, NA) / 0)  
+```
+
+---
+
+## Character vectors
+
+* Most complex type  
+
+* Strings require more memory but ...  
+
+    + R uses a "global string pool" ==&gt; Each unique string stored in one place
+
+
+```r
+x &lt;- "This is a reasonably long string."
+pryr::object_size(x)
+y &lt;- rep(x, 1000)
+pryr::object_size(y)
+# y doesn't take 1000 times memory of x because each element of y is just
+#   a pointer to the same string - pointers take less space
+```
+
+---
+
+## Using Atomic Vectors
+
+* Testing functions to verify type provided by **purrrr** package  
+    
+    + `is_numeric()`, `is_logical()`, `is_character()`, etc.  
+    
+
+```r
+is_character(c(1, 2, 3, 4, 5))
+is_character(c(1, 2, 3, 4, "5"))
+is_character(c(1, 2, 3, 4, NA))
+is_character(c(1, 2, 3, 4, NA_character_))
+is_logical(c(T, T, F))
+is_logical(c(TRUE, F, FALSE))
+is_logical(c("true", "false", "true"))
+```
+
+---
+
+## Using atomic vectors: coercion  
+
+* Implicit coercion  
+
+    + Happens when you use a vector in a specific context 
+    that expects a certain type of vector  
+
+---
+class: inverse, center, top
+
+background-image: url(https://imgs.xkcd.com/comics/types.png)
+background-size: contain
+
+
+---
+## Coercion examples 
+
+
+```r
+# implicit coercion from logical to numeric - T to 1 and F to 0
+x &lt;- runif(1000)
+y &lt;- x &gt; .75
+sum(y)  # how many are greater than 0.5?
+mean(y) # what proportion are greater than 0.5?
+```
+
+---
+
+## More coercion examples
+
+
+```r
+# if multiple types, most complex type wins - cannot mix types in a vector
+typeof(c(TRUE, 1L))
+typeof(c(1L, 1.5))
+typeof(c(1.5, "a"))
+is_numeric(typeof(c(1.5, "a"))) 
+is_double(typeof(c(1.5, "a")))
+is_integer(typeof(c(1.5, "a")))
+is_character(typeof(c(1.5, "a")))
+```
+
+---
+
+## Recycling Vectors 
+
+* Mixing vectors and "scalars" easy because of recycling  
+
+* Built-in functions are **vectorized**  
+
+* R will expand the shortest vector to the same length as the longest  
+
+    + R warns when the length of the longer is not an integer multiple of the length of the shorter
+
+---
+
+## Recycling Examples
+
+
+
+```r
+# Stats calculations are simplified by recycling scalars
+x&lt;- sample(70:100, 5, replace = TRUE) 
+x
+x - mean(x)
+#   tidyverse gives errors if recycle anything but a scalar, since can be dangerous
+1:10 + 1:2
+1:10 + 1:3  # this will produce a warning
+tibble(x = 1:4, y = 1:2) # this will produce an error
+tibble(x = 1:4, y = rep(1:2, 2))
+tibble(x = 1:4, y = rep(1:2, each = 2))
+```
+
+---
+
+## Review of Subsetting Vectors: Part 1 
+
+
+```r
+# 1. can subset a vector using a numeric vector containing only integers
+#    where negatives indicate drops
+x &lt;- c("one", "two", "three", "four", "five")
+x[c(3, 2, 5)]
+x[c(1, 1, 5, 5, 5, 2)]
+x[c(-1, -3, -5)]
+x[c(1, -1)]  # this gives an error - can't mix pos and neg
+```
+
+
+
+```r
+# 2. can also subset with a logical vector
+x &lt;- c(10, 3, NA, 5, 8, 1, NA)
+x[!is.na(x)]
+x[x %% 2 == 0]   # get evens and missings
+```
+
+---
+
+## Review of Subsetting Vectors: Part 2 
+
+
+
+```r
+# 3. Subsetting with names
+x &lt;- c(abc = 1, def = 2, xyz = 5)
+x[c("xyz", "def")]
+```
+
+
+```r
+# 4. can also get first row of matrix with x[1,] and first column with x[,1]
+temp &lt;- tibble(x = 1:4, y = rep(1:2, each = 2))
+temp[1,]
+temp[,1]
+temp[-1,]
+```
+
+---
+
+## Lists 
+
+    + Can contain other lists  
+    
+    + Use `list()` to create lists
+    
+    + Use `str()` to inspect lists  
+    
+    + Can mix types of objects  
+    
+    + Subsetting: "[", "[[", "$"
+
+---
+## Visualizing Lists and Subsetting
+
+* See R4DS Section 20.5.1 for examples to study! 
+
+* Study subsetting commands  
+
+    + "[" : extracts a sub-list. The result will always be a list.
+    + "[[" :extracts a single component from a list;  removes a level of hierarchy from the list.
+    + "$" : shorthand for extracting **named** elements of a list; works like "[[" except you don’t need to use quotes.
+
+---
+
+##  Data Example  
+
+
+```r
+str(mtcars)
+typeof(mtcars)
+attributes(mtcars)
+attr(mtcars, "class")
+```
+
+---
+
+## Create a Plot and Save It  
+
+
+```r
+g &lt;- ggplot(mtcars) + 
+  geom_point(aes(x = wt, y = mpg))
+g
+typeof(g)
+str(g)
+attributes(g)
+```
+
+---
+
+## Explore the List Testing methods of extraction
+
+
+```r
+g[1]
+g[[1]]
+g$data
+g[[1]][1]
+g[[1]][[1]]
+g[[1]][1,]
+g[[1]][,1]
+g$data$mpg
+g[2]
+g[9]
+g[9]$labels$x
+g$labels$x
+```
+
+---
+
+## Now fit a least squares line using the code below
+
+* Fit the model and explore the components of the regression results using methods of subsetting lists. 
+
+
+```r
+# Following creates a list of regression results in lsq_mod
+lsq_mod &lt;- lm(mpg~wt, data = mtcars)
+str(lsq_mod)
+attributes(lsq_mod)
+lsq_mod$coefficients
+lsq_mod$call
+```
+
+---
+
+## Attributes of vectors  
+
+* Names  
+
+* Dimensions  
+
+* Classes:  generic functions `summary()`, `print()`, etc. 
+
+---
+
+## Generic Functions and Methods  
+
+&lt;img src="figures/generic_functions_and_methods.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+## Check Methods of Generic Functions  
+
+* Some generic functions have many, many methods!!
+
+
+```r
+methods(summary)
+methods(print)
+methods(residuals)
+```
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
