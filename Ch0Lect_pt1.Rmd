@@ -29,7 +29,8 @@ library(rvest)
 * General statistical model
 
 
-* Four-step modeling process
+* Four-step modeling process  
+
 
 
 * Constant model
