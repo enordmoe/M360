@@ -11,6 +11,12 @@
     <link href="libs/xaringanExtra-scribble-0.0.1/scribble.css" rel="stylesheet" />
     <script src="libs/xaringanExtra-scribble-0.0.1/scribble.js"></script>
     <script>document.addEventListener('DOMContentLoaded', function() { window.xeScribble = new Scribble({"pen_color":["#FF0000"],"pen_size":3,"eraser_size":30,"palette":[]}) })</script>
+    <script src="libs/clipboard-2.0.6/clipboard.min.js"></script>
+    <link href="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.js"></script>
+    <script>window.xaringanExtraClipboard(null, {"button":"Copy Code","success":"Copied!","error":"Press Ctrl+C to Copy"})</script>
+    <link href="libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view-0.2.6/tile-view.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
   <body>
@@ -23,6 +29,7 @@ class: center, middle, inverse, title-slide
 
 ---
 
+class: highlight-last-item
 
 
 
@@ -46,62 +53,166 @@ class: center, middle, inverse, title-slide
 
 # Outline 
 
-* Review of Stats I
+- Review of Stats I
 
-* Statistical models
+--
 
-* Datasets and types of Variables
+- Statistical models
 
-* Design and Inference
+--
 
-* Families of models
+- Datasets and types of Variables
+
+--
+
+- Design and Inference
+
+--
+
+- Families of models
+
+
+---
+background-image: url(figures/Inference_Roadmap_Review.png)
+background-size: contain
+
 
 
 ---
 class: highlight-last-item
 
-# Outline
+# Data  
 
-* Review of functions
-
---
-
-* Vector basics  
+- Data are numbers with a context. 
 
 --
 
-* Atomic vectors  
+- Modeling mindset
+$$
+\mbox{Data} = \mbox{Pattern} + \mbox{Departures from a pattern}
+$$
 
 --
 
-* Using atomic vectors  
-
---
-
-* Lists
+- How to identify the pattern?
 
 ---
-#Panelset example 
+# General form of a model
+
+- The intuitive statistical modeling idea:
+
+$$
+\mbox{Data} = \mbox{Model} + \mbox{Error}
+$$
+
+--
+
+- More formally, we have:
+
+$$
+Y= f(X) + \epsilon
+$$
+
+---
+background-image: url(figures/chris-leipelt-IYOJOCQOtBg-unsplash.jpg)
+background-size: 300px
+background-position: 75% 75%
+
+# Purposes of Statistical Modeling
+
+.pull-left[
+1. Making predictions
+
+1. Understanding relationships
+
+1. Assessing differences
+]
+
+--
+
+.pull-right[
+- Obtaining confidence intervals
+
+- Testing hypotheses
+]
+
+
+
+---
+class: highlight-last-item
+
+# Types of Studies
+
+
+- **Observational study**: Data are recorded without "manipulating" any of the variables.
+
+--
+
+- **Statistical experiment**: One or more of the explanatory variables is/are assigned/controlled for all experimental units.
+
+--
+
+**Question:** How is the type of study related to the kinds of inference that can be made? 
+
+
+---
+# Design and Inference
+
+&lt;img src="figures/statistics1e_fig_01_03.jpg" width="90%" /&gt;
+
+Source: *Statistics: Unlocking the Power of Data*
+---
+background-image: url(figures/alan-king-KZv7w34tluA-unsplash.jpg)
+background-size: 200px
+background-position: 90% 8%
+
+# Fundamentals  
+
+## Building blocks  
+
+--
+
+  - **Observational units.** in a study are the people, objects, or cases on&lt;br&gt; which
+  data are recorded. 
+
+--
+
+
+## Variables in a modeling framework
+
+--
+
+**Response variable.** the variable that measures the outcome of interest; typically the variable whose value we would like to predict.  
+
+--
+
+**Explanatory variable(s).** the variable(s) whose relationship to the response is being studied.  
+]
+
+---
+class: highlight-last-item
+
+# Types of Variables
+
+- **Quantitative**: expressible as numbers for which arithmetic makes sense
+
+--
+
+- **Categorical**: divides sample observations into groups
+
+--
+
+  - **Binary**: categorical with just two groups
+
+---
+
+# Sample Dataset
 .panelset[
 .panel[.panel-name[Code]
 
 ```r
-library(tidyverse)
-lemurs &lt;- readRDS("lemurs.rds")
-
-lemurs %&gt;%
-  filter(
-    common_name == "Ring-Tailed Lemur",
-    between(age_at_wt_y, 1, 5)
-  ) %&gt;%
-  ggplot() +
-  aes(x = age_at_wt_y, y = weight) +
-  geom_point() +
-  labs(
-    x = "Age at Weight",
-    y = "Weight (g)",
-    title = "Weight Gain of Young Ring-Tailed Lemurs"
-  )
+# Show the first ten rows of Day1Survey
+head(Day1Survey, n = 6)
 ```
 
 
@@ -110,14 +221,38 @@ lemurs %&gt;%
 
 .panel[.panel-name[Output]
 
-&lt;img src="Ch0Lect_pt1_files/figure-html/unnamed-chunk-2-1.png" width="100%" /&gt;
+```
+##   Section    Class Sex Distance Height Handedness Coins WhiteString BlackString
+## 1       1   Senior   F      400     62      Right  1.12          42           6
+## 2       1        *   F      450     61       Left 29.00          45           5
+## 3       1 Freshman   F     3000     61      Right  1.50          22           4
+## 4       1 Freshman   M      100     72      Right  0.07          40           4
+## 5       1      N/A   F     2000     69      Right  0.12          48           7
+## 6       1   Senior   M      500     73      Right  8.00          30           8
+##   Reading TV Pulse Texting
+## 1      80  3    71       3
+## 2     100 10    78     100
+## 3     100  4    80       2
+## 4      50 25    63     200
+## 5     200  5    63     100
+## 6     100  0    56       1
+```
+
+
 
 ]
-.panel[.panel-name[Regression]
+]
 
-&lt;img src="Ch0Lect_pt1_files/figure-html/unnamed-chunk-3-1.png" width="100%" /&gt;
-]
-]
+
+
+
+---
+# Modeling Matrix: Our Course Summary
+
+
+
+&lt;img src="figures/mod_matrix.png" width="90%" /&gt;
+
 
 
 
@@ -129,7 +264,7 @@ lemurs %&gt;%
 "highlightStyle": "github",
 "highlightLines": true,
 "ratio": "16:9",
-"countIncrementalSlides": true
+"countIncrementalSlides": false
 });
 if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   window.dispatchEvent(new Event('resize'));

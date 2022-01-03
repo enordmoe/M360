@@ -1,0 +1,123 @@
+---
+title: "Chapter 0: What is a Statistical Model?"
+subtitle: "Part 1"
+author: "Applied Statistics II"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: xaringan-themer.css
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      ratio: 16:9
+      countIncrementalSlides: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  fig.width=9, fig.height=4, fig.retina=3, 
+  out.width="90%",
+  message = FALSE
+)
+
+```
+
+
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(rvest)
+```
+
+```{r xaringanExtra, echo=FALSE}
+xaringanExtra::use_xaringan_extra(c("panelset", "scribble"))
+```
+
+```{r xaringanExtra-clipboard, echo=FALSE}
+xaringanExtra::use_clipboard()
+```
+
+```{css echo=FALSE}
+.highlight-last-item > ul > li,
+.highlight-last-item > ol > li {
+  opacity: 0.5;
+}
+.highlight-last-item > ul > li:last-of-type,
+.highlight-last-item > ol > li:last-of-type {
+  opacity: 1;
+}
+```
+
+# Outline 
+
+* Review of Stats I
+
+* Statistical models
+
+* Datasets and types of Variables
+
+* Design and Inference
+
+* Families of models
+
+
+---
+class: highlight-last-item
+
+# Outline
+
+* Review of functions
+
+--
+
+* Vector basics  
+
+--
+
+* Atomic vectors  
+
+--
+
+* Using atomic vectors  
+
+--
+
+* Lists
+
+---
+background-image: url(figures/Inference_Roadmap_Review.png)
+background-size: contain
+
+
+---
+#Panelset example 
+.panelset[
+```{r, panelset = TRUE}
+library(tidyverse)
+lemurs <- readRDS("lemurs.rds")
+
+lemurs %>%
+  filter(
+    common_name == "Ring-Tailed Lemur",
+    between(age_at_wt_y, 1, 5)
+  ) %>%
+  ggplot() +
+  aes(x = age_at_wt_y, y = weight) +
+  geom_point() +
+  labs(
+    x = "Age at Weight",
+    y = "Weight (g)",
+    title = "Weight Gain of Young Ring-Tailed Lemurs"
+  )
+```
+.panel[.panel-name[Regression]
+
+```{r echo=FALSE}
+last_plot() + geom_smooth(method = "lm")
+```
+]
+]
+
+
+
+
