@@ -191,7 +191,7 @@ background-position: 90% 8%
 --
 
 **Explanatory variable(s).** the variable(s) whose relationship to the response is being studied.  
-]
+
 
 ---
 class: highlight-last-item
