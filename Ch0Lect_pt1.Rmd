@@ -58,11 +58,11 @@ xaringanExtra::use_tile_view()
 
 --
 
-- Statistical models
+- Statistical modeling
 
 --
 
-- Datasets and types of Variables
+- Fundamentals
 
 --
 
@@ -70,7 +70,7 @@ xaringanExtra::use_tile_view()
 
 --
 
-- Families of models
+- Examples
 
 
 ---
@@ -137,34 +137,6 @@ background-position: 75% 75%
 - Testing hypotheses
 ]
 
-
-
----
-class: highlight-last-item
-
-# Types of Studies
-
-
-- **Observational study**: Data are recorded without "manipulating" any of the variables.
-
---
-
-- **Statistical experiment**: One or more of the explanatory variables is/are assigned/controlled for all experimental units.
-
---
-
-**Question:** How is the type of study related to the kinds of inference that can be made? 
-
-
----
-# Design and Inference
-
-```{r out.width = '90%', echo = FALSE}
-# local
-knitr::include_graphics("figures/statistics1e_fig_01_03.jpg")
-```
-
-Source: *Statistics: Unlocking the Power of Data*
 ---
 background-image: url(figures/alan-king-KZv7w34tluA-unsplash.jpg)
 background-size: 200px
@@ -207,6 +179,35 @@ class: highlight-last-item
 --
 
   - **Binary**: categorical with just two groups
+
+---
+
+---
+class: highlight-last-item
+
+# Types of Studies
+
+
+- **Observational study**: Data are recorded without "manipulating" any of the variables.
+
+--
+
+- **Statistical experiment**: One or more of the explanatory variables is/are assigned/controlled for all experimental units.
+
+--
+
+**Question:** How is the type of study related to the kinds of inference that can be made? 
+
+
+---
+# Design and Inference
+
+```{r out.width = '90%', echo = FALSE}
+# local
+knitr::include_graphics("figures/statistics1e_fig_01_03.jpg")
+```
+
+Source: *Statistics: Unlocking the Power of Data*
 
 ---
 
