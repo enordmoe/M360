@@ -253,10 +253,101 @@ head(Day1Survey, n = 6)
 
 &lt;img src="figures/mod_matrix.png" width="90%" /&gt;
 
+---
+class: inverse, center, middle
+
+
+# Case Study 
+
+---
+# Study of Treaments of Anorexia
+
+- A study of the effect of  therapies for anorexia patients
+
+  - Family Therapy
+  
+  - Cognitive Behavioral Therapy
+  
+  - A Control Therapy
+
+- Variables of interest
+
+  - *gain*: weight gain over the course of the study
+  
+  - *group*: treatment group
+  
+- Research question of interest
+
+  - Does Family Therapy increase weight gain compared to the control therapy?
+
+---
+
+## Describing the Data: Numerically
 
 
 
 
+.panelset[
+.panel[.panel-name[Code]
+
+```r
+# Import the data from the web
+anorexia &lt;- read.csv("http://people.kzoo.edu/enordmoe/math260/data/anorexia.csv")
+# View the first few rows of the data
+head(anorexia, n=10)
+tally(~group, data = anorexia)
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+```
+##    wtbef wtaft   group  gain gained
+## 1   87.3  75.1 Control -12.2  FALSE
+## 2   86.0  75.4 Control -10.6  FALSE
+## 3   88.3  78.1 Control -10.2  FALSE
+## 4   89.0  78.8 Control -10.2  FALSE
+## 5   89.4  80.1 Control  -9.3  FALSE
+## 6   88.7  79.5 Control  -9.2  FALSE
+## 7   80.6  73.5 Control  -7.1  FALSE
+## 8   79.7  73.0 Control  -6.7  FALSE
+## 9   91.8  86.4 Control  -5.4  FALSE
+## 10  84.1  79.5 Control  -4.6  FALSE
+## group
+## Control  Family 
+##      26      17
+```
+
+
+
+]
+]
+
+
+---
+## Describing the Data: Graphically
+
+
+.panelset[
+.panel[.panel-name[R Code]
+
+```r
+gf_dotplot(~gain | group~., data = anorexia)
+gf_boxploth(group ~ gain, data = anorexia)
+```
+]
+.panel[.panel-name[Dotplot]
+&lt;img src="Ch0Lect_pt1_files/figure-html/anorex_plots2-1.png" width="90%" /&gt;
+]
+.panel[.panel-name[Boxplot]
+&lt;img src="Ch0Lect_pt1_files/figure-html/anorex_plots3-1.png" width="90%" /&gt;
+]
+]
+
+&lt;!-----&gt;
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

@@ -231,7 +231,76 @@ head(Day1Survey, n = 6)
 knitr::include_graphics("figures/mod_matrix.png")
 ```
 
+---
+class: inverse, center, middle
+
+
+# Case Study 
+
+---
+# Study of Treaments of Anorexia
+
+- A study of the effect of  therapies for anorexia patients
+
+  - Family Therapy
+  
+  - Cognitive Behavioral Therapy
+  
+  - A Control Therapy
+  
+--
+
+- Variables of interest
+
+  - *gain*: weight gain over the course of the study
+  
+  - *group*: treatment group
+  
+--
+  
+- Research question of interest
+
+  - Does Family Therapy increase weight gain compared to the control therapy?
+
+---
+
+## Describing the Data: Numerically
 
 
 
 
+.panelset[
+```{r, panelset = TRUE}
+# Import the data from the web
+anorexia <- read.csv("http://people.kzoo.edu/enordmoe/math260/data/anorexia.csv")
+# View the first few rows of the data
+head(anorexia, n=10)
+tally(~group, data = anorexia)
+```
+]
+
+
+---
+## Describing the Data: Graphically
+
+
+.panelset[
+.panel[.panel-name[R Code]
+```{r anorex_plots, eval = FALSE}
+gf_dotplot(~gain | group~., data = anorexia)
+gf_boxploth(group ~ gain, data = anorexia)
+```
+]
+.panel[.panel-name[Dotplot]
+```{r anorex_plots2, echo = FALSE}
+gf_dotplot(~gain | group~., data = anorexia)
+```
+]
+.panel[.panel-name[Boxplot]
+```{r anorex_plots3, echo = FALSE}
+gf_boxploth(group ~ gain, data = anorexia)
+```
+]
+]
+
+<!----->
