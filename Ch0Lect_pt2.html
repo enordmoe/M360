@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Chapter 0: What is a Statistical Model?</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Applied Statistics II" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset-0.2.6/panelset.js"></script>
+    <script src="libs/fabric-4.3.1/fabric.min.js"></script>
+    <link href="libs/xaringanExtra-scribble-0.0.1/scribble.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-scribble-0.0.1/scribble.js"></script>
+    <script>document.addEventListener('DOMContentLoaded', function() { window.xeScribble = new Scribble({"pen_color":["#FF0000"],"pen_size":3,"eraser_size":30,"palette":[]}) })</script>
+    <script src="libs/clipboard-2.0.6/clipboard.min.js"></script>
+    <link href="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.js"></script>
+    <script>window.xaringanExtraClipboard(null, {"button":"Copy Code","success":"Copied!","error":"Press Ctrl+C to Copy"})</script>
+    <link href="libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view-0.2.6/tile-view.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Chapter 0: What is a Statistical Model?
+## Part 2
+### Applied Statistics II
+
+---
+
+class: highlight-last-item
+
+
+
+
+
+
+
+
+
+
+&lt;style type="text/css"&gt;
+.highlight-last-item &gt; ul &gt; li,
+.highlight-last-item &gt; ol &gt; li {
+  opacity: 0.5;
+}
+.highlight-last-item &gt; ul &gt; li:last-of-type,
+.highlight-last-item &gt; ol &gt; li:last-of-type {
+  opacity: 1;
+}
+&lt;/style&gt;
+
+# Outline 
+
+- Statistical model
+
+--
+
+- 4-step process
+
+--
+
+- Case study
+
+--
+
+- R Code
+
+
+---
+
+# Statistical modeling
+
+- A general statistical model:
+
+$$
+Y = f(X) + \epsilon
+$$
+
+--
+
+- Goal: Find a model for a relationship between a **response variable** ($Y$) and one or more **explanatory/predictor** variables `\((X_1, X_2, \ldots, X_k)\)`.
+---
+background-image: url(figures/nyt_model.png)
+background-size: contain
+
+---
+class: highlight-last-item
+
+# Four-step Modeling Process
+
+1. **Choose**: Pick a form for the model.
+
+--
+
+1. **Fit**: Estimate any parameters.
+
+--
+
+1. **Assess**: Is the model adequate? Could it be simpler? Are conditions met?
+
+--
+
+1. **Use**: Answer the question of interest
+
+
+---
+
+# Study: Financial incentives for weight loss 
+
+.pull-left[
+
+&lt;img src="figures/wt_loss_title.png" width="90%" /&gt;
+
+- **Research question**: Do financial incentives help people lose weight more successfully?
+
+]
+
+--
+
+.pull-right[
+- **Participants**: healthy adults 30-70 with BMI of 30-40 
+
+- **Treatment groups**: Randomly assigned to treatment groups (*Group*):
+
+  - Financial incentives vs
+  
+  - Control (monthly weigh-ins, no financial incentive)
+  
+- **Response**: *WeightLoss* = Before - After
+  - Positive `\(\Rightarrow\)` weight loss
+
+- R Dataset: **WeightLossIncentive4**
+]
+
+---
+
+# Study: Financial incentives for weight loss 
+## The Data
+
+.panelset[
+.panel[.panel-name[Access and Group Size]
+
+```r
+# Load data set
+data("WeightLossIncentive4")
+tally(~Group, data = WeightLossIncentive4)
+```
+
+```
+## Group
+##   Control Incentive 
+##        19        17
+```
+]
+.panel[.panel-name[Control]
+
+```r
+filter(WeightLossIncentive4, Group == "Control")
+```
+
+```
+##    WeightLoss   Group
+## 1        12.5 Control
+## 2        12.0 Control
+## 3         1.0 Control
+## 4        -5.0 Control
+## 5         3.0 Control
+## 6        -5.0 Control
+## 7         7.5 Control
+## 8        -2.5 Control
+## 9        20.0 Control
+## 10       -1.0 Control
+## 11        2.0 Control
+## 12        4.5 Control
+## 13       -2.0 Control
+## 14      -17.0 Control
+## 15       19.0 Control
+## 16       -2.0 Control
+## 17       12.0 Control
+## 18       10.5 Control
+## 19        5.0 Control
+```
+]
+.panel[.panel-name[Incentive]
+
+```r
+filter(WeightLossIncentive4, Group == "Incentive")
+```
+
+```
+##    WeightLoss     Group
+## 1        25.5 Incentive
+## 2        24.0 Incentive
+## 3         8.0 Incentive
+## 4        15.5 Incentive
+## 5        21.0 Incentive
+## 6         4.5 Incentive
+## 7        30.0 Incentive
+## 8         7.5 Incentive
+## 9        10.0 Incentive
+## 10       18.0 Incentive
+## 11        5.0 Incentive
+## 12       -0.5 Incentive
+## 13       27.0 Incentive
+## 14        6.0 Incentive
+## 15       25.5 Incentive
+## 16       21.0 Incentive
+## 17       18.5 Incentive
+```
+]
+]
+
+&lt;!-----&gt;
+
+
+
+---
+### Describing the Data Graphically and Nummerically
+
+.panelset[
+.panel[.panel-name[R Code]
+
+```r
+# coord_flip makes dotplot vertical
+gf_dotplot(~WeightLoss | Group, data = WeightLossIncentive4) + 
+  coord_flip()
+gf_boxplot(WeightLoss ~ Group, data = WeightLossIncentive4)
+# summary statistics by group
+favstats(WeightLoss ~ Group, data = WeightLossIncentive4)
+```
+]
+.panel[.panel-name[Dotplot]
+&lt;img src="Ch0Lect_pt2_files/figure-html/figraph2-1.png" width="90%" /&gt;
+]
+.panel[.panel-name[Boxplot]
+&lt;img src="Ch0Lect_pt2_files/figure-html/figraph3-1.png" width="90%" /&gt;
+]
+
+.panel[.panel-name[Summary Statistics]
+
+```
+##       Group   min   Q1 median    Q3 max      mean       sd  n missing
+## 1   Control -17.0 -2.0      3 11.25  20  3.921053 9.107785 19       0
+## 2 Incentive  -0.5  7.5     18 24.00  30 15.676471 9.413988 17       0
+```
+]
+]
+
+&lt;!-----&gt;
+
+---
+# Step 1: Choose a Model
+
+.pull-left[
+### Characteristics
+
+Consider a model suggested by the data: 
+- Different means for each treatment group (
+`\(\mu_i\)`
+)
+
+- Common variability ( 
+`\(\sigma\)`
+)
+
+- Normally distributed (symmetric) errors (
+`\(\epsilon\)`
+)
+]
+
+--
+
+.pull-right[
+### Formally stated:
+$$
+Y = \mu_i + \epsilon \mbox{ where } \epsilon \sim N(0, \sigma_i)
+$$
+
+### By group:
+
+- Control Group: `$$Y = \mu_1 + \epsilon \mbox{ so } Y \sim N(\mu_1, \sigma_1)$$`
+
+- Incentives Group: `$$Y = \mu_2 + \epsilon \mbox{ so } Y \sim N(\mu_2, \sigma_2)$$`
+
+
+]
+
+
+---
+# Step 2: Fit the Model
+
+### Process
+
+- Depends on study design, types of variables, and proposed model.
+
+--
+
+### Financial incentives model
+
+  - Compute sample estimates of means `\(\bar y_i\)`  and standard deviations `\(s_i\)`
+  
+  - Fitted values differ by treatment group: 
+  
+  `$$\hat y = \bar y_i$$`
+  - **Note**: No error term in the *fitted model*
+  
+--
+
+  - **Interpretation**: Predicted weight loss for a member of group `\(i\)`.
+
+---
+
+# Step 3: Assess the Model 
+
+- Determine whether the conditions of the model hold
+
+  - Look at residual `\(\hat y_i\)` 
+
+- Consider whether a different (simpler) model might fit.
+
+---
+
+## Check conditions on residuals
+
+- Use R function `lm()` to fit the two-mean model (see code example)
+
+- Verify fitted values
+
+- Plot residuals to check conditions
+
+---
+
+## R code and output for checking conditions  on residuals
+
+.panelset[
+.panel[.panel-name[R Code]
+
+```r
+# fits two-means model
+wl_mod &lt;- lm(WeightLoss ~ Group, data = WeightLossIncentive4)
+# adds fitted and residual values to the dataset
+WeightLossIncentive4 &lt;- WeightLossIncentive4 %&gt;% 
+  mutate(yhat = fitted(wl_mod), resid = resid(wl_mod))
+# Check the values
+head(WeightLossIncentive4)
+tail(WeightLossIncentive4)
+# Residual dotplots 
+gf_dotplot(~resid | Group, data = WeightLossIncentive4) + 
+  coord_flip()
+# Residual quantile plots
+gf_qq(~ resid | Group, data = WeightLossIncentive4) %&gt;% gf_qqline()
+```
+]
+
+.panel[.panel-name[Fitted values and residuals]
+
+```
+##   WeightLoss   Group     yhat      resid
+## 1       12.5 Control 3.921053  8.5789474
+## 2       12.0 Control 3.921053  8.0789474
+## 3        1.0 Control 3.921053 -2.9210526
+## 4       -5.0 Control 3.921053 -8.9210526
+## 5        3.0 Control 3.921053 -0.9210526
+## 6       -5.0 Control 3.921053 -8.9210526
+```
+
+```
+##    WeightLoss     Group     yhat      resid
+## 31       -0.5 Incentive 15.67647 -16.176471
+## 32       27.0 Incentive 15.67647  11.323529
+## 33        6.0 Incentive 15.67647  -9.676471
+## 34       25.5 Incentive 15.67647   9.823529
+## 35       21.0 Incentive 15.67647   5.323529
+## 36       18.5 Incentive 15.67647   2.823529
+```
+]
+.panel[.panel-name[Dotplot]
+&lt;img src="Ch0Lect_pt2_files/figure-html/fimod3-1.png" width="90%" /&gt;
+]
+.panel[.panel-name[Normal quantile plots]
+&lt;img src="Ch0Lect_pt2_files/figure-html/fimod4-1.png" width="90%" /&gt;
+]
+
+]
+
+&lt;!-----&gt;
+
+---
+
+# Test versus a simpler model
+
+Carry out a two-sample `\(t\)`-test for financial incentives data
+
+
+$$
+H_0: \mu_1 = \mu_2  \quad\Rightarrow \quad Y = \mu + \epsilon \quad \mbox{ (one mean model)} 
+$$
+
+versus 
+
+$$
+H_a: \mu_1 \neq \mu_2 \quad \Rightarrow \quad Y = \mu_i + \epsilon \quad \mbox{ (two means model)}
+$$
+---
+### Two-sample t-test for financial incentives data
+
+**Which model is preferred?**
+
+.panelset[
+.panel[.panel-name[Code]
+
+```r
+t.test(WeightLoss ~ Group, data = WeightLossIncentive4)
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+```
+## 
+## 	Welch Two Sample t-test
+## 
+## data:  WeightLoss by Group
+## t = -3.7982, df = 33.276, p-value = 0.0005889
+## alternative hypothesis: true difference in means between group Control and group Incentive is not equal to 0
+## 95 percent confidence interval:
+##  -18.05026  -5.46058
+## sample estimates:
+##   mean in group Control mean in group Incentive 
+##                3.921053               15.676471
+```
+
+
+
+]
+]
+
+---
+# Step 4: Use the Model
+
+- Estimate treatment effect
+
+- Fund more studies
+
+- Health care policy implications
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"ratio": "16:9",
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
