@@ -267,7 +267,7 @@ $$
 
 - Determine whether the conditions of the model hold
 
-  - Look at residual $\hat y_i$ 
+  - Look at residual $y-\hat y_i$ 
 
 - Consider whether a different (simpler) model might fit.
 
