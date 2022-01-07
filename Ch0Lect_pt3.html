@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Chapter 0: What is a Statistical Model?</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Applied Statistics II" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset-0.2.6/panelset.js"></script>
+    <script src="libs/fabric-4.3.1/fabric.min.js"></script>
+    <link href="libs/xaringanExtra-scribble-0.0.1/scribble.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-scribble-0.0.1/scribble.js"></script>
+    <script>document.addEventListener('DOMContentLoaded', function() { window.xeScribble = new Scribble({"pen_color":["#FF0000"],"pen_size":3,"eraser_size":30,"palette":[]}) })</script>
+    <script src="libs/clipboard-2.0.6/clipboard.min.js"></script>
+    <link href="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.js"></script>
+    <script>window.xaringanExtraClipboard(null, {"button":"Copy Code","success":"Copied!","error":"Press Ctrl+C to Copy"})</script>
+    <link href="libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view-0.2.6/tile-view.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Chapter 0: What is a Statistical Model?
+## Part 3
+### Applied Statistics II
+
+---
+
+class: highlight-last-item
+
+
+
+
+
+
+
+
+
+
+&lt;style type="text/css"&gt;
+.highlight-last-item &gt; ul &gt; li,
+.highlight-last-item &gt; ol &gt; li {
+  opacity: 0.5;
+}
+.highlight-last-item &gt; ul &gt; li:last-of-type,
+.highlight-last-item &gt; ol &gt; li:last-of-type {
+  opacity: 1;
+}
+&lt;/style&gt;
+
+# Outline 
+
+- 4-step process review
+
+--
+
+- The Use Step
+
+--
+
+- Effect size
+
+
+---
+class: highlight-last-item
+
+# Four-step Modeling Process
+
+1. **Choose**: Pick a form for the model.
+
+--
+
+1. **Fit**: Estimate any parameters.
+
+--
+
+1. **Assess**: Is the model adequate? Could it be simpler? Are conditions met?
+
+--
+
+1. **Use**: Answer the question of interest
+
+---
+
+# Study: Financial incentives for weight loss 
+
+.pull-left[
+- **Research question**: Do financial incentives help people lose weight more successfully?
+]
+.pull-right[
+&lt;img src="https://source.unsplash.com/1fzyz-bmKBw" width="90%" /&gt;
+]
+
+---
+### Two-sample t-test for financial incentives data
+
+**Which model is preferred?**
+
+.panelset[
+.panel[.panel-name[Code]
+
+```r
+t.test(WeightLoss ~ Group, data = WeightLossIncentive4)
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+```
+## 
+## 	Welch Two Sample t-test
+## 
+## data:  WeightLoss by Group
+## t = -3.7982, df = 33.276, p-value = 0.0005889
+## alternative hypothesis: true difference in means between group Control and group Incentive is not equal to 0
+## 95 percent confidence interval:
+##  -18.05026  -5.46058
+## sample estimates:
+##   mean in group Control mean in group Incentive 
+##                3.921053               15.676471
+```
+
+
+
+]
+]
+
+---
+background-image: url(figures/pvalue_controversy.png)
+background-size: contain
+
+## The p-valaue controversy
+
+---
+
+# The Trouble with the p-value
+
+- The `\(p\)`-value tells the strength of evidence of an "effect"
+
+--
+
+- The `\(p\)`-value tells nothing about the size or importance of an "effect"
+
+
+---
+# Step 4: Use: Answer the question of interest
+
+- Confidence interval: size of the effect
+
+--
+
+- Scope of inference.  
+
+  - Can causal inference be concluded? 
+  - To what population(s) can we generalize? 
+  - Is the **effect size** large enough to be *important*? 
+
+---
+# Effect size
+
+- **Effect size**: "an often standardized measure of the magnitude of a certain phenomenon of scientific interest."&lt;sup&gt;*&lt;/sup&gt;
+
+--
+
+- **Two quantitative variables**
+
+  - Correlation coefficient `\(r\)`
+  
+  - Regression slope `\(b\)` (or Beta coefficients or Cohen's `\(f^2\)`)
+  
+--
+
+-  **Comparing populations**
+
+  - Standardized mean difference `\(\theta\)`
+$$
+\theta = \frac{\mu_1-\mu_2}{\sigma}
+$$
+where `\(\sigma\)` is the standard deviation of one (or both) of the populations being compared.
+
+
+.footnote[[*] Schafer T and Schwarz MA (2019) The Meaningfulness of Effect Sizes in Psychological Research: Differences Between Sub-Disciplines and the Impact of Potential Biases. Front. Psychol. 10:813. doi: 10.3389/fpsyg.2019.00813
+]
+
+---
+# Estimated Effect Size for Difference in Means
+
+$$
+\mbox{effect size} = \frac{\mbox{Difference in sample means}}{\mbox{Estimated Standard Deviation}} = \frac{\bar y_1-\bar y_2}{s_p}
+$$
+Where `\(s_p\)` is "pooled" standard deviation defined as:
+$$
+s_p=\sqrt{\frac{(n_1-1)s_1^2 + (n_2-1)s_2^2}{n_1+n_2-2}}
+$$
+
+- Alternatively, for financial incentives data, we might estimate `\(\sigma\)` by `\(s\)`, the standard deviation of weight losses for control ("untreated") individuals
+
+---
+# Example: Effect Size from Study of Financial Incentives for Weight Loss
+
+
+
+```r
+favstats(WeightLoss ~ Group, data = WeightLossIncentive4)
+```
+
+```
+##       Group   min   Q1 median    Q3 max      mean       sd  n missing
+## 1   Control -17.0 -2.0      3 11.25  20  3.921053 9.107785 19       0
+## 2 Incentive  -0.5  7.5     18 24.00  30 15.676471 9.413988 17       0
+```
+
+
+Using `\(s_p\)` in the denominator:
+$$
+\mbox{effect size} = \frac{|\bar y_1 - \bar y_2|}{s_p} =  \frac{|15.68 - 3.92|}{9.25} = 1.27
+$$
+--
+Using `\(s_C\)` (control sd) in the denominator:
+$$
+\mbox{effect size} = \frac{|\bar y_1 - \bar y_2|}{s_p} =  \frac{|15.68 - 3.92|}{9.11} = 1.29
+$$
+
+---
+# Assessing Effect Sizes
+
+- General guidelines for effect sizes
+
+  - Small: 0.2
+  
+  - Medium: 0.5
+  
+  - Large: 1.0
+  
+--
+
+- But these are no substitute for judgement in context.
+
+  - How does difference in average weight loss of 11.76 pounds compare with starting weights?
+  
+  - Was weight loss sustained?
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"ratio": "16:9",
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
