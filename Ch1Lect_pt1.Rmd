@@ -1,0 +1,265 @@
+---
+title: "Chapter 1: Simple Linear Regression"
+subtitle: "Part 1"
+author: "Applied Statistics II"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: xaringan-themer.css
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      ratio: 16:9
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  fig.width=9, fig.height=4, fig.retina=3, 
+  out.width="90%",
+  message = FALSE
+)
+
+```
+
+
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(rvest)
+library(mosaic)
+library(Stat2Data)
+data("WeightLossIncentive4")
+```
+
+```{r xaringanExtra, echo=FALSE}
+xaringanExtra::use_xaringan_extra(c("panelset", "scribble"))
+xaringanExtra::use_clipboard()
+xaringanExtra::use_tile_view()
+```
+
+
+```{css echo=FALSE}
+.highlight-last-item > ul > li,
+.highlight-last-item > ol > li {
+  opacity: 0.5;
+}
+.highlight-last-item > ul > li:last-of-type,
+.highlight-last-item > ol > li:last-of-type {
+  opacity: 1;
+}
+```
+
+# Outline 
+
+- Simple linear model
+
+--
+
+- Example and R code
+  
+--
+
+- Estimating the model
+
+  - The Least Squares Criterion
+
+
+
+---
+# Single Quantitative Predictor Model
+
+- Notation: 
+
+  - $Y$ = response variable
+
+  - $X$ = explanatory variable
+
+--
+
+- Assume $X$ and $Y$ are both quantitative (for now)
+
+$$
+\begin{align}
+\mbox{Data} &= \mbox{Model} + \mbox{Error}\\[2ex]
+Y &= f(X) + \epsilon \\[2ex]
+Y &= \mu_Y + \epsilon \\[2ex]
+\end{align}
+$$
+
+---
+class: highlight-last-item
+background-image: url(https://source.unsplash.com/KlVNProwo7E)
+background-size: 250px
+background-position: 85% 35%
+
+
+# Research Questions 
+
+- Can cricket chirps be used to predict the temperature?
+
+--
+
+- Does electrical stimulation of the brain help with problem solving?
+
+--
+
+- To what extent does economic growth depend on the inflation rate?
+
+--
+
+- Can we predict Rotten Tomatoes scores using movie budgets?
+
+--
+
+- How strong is the dependence of college GPA on high school GPA?
+
+--
+
+- How long after begin vaccinated will an individual need a booster?
+
+
+---
+### Example: Predicting Final Score from Midterm Score
+
+```{r}
+MidtermFinal <- read.csv("http://people.kzoo.edu/enordmoe/math360/MidtermFinal.csv")
+dim(MidtermFinal)
+```
+
+- First 6 cases
+
+```{r, echo = FALSE}
+knitr::kable(head(MidtermFinal), format = 'html')
+```
+
+---
+### Graphing the Data 
+
+- Scatterplot with a smoother helps determine whether a linear model is appropriate.
+
+.panelset[
+```{r, panelset = TRUE}
+gf_point(Final ~ Midterm, data = MidtermFinal) %>%
+  gf_smooth()
+```
+]
+
+
+---
+### Fitting a Simple Least Squares Regression Model
+
+- Fitted model is represented by
+$$
+\widehat Y = \hat\beta_0 + \hat\beta_1 X
+$$
+where
+  - $\hat\beta_0$ is the intercept of the fitted line and
+  
+  - $\hat\beta_1$ is the slope of the fitted line
+
+--
+
+- Fitting criterion: Minimize the sum of squared prediction errors 
+
+  - $\mbox{SSE}=\sum(Y-\widehat Y)^2$
+
+- Fitted line is called the **least squares regression line**
+
+---
+### Least Squares Estimation
+
+- Choose line that minimizes **sum of squares** of vertical distances
+  - Residual = $Y-\hat Y$
+
+```{r, echo = FALSE}
+library(latex2exp)
+d <- MidtermFinal
+fit <- lm(Final ~ Midterm, data = d)
+d$predicted <- predict(fit)   # Save the predicted values
+d$residuals <- residuals(fit) # Save the residual values
+ggplot(d, aes(x = Midterm, y = Final)) +
+  geom_smooth(method = "lm", se = FALSE, color = "lightgrey") +  # Plot regression slope
+  geom_segment(aes(xend = Midterm, yend = predicted), alpha = .25) +  # alpha to fade lines
+  geom_point() +
+  geom_point(aes(y = predicted), shape = 1) +
+  theme_bw() +  # Add theme for cleaner look
+#  annotate(geom="text", x=25, y=80, label=TeX("$\\hat{Y} = \\beta_0 + \\beta_1X_1", output='character'), parse=TRUE)
+  annotate(
+    geom = "curve", x = 29, y = 89, xend = 34, yend = 82, color = "red",
+    curvature = -.2, arrow = arrow(length = unit(2, "mm"))
+    ) +
+  annotate(geom = "text", x = 27, y = 90, label = TeX("$Y-\\hat{Y}$", output='character'), parse=TRUE,
+           hjust = "left", size = 8)
+```
+---
+### Example: Using R to Find and Plot the Regression Line
+
+.panelset[
+.panel[.panel-name[R Code]
+```{r lsmod1, eval = FALSE}
+# Fit and save the regression model
+model1 <- lm(Final ~ Midterm, data = MidtermFinal)
+#Obtain regression output including slope and intercept
+summary(model1)
+# Graph regression line on scatterplot
+gf_point(Final ~ Midterm, data = MidtermFinal, 
+         xlab = "Midterm Score", ylab = "Final Score") %>%
+  gf_smooth(method = "lm")
+```
+]
+.panel[.panel-name[Regression Output]
+```{r lsmod2, echo = FALSE}
+# Fit and save the regression model
+model1 <- lm(Final ~ Midterm, data = MidtermFinal)
+#Obtain regression output including slope and intercept
+summary(model1)
+```
+]
+.panel[.panel-name[Scatterplot with Regresson Line]
+```{r lsmod3, echo = FALSE}
+# Graph regression line on scatterplot
+gf_point(Final ~ Midterm, data = MidtermFinal, 
+         xlab = "Midterm Score", ylab = "Final Score") %>%
+  gf_smooth(method = "lm")
+```
+]
+]
+
+---
+# The Fitted Regression Equation
+
+$$
+\begin{align*}
+\hat Y &= 18.67 + 1.49X \\[2ex]
+\widehat{\mbox{Final}}  &= 18.67 + 1.49\mbox{(Midterm)} \\[2ex]
+\end{align*}
+$$
+---
+# Computing Predictions and Residuals
+
+- Compute the predicted Final Exam score and find the residual for Katelin
+
+  - Prediction:
+
+$$
+\widehat{\mbox{Final}}  = 18.67 + 1.49\mbox{(35)} = 70.82
+$$
+
+  - Residual:
+
+$$
+\mbox{Final}-\widehat{\mbox{Final}}  = 53-70.82 = -17.82
+$$
+
+---
+
+# The Rest of Chapter 1
+
+- Regression model conditions
+
+- Residual analysis
+
+- Transforming and reexpressing data
+
+- More of R
