@@ -116,7 +116,7 @@ background-position: 85% 35%
 
 --
 
-- How long after begin vaccinated will an individual need a booster?
+- How long after being vaccinated will an individual need a booster?
 
 
 ---
