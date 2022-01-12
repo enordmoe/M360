@@ -136,7 +136,6 @@ $$
 
 ---
 
----
 
 ### Example: Predicting Final Score from Midterm Score Revisited
 
@@ -256,14 +255,16 @@ gf_point(resid(m2) ~ fitted(m2)) %>%
 ]
 .panel[.panel-name[Roughly Linear Plot]
 ```{r rvp2, echo = FALSE}
-gf_point(Final ~ Midterm, data = MidtermFinal) %>%
-  gf_smooth(method = "lm")
+m1 <- lm(Final ~ Midterm, data = MidtermFinal)
+gf_point(resid(m1) ~ fitted(m1)) %>%
+  gf_hline(yintercept = ~0, color = "blue")
 ```
 ]
 .panel[.panel-name[Curved Plot]
 ```{r rvp3, echo = FALSE}
-gf_point(Species ~ Area, data = SpeciesArea) %>%
-  gf_smooth(method = "lm")
+m2 <- lm(Species ~ Area, data = SpeciesArea)
+gf_point(resid(m2) ~ fitted(m2)) %>%
+  gf_hline(yintercept = ~0, color = "blue")
 ```
 ]
 ]
