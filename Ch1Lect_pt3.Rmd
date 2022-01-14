@@ -5,7 +5,7 @@ author: "Applied Statistics II"
 output:
   xaringan::moon_reader:
     lib_dir: libs
-    css: xaringan-themer.css
+    css: ["xaringan-themer.css", "extra.css"]
     nature:
       highlightStyle: github
       highlightLines: true
@@ -553,7 +553,7 @@ gf_point(Gold ~ Year, data = LongJumpOlympics) %>%
 ]
 
 ---
-## Can use the package plotly to identify points interactively
+## Can use the package **plotly** to identify points interactively
 .panelset[
 
 ```{r, panelset = TRUE}
@@ -588,7 +588,7 @@ gf_point(resid(mod4)~fitted(mod4)) %>%
 - **Standardized residuals.** Residuals divided by estimated standard  deviation of residuals:
  
 $$
-\frac{y - \hat y}{\hat\sigma}
+\frac{y - \hat y}{\hat\sigma_\epsilon}
 $$
 
 --
@@ -602,7 +602,162 @@ $$
 $$
 \frac{y - \hat y}{\hat\sigma_i}
 $$
+---
+## Why studentize?
 
+- **Concern**: An unusual value may exert great *influence* on the fit.
+
+  - Its residual might be underestimated because the model "moves" a  lot to fit it.
+or
+
+  - The standard error of regression may be *inflated* due to the large outlier residual
+  
+--
+  
+- **Remedy**: We **studentize** by fitting the model **without** the influential case, finding a new estimate $\hat\sigma^\epsilon$.
+
+---
+### Plots of standardized  and studentized residuals versus fitted.
+
+.panelset[
+
+```{r lj4,panelset = TRUE, fig.height=3.5}
+#Standardized resids
+p1 <- gf_point(rstandard(mod4) ~ Year, data = LongJumpOlympics, ylim = c(-4,4),
+               main="Standardized Residuals") %>%
+  gf_hline(yintercept = ~0) %>%
+  gf_hline(yintercept = ~c(-3,-2,2,3), lty = 2, data = NA)
+#Studentized resids
+p2 <- gf_point(rstudent(mod4) ~ Year, data = LongJumpOlympics, ylim = c(-4,4), 
+               main="Studentized Residuals") %>%
+  gf_hline(yintercept = ~0) %>%
+  gf_hline(yintercept = ~c(-3,-2,2,3), lty = 2, data = NA)
+grid.arrange(p1 ,p2, ncol=2)
+```
+
+]
+
+
+---
+
+class: inverse
+background-image: url(https://e0.365dm.com/21/07/768x432/skysports-bob-beamon-olympics_5462311.jpg)
+background-size: cover
+
+class: center, middle
+
+# .red[Beamon is an extreme outlier!]
+
+
+---
+
+## Example: The Butterfly Ballot in the Year 2000 Election
+
+.pull-left[
+![](https://www.wuft.org/news/files/2020/10/Butterfly_Ballot_Florida_2000_large-660x330.jpg)
+]
+
+--
+
+]
+
+.pull-right[
+![](https://media.npr.org/assets/img/2018/11/12/gettyimages-1306049_wide-78b1a96ccca5fcaac551979e4a29942620227e3d.jpg?s=1400)
+]
+
+---
+
+## Plot the Votes by County
+
+.panelset[
+```{r pres1, panelset = TRUE, message=FALSE,warning = FALSE}
+data("PalmBeach")
+p <- gf_point(Buchanan ~ Bush, label = ~County, data = PalmBeach)
+ggplotly(p)
+```
+]
+
+---
+## Linear model fit and plots
+
+
+.panelset[
+.panel[.panel-name[R Code]
+
+```{r pres3, eval=FALSE}
+# Fit and display model
+mod5 <- lm(Buchanan ~ Bush, data = PalmBeach)
+# Regresssion line plot
+gf_point(Buchanan ~ Bush, data = PalmBeach) %>%
+  gf_smooth(method = "lm")
+# Residual plot
+gf_point(resid(mod5) ~ fitted(mod5)) %>% 
+  gf_hline(yintercept = ~0, color = "blue")
+```
+
+]
+.panel[.panel-name[Plot with Regression Line]
+
+```{r, echo=FALSE}
+# Fit and display model
+mod5 <- lm(Buchanan ~ Bush, data = PalmBeach)
+# Regresssion line plot
+gf_point(Buchanan ~ Bush, data = PalmBeach) %>%
+  gf_smooth(method = "lm")
+```
+
+]
+.panel[.panel-name[Residual vs Fitted Plot]
+
+```{r, echo = FALSE}
+gf_point(resid(mod5) ~ fitted(mod5)) %>% 
+  gf_hline(yintercept = ~0, color = "blue")
+```
+
+]
+]
+---
+## Is Palm Beach an Influential Outlier?
+
+
+.panelset[
+```{r pres4, panelset = TRUE}
+# Omit Palm Beach
+PalmBeach_noPB <- filter(PalmBeach, County != "PALM BEACH")
+# Refit the regression without Palm Beach
+mod6 <- lm(Buchanan ~ Bush, data = PalmBeach_noPB)
+mod6
+mod6_fun <- makeFun(mod6)
+```
+]
+
+---
+
+## Is Palm Beach an Influential Outlier?
+
+```{r pres5, message=FALSE, warning=FALSE, fig.height = 3}
+gf_point(Buchanan ~ Bush, data = PalmBeach) %>%
+        gf_smooth(method = "lm", se = FALSE) %>% 
+  gf_fun(mod6_fun, col = "red") %>%
+  gf_refine(annotate("text", label = "Complete", x = 2.5e+05, y = 1400, size = 6, hjust = 1)) %>%
+  gf_refine(annotate("text", label = "Without\nPalm Beach", 
+                     x = 2e+05, y = 700, size = 6, hjust = 0, vjust = 1))
+# Note that the \n on the previous line is the "new line" character that causes the label to wrap
+```
+
+---
+
+## Influence and Leverage
+
+- **Influence**:  the  effect of a single data point on the regression line depends on:
+
+  - how well it matches the "trend" of the rest of the points
+  
+  - how "unusual" is its predictor value
+  
+--
+
+- **Leverage**: measures the potential for a case to affect a regression fit, based on an "unusual" predictor value. (Chapter 4)
 
 
 
