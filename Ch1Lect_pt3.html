@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Chapter 1: Simple Linear Regression</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Applied Statistics II" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset-0.2.6/panelset.js"></script>
+    <script src="libs/fabric-4.3.1/fabric.min.js"></script>
+    <link href="libs/xaringanExtra-scribble-0.0.1/scribble.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-scribble-0.0.1/scribble.js"></script>
+    <script>document.addEventListener('DOMContentLoaded', function() { window.xeScribble = new Scribble({"pen_color":["#FF0000"],"pen_size":3,"eraser_size":30,"palette":[]}) })</script>
+    <script src="libs/clipboard-2.0.6/clipboard.min.js"></script>
+    <link href="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.js"></script>
+    <script>window.xaringanExtraClipboard(null, {"button":"Copy Code","success":"Copied!","error":"Press Ctrl+C to Copy"})</script>
+    <link href="libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view-0.2.6/tile-view.js"></script>
+    <script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
+    <script src="libs/plotly-binding-4.10.0/plotly.js"></script>
+    <script src="libs/typedarray-0.1/typedarray.min.js"></script>
+    <script src="libs/jquery-3.5.1/jquery.min.js"></script>
+    <link href="libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
+    <script src="libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
+    <link href="libs/plotly-htmlwidgets-css-2.5.1/plotly-htmlwidgets.css" rel="stylesheet" />
+    <script src="libs/plotly-main-2.5.1/plotly-latest.min.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Chapter 1: Simple Linear Regression
+## Part 3: Sections 1.4-1.5
+### Applied Statistics II
+
+---
+
+class: highlight-last-item
+
+
+
+
+
+
+
+
+
+
+&lt;style type="text/css"&gt;
+.highlight-last-item &gt; ul &gt; li,
+.highlight-last-item &gt; ol &gt; li {
+  opacity: 0.5;
+}
+.highlight-last-item &gt; ul &gt; li:last-of-type,
+.highlight-last-item &gt; ol &gt; li:last-of-type {
+  opacity: 1;
+}
+&lt;/style&gt;
+
+# Outline 
+
+- Transformations
+
+--
+
+- Outliers and Influential Points
+  
+---
+class: highlight-last-item
+
+## What to Do When Regression Conditions Are Violated
+
+### Examples
+
+1. Lack of normality in residuals
+
+--
+
+1. Patterns in residuals
+
+--
+
+1. Heteroscedasticity (nonconstant variability of errors)
+
+--
+
+1. Outliers: influential points, large residuals
+
+---
+class: center, inverse, middle
+
+# Data Transformations
+
+---
+## Possible Goals of Data Transformations
+
+1. Address nonlinear patterns
+
+--
+
+1. Stabilize variance
+
+--
+
+1. Remove skewness from residuals
+
+--
+
+1. Minimize effects of outliers
+
+
+---
+### Common Transformations
+
+&lt;br&gt;
+
+|      Name      |     Mathematically     |
+|:--------------:|:----------------------:|
+| Logarithm      |  `\(Y\rightarrow\log(Y)\)` |
+| Square root    | `\(Y\rightarrow\sqrt{Y}\)` |
+| Exponential    |   `\(Y\rightarrow e^Y\)`   |
+| Power function |   `\(Y\rightarrow Y^k\)`   |
+| Reciprocal     |   `\(Y\rightarrow 1/Y\)`   |
+
+&lt;br&gt;
+
+- Transformations can be applied to either response ($Y$) or explanatory ($X$) variables.
+
+--
+
+- Art as much as science
+
+--
+
+- Often requires trial and error
+
+---
+## Examples: Doctors and Hospitals in Counties
+
+.panelset[
+.panel[.panel-name[R Code]
+
+```r
+# plot with smoothing line
+gf_point(MDs ~ Hospitals, data = CountyHealth) %&gt;%
+        gf_smooth()
+# fit linear regression
+mod1 &lt;- lm(MDs ~ Hospitals, data=CountyHealth) 
+mod1
+# scatterplot with line
+gf_point(MDs ~ Hospitals, data = CountyHealth) %&gt;%
+        gf_smooth(method="lm")
+```
+]
+.panel[.panel-name[Smoothed Scatterplot]
+&lt;img src="Ch1Lect_pt3_files/figure-html/unnamed-chunk-3-1.png" width="90%" /&gt;
+]
+.panel[.panel-name[Output]
+
+```
+## 
+## Call:
+## lm(formula = MDs ~ Hospitals, data = CountyHealth)
+## 
+## Coefficients:
+## (Intercept)    Hospitals  
+##     -1120.6        557.3
+```
+]
+.panel[.panel-name[Scatterplot with Regresson Line]
+&lt;img src="Ch1Lect_pt3_files/figure-html/unnamed-chunk-5-1.png" width="90%" /&gt;
+]
+.panel[.panel-name[Linear Model]
+The fitted linear model  is 
+$$
+\widehat{MDs} = -1120.6 + 557.3 \mbox{ Hospitals}
+$$
+- Predict number of MDs in a county with 10 hospitals.
+]
+]
+
+---
+## Residual Diagnostics
+
+.panelset[
+.panel[.panel-name[R Code]
+
+```r
+# Residual vs fitted plot
+gf_point(resid(mod1) ~ fitted(mod1)) %&gt;% 
+  gf_hline(yintercept = ~0)
+# Normality plots
+# install.packages("gridExtra")
+library(gridExtra)
+plot1 &lt;- gf_histogram(~resid(mod1))
+plot2 &lt;- gf_qq(~resid(mod1)) %&gt;%
+  gf_qqline()
+grid.arrange(plot1, plot2, ncol=2)
+```
+]
+.panel[.panel-name[Residual vs Fitted]
+&lt;img src="Ch1Lect_pt3_files/figure-html/unnamed-chunk-7-1.png" width="90%" /&gt;
+]
+.panel[.panel-name[Normality plots]
+&lt;img src="Ch1Lect_pt3_files/figure-html/unnamed-chunk-8-1.png" width="90%" /&gt;
+]
+]
+
+---
+## Transformed model plots
+- Consider whether square root or log transformation of the number of MDs results in a better fit.
+
+.panelset[
+.panel[.panel-name[R Code]
+
+```r
+# Transform data
+CountyHealth &lt;- mutate(CountyHealth, SqrtMDs = sqrt(MDs), logMDs= log(MDs))
+# Create and save plots
+plot1 &lt;- gf_point(SqrtMDs ~ Hospitals, data = CountyHealth) %&gt;%
+  gf_smooth()
+# Display plots concisely
+plot2&lt;-gf_point(logMDs ~ Hospitals, data = CountyHealth) %&gt;%
+  gf_smooth()
+grid.arrange(plot1,plot2,ncol=2)
+```
+]
+.panel[.panel-name[Scatterplots]
+&lt;img src="Ch1Lect_pt3_files/figure-html/unnamed-chunk-10-1.png" width="90%" /&gt;
+]
+]
+
+---
+### Square Root Transformation
+
+- Try the `\(\sqrt{Y}\)` transformation and fit the equation. 
+
+- The red line is the least squares regression line.
+
+.panelset[
+.panel[.panel-name[R Code]
+
+```r
+# Plot smoother and square root model
+gf_point(SqrtMDs ~ Hospitals, data=CountyHealth) %&gt;%
+  gf_smooth(method = "lm", col = "red") %&gt;%
+  gf_smooth()
+# Fit and print square root model
+mod2 &lt;- lm(SqrtMDs ~ Hospitals, data = CountyHealth)
+mod2
+```
+]
+.panel[.panel-name[Scatterplot]
+&lt;img src="Ch1Lect_pt3_files/figure-html/unnamed-chunk-12-1.png" width="90%" /&gt;
+]
+.panel[.panel-name[Output]
+
+```
+## 
+## Call:
+## lm(formula = SqrtMDs ~ Hospitals, data = CountyHealth)
+## 
+## Coefficients:
+## (Intercept)    Hospitals  
+##      -2.753        6.876
+```
+]
+]
+
+---
+### Re-assess conditions
+
+.panelset[
+.panel[.panel-name[R Code]
+
+```r
+# Residual vs fitted plot
+gf_point(resid(mod2) ~ fitted(mod2)) %&gt;% 
+  gf_hline(yintercept = ~0)
+# Normality plots
+# install.packages("gridExtra")
+library(gridExtra)
+plot1 &lt;- gf_histogram(~resid(mod2))
+plot2 &lt;- gf_qq(~resid(mod2)) %&gt;%
+  gf_qqline()
+grid.arrange(plot1, plot2, ncol=2)
+```
+]
+.panel[.panel-name[Residual vs Fitted]
+&lt;img src="Ch1Lect_pt3_files/figure-html/unnamed-chunk-15-1.png" width="90%" /&gt;
+]
+.panel[.panel-name[Normality plots]
+&lt;img src="Ch1Lect_pt3_files/figure-html/unnamed-chunk-16-1.png" width="90%" /&gt;
+]
+]
+
+
+---
+## Fitted model with square root transformation
+
+- Transformed model is satisfactory.
+
+- The fitted equation is now  
+$$
+  \widehat{\sqrt{\mbox{MDs}}} = -2.753  + 6.876 \mbox{ Hospitals}
+$$
+
+### Questions: 
+
+1. Predict the number of MDs in a county with 10 hospitals.
+
+2. Interpret the slope coefficient.
+
+
+
+---
+class: center, middle, inverse
+
+# Southeast Island Mammal Species
+
+---
+class: inverse
+background-image: url(https://assets.vacationstogo.com/images/maps/SoutheastAsiaIslands.gif)
+background-size: contain
+
+
+
+---
+
+## Example: Indonesian Wildlife
+
+.pull-left[
+Bako Park
+![](figures/Bako_park.jpeg)
+]
+
+--
+
+.pull-right[
+Green turtles
+![](figures/green_turtle.jpeg)]
+
+---
+background-image: url(figures/proboscis_unsplash.jpg)
+background-size: cover
+class: left, bottom, inverse
+
+## Proboscis monkey
+
+---
+## Species vs Area
+
+- Investigate the dependence of number of species on the size of the island.
+
+- Doesn't make sense that species would be a *linear* function of area.
+
+.panelset[
+
+.panel[.panel-name[Code]
+
+```r
+gf_point(Species ~ Area, data = SpeciesArea)
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+&lt;img src="Ch1Lect_pt3_files/figure-html/unnamed-chunk-17-1.png" width="90%" /&gt;
+
+]
+]
+
+---
+### Transformation Consideration
+
+- Address the strong curvature and extreme values using a natural log transformation. Consider the following candidates:  
+
+.panelset[
+
+.panel[.panel-name[Code]
+
+```r
+p1 &lt;- gf_point(Species ~ Area, data = SpeciesArea) 
+p2 &lt;- gf_point(logSpecies ~ Area, data = SpeciesArea)
+p3 &lt;- gf_point(Species ~ logArea, data = SpeciesArea)
+p4 &lt;- gf_point(logSpecies ~ logArea, data = SpeciesArea)
+grid.arrange(p1,p2,p3,p4,ncol=2,nrow=2)
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+&lt;img src="Ch1Lect_pt3_files/figure-html/unnamed-chunk-18-1.png" width="90%" /&gt;
+
+]
+]
+
+---
+
+## Fit the Best Model
+
+- Logging both response and predictor variables appears to give the best results. 
+
+- Proceed by fitting a simple regression using the *log-transformed* variables. 
+
+---
+## Fitting the Log-Log Model
+
+.panelset[
+.panel[.panel-name[R Code]
+
+```r
+# Fit the log-log model and get output
+mod3 &lt;- lm(logSpecies ~ logArea, data = SpeciesArea)
+mod3
+# Scatterplot and regression line with transformed variables
+gf_point(logSpecies ~ logArea, data = SpeciesArea) %&gt;%
+        gf_smooth(method="lm")
+```
+]
+.panel[.panel-name[Regression Output]
+
+```
+## 
+## Call:
+## lm(formula = logSpecies ~ logArea, data = SpeciesArea)
+## 
+## Coefficients:
+## (Intercept)      logArea  
+##      1.6249       0.2355
+```
+]
+
+.panel[.panel-name[Scatterplot with Line]
+&lt;img src="Ch1Lect_pt3_files/figure-html/unnamed-chunk-21-1.png" width="90%" /&gt;
+
+]
+]
+
+&lt;!--End of panelset  --&gt;
+
+---
+### The fitted log-log model for predicting number of species
+
+$$
+  \widehat{\log(\mbox{Species}}) = 1.625 + 0.2355 \cdot \log(\mbox{Area})
+$$
+--
+
+- Use the model to obtain the predicted value and residual for Java.
+
+- Interpret the slope coefficient in context.
+
+--
+
+- On the original scale: 
+$$
+\widehat{\mbox{Species}} = 5.08\cdot \mbox{Area}^{0.235}
+$$
+
+---
+### Re-assess log-log model 
+
+.panelset[
+.panel[.panel-name[Code]
+
+```r
+p1 &lt;- gf_point(resid(mod3) ~ fitted(mod3)) %&gt;%
+  gf_hline(yintercept = ~0)
+p2 &lt;- gf_qq(~resid(mod3)) %&gt;%
+  gf_qqline()
+grid.arrange(p1,p2,ncol=2)
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+&lt;img src="Ch1Lect_pt3_files/figure-html/unnamed-chunk-22-1.png" width="90%" /&gt;
+
+]
+]
+
+&lt;!--End of panelset  --&gt;
+
+---
+### Using R to get Java predictions from the log-log model
+
+- Try these on your own:
+
+
+```r
+1.625 + 0.2355 * log(125628)  #Fitted on the log scale
+exp(1.625 +0.2355 * log(125628)) #Fitted on the original scale
+# or create a function
+island_fun &lt;- makeFun(mod3)
+exp(island_fun(log(125628)))
+# or use the R predict function with "newdata" key
+predict(mod3, newdata = data.frame(logArea = log(125628)))
+exp(predict(mod3, newdata = data.frame(logArea = log(125628))))
+
+# Print the actual values
+filter(SpeciesArea, Name == "Java")  %&gt;%
+  select(c(Name, Area, Species))
+```
+
+---
+class: center, middle, inverse
+
+# Outliers and Influential Observations 
+
+---
+## Olympic Long Jump Data
+
+- Gold medal distance as a function of time:
+
+.panelset[
+
+.panel[.panel-name[Code]
+
+```r
+data(LongJumpOlympics)
+gf_point(Gold ~ Year, data = LongJumpOlympics) %&gt;%
+  gf_smooth() %&gt;%
+  gf_smooth(method = "lm", color = "red")
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+&lt;img src="Ch1Lect_pt3_files/figure-html/unnamed-chunk-24-1.png" width="90%" /&gt;
+
+]
+
+]
+
+---
+### Fit model and identify outlier:
+
+.panelset[
+
+.panel[.panel-name[R Code]
+
+
+```r
+mod4 &lt;- lm(Gold ~ Year, data = LongJumpOlympics)  
+mod4
+gf_point(Gold ~ Year, data = LongJumpOlympics) %&gt;%
+  gf_smooth(method="lm") %&gt;%
+  gf_refine(annotate("text", label = "Bob Beamon", x = 1968, y = 8.9, size = 6, colour = "red", hjust = -0.1))
+```
+
+]
+
+.panel[.panel-name[Regression Output]
+
+
+```
+## 
+## Call:
+## lm(formula = Gold ~ Year, data = LongJumpOlympics)
+## 
+## Coefficients:
+## (Intercept)         Year  
+##   -19.48359      0.01407
+```
+
+]
+
+.panel[.panel-name[Scatterplot with Outlier]
+
+&lt;img src="Ch1Lect_pt3_files/figure-html/unnamed-chunk-27-1.png" width="90%" /&gt;
+
+]
+]
+---
+## Bob Beamon's record-breaking long jump
+
+.center[
+&lt;iframe width="560" height="315" src="https://www.youtube.com/embed/DEt_Xgg8dzc" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen&gt;&lt;/iframe&gt;
+]
+
+---
+## Can use the package plotly to identify points interactively
+.panelset[
+
+.panel[.panel-name[Code]
+
+```r
+#install.packages("plotly")
+library(plotly)
+p &lt;- gf_point(Gold ~ Year, data = LongJumpOlympics)
+ggplotly(p)
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+<div id="htmlwidget-c6da29246371f3ce7139" style="width:90%;height:288px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-c6da29246371f3ce7139">{"x":{"data":[{"x":[1900,1904,1906,1908,1912,1920,1924,1928,1932,1936,1948,1952,1956,1960,1964,1968,1972,1976,1980,1984,1988,1992,1996,2000,2004,2008],"y":[7.185,7.34,7.2,7.48,7.6,7.15,7.445,7.73,7.64,8.06,7.825,7.57,7.83,8.12,8.07,8.9,8.24,8.35,8.54,8.54,8.72,8.67,8.5,8.55,8.59,8.37],"text":["Year: 1900<br />Gold: 7.185","Year: 1904<br />Gold: 7.340","Year: 1906<br />Gold: 7.200","Year: 1908<br />Gold: 7.480","Year: 1912<br />Gold: 7.600","Year: 1920<br />Gold: 7.150","Year: 1924<br />Gold: 7.445","Year: 1928<br />Gold: 7.730","Year: 1932<br />Gold: 7.640","Year: 1936<br />Gold: 8.060","Year: 1948<br />Gold: 7.825","Year: 1952<br />Gold: 7.570","Year: 1956<br />Gold: 7.830","Year: 1960<br />Gold: 8.120","Year: 1964<br />Gold: 8.070","Year: 1968<br />Gold: 8.900","Year: 1972<br />Gold: 8.240","Year: 1976<br />Gold: 8.350","Year: 1980<br />Gold: 8.540","Year: 1984<br />Gold: 8.540","Year: 1988<br />Gold: 8.720","Year: 1992<br />Gold: 8.670","Year: 1996<br />Gold: 8.500","Year: 2000<br />Gold: 8.550","Year: 2004<br />Gold: 8.590","Year: 2008<br />Gold: 8.370"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,0,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,0,0,1)"}},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":32.4383561643836,"r":7.30593607305936,"b":46.392694063927,"l":43.1050228310502},"plot_bgcolor":"rgba(235,235,235,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[1894.6,2013.4],"tickmode":"array","ticktext":["1920","1950","1980","2010"],"tickvals":[1920,1950,1980,2010],"categoryorder":"array","categoryarray":["1920","1950","1980","2010"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"y","title":{"text":"Year","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[7.0625,8.9875],"tickmode":"array","ticktext":["7.5","8.0","8.5"],"tickvals":[7.5,8,8.5],"categoryorder":"array","categoryarray":["7.5","8.0","8.5"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"x","title":{"text":"Gold","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":false,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.88976377952756,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.689497716895}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"3fd0966ec73":{"x":{},"y":{},"type":"scatter"}},"cur_data":"3fd0966ec73","visdat":{"3fd0966ec73":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+
+]
+
+]
+
+---
+
+### Obtain the plot of residual versus fitted values:  
+
+.panelset[
+
+.panel[.panel-name[Code]
+
+```r
+gf_point(resid(mod4)~fitted(mod4)) %&gt;% 
+  gf_hline(yintercept = ~0, color = "red")
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+&lt;img src="Ch1Lect_pt3_files/figure-html/unnamed-chunk-29-1.png" width="90%" /&gt;
+
+]
+
+]
+
+---
+### Other types of residuals
+
+- Scaled residuals are helpful in identifying outliers.
+
+--
+
+- **Standardized residuals.** Residuals divided by estimated standard  deviation of residuals:
+ 
+$$
+\frac{y - \hat y}{\hat\sigma}
+$$
+
+--
+
+- **Studentized residuals.** Residuals divided by standard deviation of residuals from the regression *after omitting the point in question*
+
+  - Removes effect of extreme observation on standard deviation
+  
+  - Implicitly involves fitting `\(n\)` different regression models.
+    
+$$
+\frac{y - \hat y}{\hat\sigma_i}
+$$
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"ratio": "16:9",
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
