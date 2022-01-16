@@ -16,7 +16,7 @@ class: highlight-last-item
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
-  fig.width=9, fig.height=4, fig.retina=3, 
+  fig.width=9, fig.height=4,  
   out.width="90%",
   message = FALSE
 )
