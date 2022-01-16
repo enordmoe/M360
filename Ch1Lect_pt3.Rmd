@@ -38,7 +38,7 @@ MidtermFinal <- read.csv("http://people.kzoo.edu/enordmoe/math360/MidtermFinal.c
 ```
 
 ```{r xaringanExtra, echo=FALSE}
-xaringanExtra::use_xaringan_extra(c("panelset", "scribble"))
+xaringanExtra::use_xaringan_extra(c("panelset"))
 xaringanExtra::use_clipboard()
 xaringanExtra::use_tile_view()
 ```
