@@ -1,0 +1,763 @@
+---
+title: "Chapter 1: Simple Linear Regression"
+subtitle: "Part 3: Sections 1.4-1.5"
+author: "Applied Statistics II"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: ["xaringan-themer.css", "extra.css"]
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      ratio: 16:9
+      countIncrementalSlides: false
+---
+class: highlight-last-item
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  fig.width=9, fig.height=4,  
+  out.width="90%",
+  message = FALSE
+)
+
+```
+
+
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(mosaic)
+library(Stat2Data)
+library(gridExtra)
+library(plotly)
+data("SpeciesArea")
+data("CountyHealth")
+data("LongJumpOlympics")
+MidtermFinal <- read.csv("http://people.kzoo.edu/enordmoe/math360/MidtermFinal.csv")
+```
+
+```{r xaringanExtra, echo=FALSE}
+xaringanExtra::use_xaringan_extra(c("panelset"))
+xaringanExtra::use_clipboard()
+xaringanExtra::use_tile_view()
+```
+
+
+```{css echo=FALSE}
+.highlight-last-item > ul > li,
+.highlight-last-item > ol > li {
+  opacity: 0.5;
+}
+.highlight-last-item > ul > li:last-of-type,
+.highlight-last-item > ol > li:last-of-type {
+  opacity: 1;
+}
+```
+
+# Outline 
+
+- Transformations
+
+--
+
+- Outliers and Influential Points
+  
+---
+class: highlight-last-item
+
+## What to Do When Regression Conditions Are Violated
+
+### Examples
+
+1. Lack of normality in residuals
+
+--
+
+1. Patterns in residuals
+
+--
+
+1. Heteroscedasticity (nonconstant variability of errors)
+
+--
+
+1. Outliers: influential points, large residuals
+
+---
+class: center, inverse, middle
+
+# Data Transformations
+
+---
+## Possible Goals of Data Transformations
+
+1. Address nonlinear patterns
+
+--
+
+1. Stabilize variance
+
+--
+
+1. Remove skewness from residuals
+
+--
+
+1. Minimize effects of outliers
+
+
+---
+### Common Transformations
+
+<br>
+
+|      Name      |     Mathematically     |
+|:--------------:|:----------------------:|
+| Logarithm      |  $Y\rightarrow\log(Y)$ |
+| Square root    | $Y\rightarrow\sqrt{Y}$ |
+| Exponential    |   $Y\rightarrow e^Y$   |
+| Power function |   $Y\rightarrow Y^k$   |
+| Reciprocal     |   $Y\rightarrow 1/Y$   |
+
+<br>
+
+- Transformations can be applied to either response ($Y$) or explanatory ($X$) variables.
+
+--
+
+- Art as much as science
+
+--
+
+- Often requires trial and error
+
+---
+## Examples: Doctors and Hospitals in Counties
+
+.panelset[
+.panel[.panel-name[R Code]
+```{r, eval = FALSE}
+# plot with smoothing line
+gf_point(MDs ~ Hospitals, data = CountyHealth) %>%
+        gf_smooth()
+# fit linear regression
+mod1 <- lm(MDs ~ Hospitals, data=CountyHealth) 
+mod1
+# scatterplot with line
+gf_point(MDs ~ Hospitals, data = CountyHealth) %>%
+        gf_smooth(method="lm")
+```
+]
+.panel[.panel-name[Smoothed Scatterplot]
+```{r, echo = FALSE}
+gf_point(MDs ~ Hospitals, data = CountyHealth) %>%
+        gf_smooth()
+```
+]
+.panel[.panel-name[Output]
+```{r, echo = FALSE}
+# fit linear regression
+mod1 <- lm(MDs ~ Hospitals, data=CountyHealth) 
+mod1
+```
+]
+.panel[.panel-name[Scatterplot with Regresson Line]
+```{r , echo = FALSE}
+# scatterplot with line
+gf_point(MDs ~ Hospitals, data = CountyHealth) %>%
+        gf_smooth(method="lm")
+```
+]
+.panel[.panel-name[Linear Model]
+The fitted linear model  is 
+$$
+\widehat{MDs} = -1120.6 + 557.3 \mbox{ Hospitals}
+$$
+- Predict number of MDs in a county with 10 hospitals.
+]
+]
+
+---
+## Residual Diagnostics
+
+.panelset[
+.panel[.panel-name[R Code]
+```{r, eval = FALSE}
+# Residual vs fitted plot
+gf_point(resid(mod1) ~ fitted(mod1)) %>% 
+  gf_hline(yintercept = ~0)
+# Normality plots
+# install.packages("gridExtra")
+library(gridExtra)
+plot1 <- gf_histogram(~resid(mod1))
+plot2 <- gf_qq(~resid(mod1)) %>%
+  gf_qqline()
+grid.arrange(plot1, plot2, ncol=2)
+```
+]
+.panel[.panel-name[Residual vs Fitted]
+```{r, echo = FALSE}
+gf_point(resid(mod1) ~ fitted(mod1)) %>% 
+  gf_hline(yintercept = ~0)
+```
+]
+.panel[.panel-name[Normality plots]
+```{r, echo = FALSE}
+plot1 <- gf_histogram(~resid(mod1))
+plot2 <- gf_qq(~resid(mod1)) %>%
+  gf_qqline()
+grid.arrange(plot1, plot2, ncol=2)
+```
+]
+]
+
+---
+## Transformed model plots
+- Consider whether square root or log transformation of the number of MDs results in a better fit.
+
+.panelset[
+.panel[.panel-name[R Code]
+```{r, eval = FALSE}
+# Transform data
+CountyHealth <- mutate(CountyHealth, SqrtMDs = sqrt(MDs), logMDs= log(MDs))
+# Create and save plots
+plot1 <- gf_point(SqrtMDs ~ Hospitals, data = CountyHealth) %>%
+  gf_smooth()
+# Display plots concisely
+plot2<-gf_point(logMDs ~ Hospitals, data = CountyHealth) %>%
+  gf_smooth()
+grid.arrange(plot1,plot2,ncol=2)
+```
+]
+.panel[.panel-name[Scatterplots]
+```{r echo=FALSE, fig.height=3}
+CountyHealth <- mutate(CountyHealth, SqrtMDs = sqrt(MDs), logMDs= log(MDs))
+plot1 <- gf_point(SqrtMDs ~ Hospitals, data = CountyHealth) %>%
+  gf_smooth()
+plot2<-gf_point(logMDs ~ Hospitals, data = CountyHealth) %>%
+  gf_smooth()
+grid.arrange(plot1,plot2,ncol=2)
+```
+]
+]
+
+---
+### Square Root Transformation
+
+- Try the $\sqrt{Y}$ transformation and fit the equation. 
+
+- The red line is the least squares regression line.
+
+.panelset[
+.panel[.panel-name[R Code]
+```{r, eval = FALSE}
+# Plot smoother and square root model
+gf_point(SqrtMDs ~ Hospitals, data=CountyHealth) %>%
+  gf_smooth(method = "lm", col = "red") %>%
+  gf_smooth()
+# Fit and print square root model
+mod2 <- lm(SqrtMDs ~ Hospitals, data = CountyHealth)
+mod2
+```
+]
+.panel[.panel-name[Scatterplot]
+```{r echo=FALSE, fig.height=3}
+gf_point(SqrtMDs ~ Hospitals, data=CountyHealth) %>%
+  gf_smooth(method = "lm", col = "red") %>%
+  gf_smooth()
+```
+]
+.panel[.panel-name[Output]
+```{r echo=FALSE}
+mod2 <- lm(SqrtMDs ~ Hospitals, data = CountyHealth)
+mod2
+```
+]
+]
+
+---
+### Re-assess conditions
+
+.panelset[
+.panel[.panel-name[R Code]
+```{r, eval = FALSE}
+# Residual vs fitted plot
+gf_point(resid(mod2) ~ fitted(mod2)) %>% 
+  gf_hline(yintercept = ~0)
+# Normality plots
+# install.packages("gridExtra")
+library(gridExtra)
+plot1 <- gf_histogram(~resid(mod2))
+plot2 <- gf_qq(~resid(mod2)) %>%
+  gf_qqline()
+grid.arrange(plot1, plot2, ncol=2)
+```
+]
+.panel[.panel-name[Residual vs Fitted]
+```{r, echo = FALSE}
+gf_point(resid(mod2) ~ fitted(mod2)) %>% 
+  gf_hline(yintercept = ~0)
+```
+]
+.panel[.panel-name[Normality plots]
+```{r, echo = FALSE}
+plot1 <- gf_histogram(~resid(mod2))
+plot2 <- gf_qq(~resid(mod2)) %>%
+  gf_qqline()
+grid.arrange(plot1, plot2, ncol=2)
+```
+]
+]
+
+
+---
+## Fitted model with square root transformation
+
+- Transformed model is satisfactory.
+
+- The fitted equation is now  
+$$
+  \widehat{\sqrt{\mbox{MDs}}} = -2.753  + 6.876 \mbox{ Hospitals}
+$$
+
+### Questions: 
+
+1. Predict the number of MDs in a county with 10 hospitals.
+
+2. Interpret the slope coefficient.
+
+
+
+---
+class: center, middle, inverse
+
+# Southeast Island Mammal Species
+
+---
+class: inverse
+background-image: url(https://assets.vacationstogo.com/images/maps/SoutheastAsiaIslands.gif)
+background-size: contain
+
+
+
+---
+
+## Example: Indonesian Wildlife
+
+.pull-left[
+Bako Park
+![](figures/Bako_park.jpeg)
+]
+
+--
+
+.pull-right[
+Green turtles
+![](figures/green_turtle.jpeg)]
+
+---
+background-image: url(figures/proboscis_unsplash.jpg)
+background-size: cover
+class: left, bottom, inverse
+
+## Proboscis monkey
+
+---
+## Species vs Area
+
+- Investigate the dependence of number of species on the size of the island.
+
+- Doesn't make sense that species would be a *linear* function of area.
+
+.panelset[
+
+```{r, panelset = TRUE, fig.height = 3}
+gf_point(Species ~ Area, data = SpeciesArea)
+```
+]
+
+---
+### Transformation Consideration
+
+- Address the strong curvature and extreme values using a natural log transformation. Consider the following candidates:  
+
+.panelset[
+
+```{r, panelset = TRUE,fig.height=3.5}
+p1 <- gf_point(Species ~ Area, data = SpeciesArea) 
+p2 <- gf_point(logSpecies ~ Area, data = SpeciesArea)
+p3 <- gf_point(Species ~ logArea, data = SpeciesArea)
+p4 <- gf_point(logSpecies ~ logArea, data = SpeciesArea)
+grid.arrange(p1,p2,p3,p4,ncol=2,nrow=2)
+```
+]
+
+---
+
+## Fit the Best Model
+
+- Logging both response and predictor variables appears to give the best results. 
+
+- Proceed by fitting a simple regression using the *log-transformed* variables. 
+
+---
+## Fitting the Log-Log Model
+
+.panelset[
+.panel[.panel-name[R Code]
+```{r, eval = FALSE}
+# Fit the log-log model and get output
+mod3 <- lm(logSpecies ~ logArea, data = SpeciesArea)
+mod3
+# Scatterplot and regression line with transformed variables
+gf_point(logSpecies ~ logArea, data = SpeciesArea) %>%
+        gf_smooth(method="lm")
+```
+]
+.panel[.panel-name[Regression Output]
+```{r, echo = FALSE}
+# Fit the log-log model and get output
+mod3 <- lm(logSpecies ~ logArea, data = SpeciesArea)
+mod3
+```
+]
+
+.panel[.panel-name[Scatterplot with Line]
+```{r, echo = FALSE}
+gf_point(logSpecies ~ logArea, data = SpeciesArea) %>%
+        gf_smooth(method="lm")
+```
+
+]
+]
+
+<!--End of panelset  -->
+
+---
+### The fitted log-log model for predicting number of species
+
+$$
+  \widehat{\log(\mbox{Species}}) = 1.625 + 0.2355 \cdot \log(\mbox{Area})
+$$
+--
+
+- Use the model to obtain the predicted value and residual for Java.
+
+- Interpret the slope coefficient in context.
+
+--
+
+- On the original scale: 
+$$
+\widehat{\mbox{Species}} = 5.08\cdot \mbox{Area}^{0.235}
+$$
+
+---
+### Re-assess log-log model 
+
+.panelset[
+```{r, panelset = TRUE}
+p1 <- gf_point(resid(mod3) ~ fitted(mod3)) %>%
+  gf_hline(yintercept = ~0)
+p2 <- gf_qq(~resid(mod3)) %>%
+  gf_qqline()
+grid.arrange(p1,p2,ncol=2)
+```
+]
+
+<!--End of panelset  -->
+
+---
+### Using R to get Java predictions from the log-log model
+
+- Try these on your own:
+
+```{r, eval = FALSE}
+1.625 + 0.2355 * log(125628)  #Fitted on the log scale
+exp(1.625 +0.2355 * log(125628)) #Fitted on the original scale
+# or create a function
+island_fun <- makeFun(mod3)
+exp(island_fun(log(125628)))
+# or use the R predict function with "newdata" key
+predict(mod3, newdata = data.frame(logArea = log(125628)))
+exp(predict(mod3, newdata = data.frame(logArea = log(125628))))
+
+# Print the actual values
+filter(SpeciesArea, Name == "Java")  %>%
+  select(c(Name, Area, Species))
+```
+
+---
+class: center, middle, inverse
+
+# Outliers and Influential Observations 
+
+---
+## Olympic Long Jump Data
+
+- Gold medal distance as a function of time:
+
+.panelset[
+
+```{r, panelset = TRUE, fig.height = 3.5}
+data(LongJumpOlympics)
+gf_point(Gold ~ Year, data = LongJumpOlympics) %>%
+  gf_smooth() %>%
+  gf_smooth(method = "lm", color = "red")
+```
+
+]
+
+---
+### Fit model and identify outlier:
+
+.panelset[
+
+.panel[.panel-name[R Code]
+
+```{r, eval = FALSE, fig.height = 3.5}
+mod4 <- lm(Gold ~ Year, data = LongJumpOlympics)  
+mod4
+gf_point(Gold ~ Year, data = LongJumpOlympics) %>%
+  gf_smooth(method="lm") %>%
+  gf_refine(annotate("text", label = "Bob Beamon", x = 1968, y = 8.9, size = 6, colour = "red", hjust = -0.1))
+```
+
+]
+
+.panel[.panel-name[Regression Output]
+
+```{r, echo = FALSE}
+mod4 <- lm(Gold ~ Year, data = LongJumpOlympics)  
+mod4
+```
+
+]
+
+.panel[.panel-name[Scatterplot with Outlier]
+
+```{r, echo = FALSE, fig.height = 3.5}
+gf_point(Gold ~ Year, data = LongJumpOlympics) %>%
+  gf_smooth(method="lm") %>%
+  gf_refine(annotate("text", label = "Bob Beamon", x = 1968, y = 8.9, size = 6, colour = "red", hjust = -0.1))
+```
+
+]
+]
+---
+## Bob Beamon's record-breaking long jump
+
+.center[
+<iframe width="560" height="315" src="https://www.youtube.com/embed/DEt_Xgg8dzc" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+]
+
+---
+## Can use the package **plotly** to identify points interactively
+.panelset[
+
+```{r, panelset = TRUE}
+#install.packages("plotly")
+library(plotly)
+p <- gf_point(Gold ~ Year, data = LongJumpOlympics)
+ggplotly(p)
+```
+
+]
+
+---
+
+### Obtain the plot of residual versus fitted values:  
+
+.panelset[
+
+```{r, panelset = TRUE}
+gf_point(resid(mod4)~fitted(mod4)) %>% 
+  gf_hline(yintercept = ~0, color = "red")
+```
+
+]
+
+---
+### Other types of residuals
+
+- Scaled residuals are helpful in identifying outliers.
+
+--
+
+- **Standardized residuals.** Residuals divided by estimated standard  deviation of residuals:
+ 
+$$
+\frac{y - \hat y}{\hat\sigma_\epsilon}
+$$
+
+--
+
+- **Studentized residuals.** Residuals divided by standard deviation of residuals from the regression *after omitting the point in question*
+
+  - Removes effect of extreme observation on standard deviation
+  
+  - Implicitly involves fitting $n$ different regression models.
+    
+$$
+\frac{y - \hat y}{\hat\sigma_i}
+$$
+---
+## Why studentize?
+
+- **Concern**: An unusual value may exert great *influence* on the fit.
+
+  - Its residual might be underestimated because the model "moves" a  lot to fit it.
+or
+
+  - The standard error of regression may be *inflated* due to the large outlier residual
+  
+--
+  
+- **Remedy**: We **studentize** by fitting the model **without** the influential case, finding a new estimate $\hat\sigma^\epsilon$.
+
+---
+### Plots of standardized  and studentized residuals versus fitted.
+
+.panelset[
+
+```{r lj4,panelset = TRUE, fig.height=3.5}
+#Standardized resids
+p1 <- gf_point(rstandard(mod4) ~ Year, data = LongJumpOlympics, ylim = c(-4,4),
+               main="Standardized Residuals") %>%
+  gf_hline(yintercept = ~0) %>%
+  gf_hline(yintercept = ~c(-3,-2,2,3), lty = 2, data = NA)
+#Studentized resids
+p2 <- gf_point(rstudent(mod4) ~ Year, data = LongJumpOlympics, ylim = c(-4,4), 
+               main="Studentized Residuals") %>%
+  gf_hline(yintercept = ~0) %>%
+  gf_hline(yintercept = ~c(-3,-2,2,3), lty = 2, data = NA)
+grid.arrange(p1 ,p2, ncol=2)
+```
+
+]
+
+
+---
+
+class: inverse
+background-image: url(https://e0.365dm.com/21/07/768x432/skysports-bob-beamon-olympics_5462311.jpg)
+background-size: cover
+
+class: center, middle
+
+# .red[Beamon is an extreme outlier!]
+
+
+---
+
+## Example: The Butterfly Ballot in the Year 2000 Election
+
+.pull-left[
+![](https://www.wuft.org/news/files/2020/10/Butterfly_Ballot_Florida_2000_large-660x330.jpg)
+]
+
+--
+
+]
+
+.pull-right[
+![](https://media.npr.org/assets/img/2018/11/12/gettyimages-1306049_wide-78b1a96ccca5fcaac551979e4a29942620227e3d.jpg?s=1400)
+]
+
+---
+
+## Plot the Votes by County
+
+.panelset[
+```{r pres1, panelset = TRUE, message=FALSE,warning = FALSE}
+data("PalmBeach")
+p <- gf_point(Buchanan ~ Bush, label = ~County, data = PalmBeach)
+ggplotly(p)
+```
+]
+
+---
+## Linear model fit and plots
+
+
+.panelset[
+.panel[.panel-name[R Code]
+
+```{r pres3, eval=FALSE}
+# Fit and display model
+mod5 <- lm(Buchanan ~ Bush, data = PalmBeach)
+# Regresssion line plot
+gf_point(Buchanan ~ Bush, data = PalmBeach) %>%
+  gf_smooth(method = "lm")
+# Residual plot
+gf_point(resid(mod5) ~ fitted(mod5)) %>% 
+  gf_hline(yintercept = ~0, color = "blue")
+```
+
+]
+.panel[.panel-name[Plot with Regression Line]
+
+```{r, echo=FALSE}
+# Fit and display model
+mod5 <- lm(Buchanan ~ Bush, data = PalmBeach)
+# Regresssion line plot
+gf_point(Buchanan ~ Bush, data = PalmBeach) %>%
+  gf_smooth(method = "lm")
+```
+
+]
+.panel[.panel-name[Residual vs Fitted Plot]
+
+```{r, echo = FALSE}
+gf_point(resid(mod5) ~ fitted(mod5)) %>% 
+  gf_hline(yintercept = ~0, color = "blue")
+```
+
+]
+]
+---
+## Is Palm Beach an Influential Outlier?
+
+
+.panelset[
+```{r pres4, panelset = TRUE}
+# Omit Palm Beach
+PalmBeach_noPB <- filter(PalmBeach, County != "PALM BEACH")
+# Refit the regression without Palm Beach
+mod6 <- lm(Buchanan ~ Bush, data = PalmBeach_noPB)
+mod6
+mod6_fun <- makeFun(mod6)
+```
+]
+
+---
+
+## Is Palm Beach an Influential Outlier?
+
+```{r pres5, message=FALSE, warning=FALSE, fig.height = 3}
+gf_point(Buchanan ~ Bush, data = PalmBeach) %>%
+        gf_smooth(method = "lm", se = FALSE) %>% 
+  gf_fun(mod6_fun, col = "red") %>%
+  gf_refine(annotate("text", label = "Complete", x = 2.5e+05, y = 1400, size = 6, hjust = 1)) %>%
+  gf_refine(annotate("text", label = "Without\nPalm Beach", 
+                     x = 2e+05, y = 700, size = 6, hjust = 0, vjust = 1))
+# Note that the \n on the previous line is the "new line" character that causes the label to wrap
+```
+
+---
+
+## Influence and Leverage
+
+- **Influence**:  the  effect of a single data point on the regression line depends on:
+
+  - how well it matches the "trend" of the rest of the points
+  
+  - how "unusual" is its predictor value
+  
+--
+
+- **Leverage**: measures the potential for a case to affect a regression fit, based on an "unusual" predictor value. (Chapter 4)
+
+
+
