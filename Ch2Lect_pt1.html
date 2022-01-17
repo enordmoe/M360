@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Chapter 2: Inference for Simple Linear Regression</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Applied Statistics II" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset-0.2.6/panelset.js"></script>
+    <script src="libs/clipboard-2.0.6/clipboard.min.js"></script>
+    <link href="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.js"></script>
+    <script>window.xaringanExtraClipboard(null, {"button":"Copy Code","success":"Copied!","error":"Press Ctrl+C to Copy"})</script>
+    <link href="libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view-0.2.6/tile-view.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+    <link rel="stylesheet" href="extra.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Chapter 2: Inference for Simple Linear Regression
+## Part 1: Section 2.1
+### Applied Statistics II
+
+---
+
+class: highlight-last-item
+
+
+
+
+
+
+
+
+
+
+&lt;style type="text/css"&gt;
+.highlight-last-item &gt; ul &gt; li,
+.highlight-last-item &gt; ol &gt; li {
+  opacity: 0.5;
+}
+.highlight-last-item &gt; ul &gt; li:last-of-type,
+.highlight-last-item &gt; ol &gt; li:last-of-type {
+  opacity: 1;
+}
+&lt;/style&gt;
+
+# Outline 
+
+- Distribution of the slope `\((\hat\beta_1)\)` and intercept `\((\hat\beta_0)\)` estimates
+
+--
+
+- Standard error of estimates
+
+--
+
+- Inference for `\(\beta_0\)` and `\(\beta_1\)` based on the `\(t\)` distribution
+
+  - Confidence intervals
+  
+  - Hypothesis tests
+  
+---
+## Sampling Distribution
+
+### The Central Limit Theorem
+
+- The sample mean `\(\bar Y\)` varies from sample to sample and has a distribution (for large `\(n\)`) that follows:
+
+$$
+\overline Y \sim N(\mu, \sigma/\sqrt{n})
+$$
+
+- This is the foundation for inference about means and differences in means.
+
+--
+
+&lt;br&gt;&lt;br&gt;
+
+**Question:** Is there an equivalent result for sample slope and/or intercept?
+
+
+---
+## Sampling Distribution
+
+### The sampling distributions of `\(\hat\beta_1\)` and `\(\hat\beta_0\)`. 
+
+- Investigate by sampling from a hypothetical true regression model 
+
+  1. Generate many samples from the same population (known linear model).
+  
+--
+  
+  1. Record the sample slopes and intercepts.
+  
+--
+  
+  1. Compute summary statistics and obtain plots of the sampling distributions.
+  
+
+- Demo: SlopeSimulation.R [R code file](https://www.dropbox.com/s/7v8vzqxrc9lbiad/SlopeSimulation.R?dl=0)
+
+---
+### The sampling distributions of `\(\hat\beta_1\)` and `\(\hat\beta_0\)`. 
+
+Assuming the conditions for a Simple Linear Model hold, the slope and interval estimates haves the following distributions:
+
+&lt;br&gt;
+
+
+|                |               `\(\hat\beta_1\)` = slope               |             `\(\hat\beta_0\)` =intercept              |
+|----------------|:-------------------------------------------------:|:-------------------------------------------------:|
+| Mean           |                     `\(\beta_1\)`                     |                     `\(\beta_0\)`                     |
+| Standard error |              `\(\sigma_{\hat\beta_1}\)`               |              `\(\sigma_{\hat\beta_0}\)`               |
+| Shape          |                      Normal                       |                      Normal                       |
+| Summary        | `\(\hat\beta_1\sim N(\beta_1,\sigma_{\hat\beta_1})\)` | `\(\hat\beta_0\sim N(\beta_0,\sigma_{\hat\beta_0})\)` |
+
+
+---
+
+## Standard Errors of Slope and Intercept Estimates
+
+- In practice, we don't know either `\(\sigma_{\hat\beta_1}\)` of `\(\sigma_{\hat\beta_0}\)`.
+
+- Use R to obtain estimates:
+
+  - `\(\mbox{SE}_{\hat\beta_1}\)` is the standard error of the slope.
+  
+  - `\(\mbox{SE}_{\hat\beta_0}\)` is the standard error of the intercept.
+
+---
+class: highlight-last-item
+
+## Factors affecting the size of the standard error of the slope
+
+The following factors influence the variability of the slope estimate
+
+--
+
+  - Larger sample size `\(\Rightarrow\)` lower SE
+  
+--
+  
+  - Greater error variability `\(\sigma_\epsilon\)` `\(\Rightarrow\)` greater SE
+  
+--
+  
+  - Greater variability in observed `\(X\)` values `\(\Rightarrow\)` lower SE
+
+
+---
+### Example: Midterm vs Final Scores
+.panelset[
+
+.panel[.panel-name[Code]
+
+```r
+MidtermFinal &lt;- read.csv("http://people.kzoo.edu/enordmoe/math360/MidtermFinal.csv")
+model1 &lt;- lm(Final ~ Midterm, data = MidtermFinal)
+summary(model1)
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+```
+## 
+## Call:
+## lm(formula = Final ~ Midterm, data = MidtermFinal)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -18.4621  -6.3571   0.1354   5.7992  16.6279 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  18.6721     9.3311   2.001   0.0548 .  
+## Midterm       1.4925     0.2413   6.186 9.58e-07 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 9.651 on 29 degrees of freedom
+## Multiple R-squared:  0.5689,	Adjusted R-squared:  0.554 
+## F-statistic: 38.26 on 1 and 29 DF,  p-value: 9.582e-07
+```
+
+
+
+]
+]
+
+
+---
+### Inference for Slope and Intercept
+
+- Key Fact:
+
+`$$t=\frac{\hat\beta_i-\beta_i}{\mbox{SE}_{\hat\beta_i}}\sim t_{n-2}\mbox{ distribution}$$`
+
+--
+
+- We use this to obtain a ** `\(100(1-\alpha)\)`% confidence interval for `\(\beta_i\)`**:
+
+`$$\hat\beta_i\pm t^*\cdot\mbox{SE}_{\hat\beta_i}$$`
+
+where `\(t^*\)` is obtained from a `\(t\)`-distribution with `\(n-2\)` degrees of freedom.
+
+---
+
+## How do we find a `\(t^*\)`?
+
+Illustrate using the information from the **MidtermFinal** data:
+
+.pull-left[
+- Use R to obtain the appropriate multiplier and compute it yourself:
+
+
+```r
+#t-star for 95% confidence 
+# interval with df=31-2
+ct(0.95, df = 29)
+```
+
+```
+## [1] 2.04523
+```
+]
+
+--
+
+.pull-right[
+- Fit the model with R and use the R function `confint()` to compute the intervals:
+
+
+```r
+mod1 &lt;- lm(Final ~ Midterm, data = MidtermFinal)
+confint(mod1)
+```
+
+```
+##                  2.5 %    97.5 %
+## (Intercept) -0.4122049 37.756398
+## Midterm      0.9990233  1.985977
+```
+
+```r
+confint(mod1, level = 0.90)
+```
+
+```
+##                  5 %      95 %
+## (Intercept) 2.817323 34.526870
+## Midterm     1.082532  1.902468
+```
+
+]
+---
+## `\(t\)`-Tests for Slope and Intercept
+### General Case
+
+Hypotheses:
+
+`$$H_0:\beta_i=c\\H_a:\beta_i\neq c$$`
+
+--
+
+Test statistic:
+`$$\frac{\hat\beta_i-c}{\mbox{SE}_{\hat\beta_i}}$$`
+
+---
+## `\(t\)`-Tests for Slope and Intercept
+### Most Common Case
+
+Hypotheses:
+
+`$$H_0:\beta_i=0\\H_a:\beta_i\neq 0$$`
+
+--
+
+Test statistic:
+
+`$$\frac{\hat\beta_i}{\mbox{SE}_{\hat\beta_i}}$$`
+
+---
+## Is the `\(t\)` Statistic "Significant"?
+
+- **Definition:** A **P-value** is the probability, assuming that the null hypothesis `\((H_0)\)` is true, of getting a statistic at least as extreme as the observed test statistic.
+
+--
+
+&lt;br&gt;
+
+- **Golden Rule**: 
+`$$\mbox{P-value is small }\Longleftrightarrow \mbox{ Reject } H_0$$`
+---
+### Is the `\(t\)` Statistic "Significant"?
+
+.panelset[
+.panel[.panel-name[Use R Output]
+
+```r
+mod1 &lt;- lm(Final ~ Midterm, data = MidtermFinal)
+summary(mod1)
+```
+
+```
+## 
+## Call:
+## lm(formula = Final ~ Midterm, data = MidtermFinal)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -18.4621  -6.3571   0.1354   5.7992  16.6279 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  18.6721     9.3311   2.001   0.0548 .  
+## Midterm       1.4925     0.2413   6.186 9.58e-07 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 9.651 on 29 degrees of freedom
+## Multiple R-squared:  0.5689,	Adjusted R-squared:  0.554 
+## F-statistic: 38.26 on 1 and 29 DF,  p-value: 9.582e-07
+```
+
+]
+.panel[.panel-name[Use Probability Functions]
+
+- Use R to obtain the appropriate `\(t\)`-ratio and compute it yourself:
+
+
+
+```r
+# Use t=6.19 df=31-2
+# Two-sided p-value
+2 * pt(6.186, df = 29, lower.tail = FALSE)
+```
+
+```
+## [1] 9.574051e-07
+```
+
+```r
+# One-sided p-value
+pt(6.186, df = 29, lower.tail = FALSE)
+```
+
+```
+## [1] 4.787026e-07
+```
+
+]
+]
+
+
+---
+### Example: Species vs Area
+
+- Is `\(t\)`-inference valid here?
+
+.pull-left[
+
+```
+## 
+## Call:
+## lm(formula = Species ~ Area, data = SpeciesArea)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -20.808  -7.494  -4.027   2.554  35.242 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 2.098e+01  4.621e+00   4.541 0.000677 ***
+## Area        1.733e-04  1.942e-05   8.925 1.21e-06 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 15.79 on 12 degrees of freedom
+## Multiple R-squared:  0.8691,	Adjusted R-squared:  0.8582 
+## F-statistic: 79.66 on 1 and 12 DF,  p-value: 1.206e-06
+```
+]
+
+.pull-right[
+- A statistically significant `\(t\)` test does not mean the model is "correct."
+
+&lt;img src="Ch2Lect_pt1_files/figure-html/unnamed-chunk-8-1.png" width="90%" /&gt;
+
+]
+
+---
+
+## Summary
+
+- Inference about coefficients uses the same process as inference about.
+
+- Conditions must hold for inference to be valid.
+
+- Two approaches
+
+  - **Significance test**: Is there an effect?
+  
+  - **Confidence interval**: How big is the effect?
+
+---
+background-image: url(https://media0.giphy.com/media/nQuG0bQUIegIk87p9Y/200w.webp?cid=ecf05e476fwrml7ex84nfhs0z7kzy7md4b1ryvbd6jhnefvj&amp;rid=200w.webp&amp;ct=g)
+background-position: top right
+
+## Your turn
+### Inference for the used car data
+
+Carry out inference for the slope `\(\beta_1\)` measuring the relationship between Price and Mileage in thousands.
+
+1. Test `\(H_0:\beta_1=0\)` versus the two-sided alternative.
+
+2. Test `\(H_0:\beta_1=-0.5\)` versus the two-sided alternative. 
+
+  - Question: What does this hypothesis mean?
+
+3. Obtain a 90% confidence interval for `\(\beta_1\)`.
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"ratio": "16:9",
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

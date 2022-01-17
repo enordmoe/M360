@@ -1,0 +1,332 @@
+---
+title: "Chapter 2: Inference for Simple Linear Regression"
+subtitle: "Part 1: Section 2.1"
+author: "Applied Statistics II"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: ["xaringan-themer.css", "extra.css"]
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      ratio: 16:9
+      countIncrementalSlides: false
+---
+class: highlight-last-item
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  fig.width=9, fig.height=4,  
+  out.width="90%",
+  message = FALSE
+)
+
+```
+
+
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(mosaic)
+library(Stat2Data)
+library(gridExtra)
+library(plotly)
+data("SpeciesArea")
+data("CountyHealth")
+data("LongJumpOlympics")
+MidtermFinal <- read.csv("http://people.kzoo.edu/enordmoe/math360/MidtermFinal.csv")
+```
+
+```{r xaringanExtra, echo=FALSE}
+xaringanExtra::use_xaringan_extra(c("panelset"))
+xaringanExtra::use_clipboard()
+xaringanExtra::use_tile_view()
+```
+
+
+```{css echo=FALSE}
+.highlight-last-item > ul > li,
+.highlight-last-item > ol > li {
+  opacity: 0.5;
+}
+.highlight-last-item > ul > li:last-of-type,
+.highlight-last-item > ol > li:last-of-type {
+  opacity: 1;
+}
+```
+
+# Outline 
+
+- Distribution of the slope $(\hat\beta_1)$ and intercept $(\hat\beta_0)$ estimates
+
+--
+
+- Standard error of estimates
+
+--
+
+- Inference for $\beta_0$ and $\beta_1$ based on the $t$ distribution
+
+  - Confidence intervals
+  
+  - Hypothesis tests
+  
+---
+## Sampling Distribution
+
+### The Central Limit Theorem
+
+- The sample mean $\bar Y$ varies from sample to sample and has a distribution (for large $n$) that follows:
+
+$$
+\overline Y \sim N(\mu, \sigma/\sqrt{n})
+$$
+
+- This is the foundation for inference about means and differences in means.
+
+--
+
+<br><br>
+
+**Question:** Is there an equivalent result for sample slope and/or intercept?
+
+
+---
+## Sampling Distribution
+
+### The sampling distributions of $\hat\beta_1$ and $\hat\beta_0$. 
+
+- Investigate by sampling from a hypothetical true regression model 
+
+  1. Generate many samples from the same population (known linear model).
+  
+--
+  
+  1. Record the sample slopes and intercepts.
+  
+--
+  
+  1. Compute summary statistics and obtain plots of the sampling distributions.
+  
+
+- Demo: SlopeSimulation.R [R code file](https://www.dropbox.com/s/7v8vzqxrc9lbiad/SlopeSimulation.R?dl=0)
+
+---
+### The sampling distributions of $\hat\beta_1$ and $\hat\beta_0$. 
+
+Assuming the conditions for a Simple Linear Model hold, the slope and interval estimates haves the following distributions:
+
+<br>
+
+
+|                |               $\hat\beta_1$ = slope               |             $\hat\beta_0$ =intercept              |
+|----------------|:-------------------------------------------------:|:-------------------------------------------------:|
+| Mean           |                     $\beta_1$                     |                     $\beta_0$                     |
+| Standard error |              $\sigma_{\hat\beta_1}$               |              $\sigma_{\hat\beta_0}$               |
+| Shape          |                      Normal                       |                      Normal                       |
+| Summary        | $\hat\beta_1\sim N(\beta_1,\sigma_{\hat\beta_1})$ | $\hat\beta_0\sim N(\beta_0,\sigma_{\hat\beta_0})$ |
+
+
+---
+
+## Standard Errors of Slope and Intercept Estimates
+
+- In practice, we don't know either $\sigma_{\hat\beta_1}$ of $\sigma_{\hat\beta_0}$.
+
+- Use R to obtain estimates:
+
+  - $\mbox{SE}_{\hat\beta_1}$ is the standard error of the slope.
+  
+  - $\mbox{SE}_{\hat\beta_0}$ is the standard error of the intercept.
+
+---
+class: highlight-last-item
+
+## Factors affecting the size of the standard error of the slope
+
+The following factors influence the variability of the slope estimate
+
+--
+
+  - Larger sample size $\Rightarrow$ lower SE
+  
+--
+  
+  - Greater error variability $\sigma_\epsilon$ $\Rightarrow$ greater SE
+  
+--
+  
+  - Greater variability in observed $X$ values $\Rightarrow$ lower SE
+
+
+---
+### Example: Midterm vs Final Scores
+.panelset[
+
+```{r, panelset = TRUE, fig.height = 3.5}
+MidtermFinal <- read.csv("http://people.kzoo.edu/enordmoe/math360/MidtermFinal.csv")
+model1 <- lm(Final ~ Midterm, data = MidtermFinal)
+summary(model1)
+```
+]
+
+
+---
+### Inference for Slope and Intercept
+
+- Key Fact:
+
+$$t=\frac{\hat\beta_i-\beta_i}{\mbox{SE}_{\hat\beta_i}}\sim t_{n-2}\mbox{ distribution}$$
+
+--
+
+- We use this to obtain a ** $100(1-\alpha)$% confidence interval for $\beta_i$**:
+
+$$\hat\beta_i\pm t^*\cdot\mbox{SE}_{\hat\beta_i}$$
+
+where $t^*$ is obtained from a $t$-distribution with $n-2$ degrees of freedom.
+
+---
+
+## How do we find a $t^*$?
+
+Illustrate using the information from the **MidtermFinal** data:
+
+.pull-left[
+- Use R to obtain the appropriate multiplier and compute it yourself:
+
+```{r}
+#t-star for 95% confidence 
+# interval with df=31-2
+ct(0.95, df = 29)
+```
+]
+
+--
+
+.pull-right[
+- Fit the model with R and use the R function `confint()` to compute the intervals:
+
+```{r}
+mod1 <- lm(Final ~ Midterm, data = MidtermFinal)
+confint(mod1)
+confint(mod1, level = 0.90)
+```
+
+]
+---
+## $t$-Tests for Slope and Intercept
+### General Case
+
+Hypotheses:
+
+$$H_0:\beta_i=c\\H_a:\beta_i\neq c$$
+
+--
+
+Test statistic:
+$$\frac{\hat\beta_i-c}{\mbox{SE}_{\hat\beta_i}}$$
+
+---
+## $t$-Tests for Slope and Intercept
+### Most Common Case
+
+Hypotheses:
+
+$$H_0:\beta_i=0\\H_a:\beta_i\neq 0$$
+
+--
+
+Test statistic:
+
+$$\frac{\hat\beta_i}{\mbox{SE}_{\hat\beta_i}}$$
+
+---
+## Is the $t$ Statistic "Significant"?
+
+- **Definition:** A **P-value** is the probability, assuming that the null hypothesis $(H_0)$ is true, of getting a statistic at least as extreme as the observed test statistic.
+
+--
+
+<br>
+
+- **Golden Rule**: 
+$$\mbox{P-value is small }\Longleftrightarrow \mbox{ Reject } H_0$$
+---
+### Is the $t$ Statistic "Significant"?
+
+.panelset[
+.panel[.panel-name[Use R Output]
+```{r}
+mod1 <- lm(Final ~ Midterm, data = MidtermFinal)
+summary(mod1)
+```
+
+]
+.panel[.panel-name[Use Probability Functions]
+
+- Use R to obtain the appropriate $t$-ratio and compute it yourself:
+
+
+```{r}
+# Use t=6.19 df=31-2
+# Two-sided p-value
+2 * pt(6.186, df = 29, lower.tail = FALSE)
+# One-sided p-value
+pt(6.186, df = 29, lower.tail = FALSE)
+```
+
+]
+]
+
+
+---
+### Example: Species vs Area
+
+- Is $t$-inference valid here?
+
+.pull-left[
+```{r, echo = FALSE, out.width = 3}
+summary(lm(Species ~ Area, data = SpeciesArea))
+```
+]
+
+.pull-right[
+- A statistically significant $t$ test does not mean the model is "correct."
+
+```{r, echo = FALSE}
+gf_point(Species ~ Area, data = SpeciesArea)
+```
+
+]
+
+---
+
+## Summary
+
+- Inference about coefficients uses the same process as inference about.
+
+- Conditions must hold for inference to be valid.
+
+- Two approaches
+
+  - **Significance test**: Is there an effect?
+  
+  - **Confidence interval**: How big is the effect?
+
+---
+background-image: url(https://media0.giphy.com/media/nQuG0bQUIegIk87p9Y/200w.webp?cid=ecf05e476fwrml7ex84nfhs0z7kzy7md4b1ryvbd6jhnefvj&rid=200w.webp&ct=g)
+background-position: top right
+
+## Your turn
+### Inference for the used car data
+
+Carry out inference for the slope $\beta_1$ measuring the relationship between Price and Mileage in thousands.
+
+1. Test $H_0:\beta_1=0$ versus the two-sided alternative.
+
+2. Test $H_0:\beta_1=-0.5$ versus the two-sided alternative. 
+
+  - Question: What does this hypothesis mean?
+
+3. Obtain a 90% confidence interval for $\beta_1$.

@@ -1,0 +1,59 @@
+---
+title: "code snippets"
+author: "E. Nordmoe"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(mosaic)
+library(gridExtra)
+```
+
+## Code Panelsets
+
+.panelset[
+
+```{r, panelset = TRUE, fig.height = 3.5}
+
+```
+]
+
+
+## Panelsets
+
+.panelset[
+.panel[.panel-name[tab_title]
+```{r echo=FALSE, fig.height=3}
+# Code here
+# Code here
+```
+]
+.panel[.panel-name[tab_title]
+{text or chunks here}
+]
+.panel[.panel-name[Output]
+```{r echo=FALSE}
+mod2 <- lm(SqrtMDs ~ Hospitals, data = CountyHealth)
+mod2
+```
+]
+]
+
+## Grid Plots
+
+```{r}
+plot1 <- gf_histogram(~resid(mod2))
+plot2 <- gf_qq(~resid(mod2)) %>%
+  gf_qqline()
+grid.arrange(plot1, plot2, ncol=2)
+```
+
+## Plotly Example
+
+```{r, panelset = TRUE}
+#install.packages("plotly")
+library(plotly)
+p <- gf_point(Gold ~ Year, data = LongJumpOlympics)
+ggplotly(p)
+```
