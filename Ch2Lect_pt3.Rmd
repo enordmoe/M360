@@ -1,0 +1,213 @@
+---
+title: "Chapter 2: Inference for Simple Linear Regression"
+subtitle: "Part 3: Section 2.4"
+date: "Applied Statistics II"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: ["xaringan-themer.css", "extra.css"]
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      ratio: 16:9
+      countIncrementalSlides: false
+---
+class: highlight-last-item
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  fig.width=9, fig.height=4,  
+  out.width="90%",
+  message = FALSE
+)
+
+```
+
+
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(mosaic)
+library(Stat2Data)
+library(gridExtra)
+library(plotly)
+data("SpeciesArea")
+data("CountyHealth")
+data("LongJumpOlympics")
+MidtermFinal <- read.csv("http://people.kzoo.edu/enordmoe/math360/MidtermFinal.csv")
+```
+
+```{r xaringanExtra, echo=FALSE}
+xaringanExtra::use_xaringan_extra(c("panelset"))
+xaringanExtra::use_clipboard()
+xaringanExtra::use_tile_view()
+```
+
+
+```{css echo=FALSE}
+.highlight-last-item > ul > li,
+.highlight-last-item > ol > li {
+  opacity: 0.5;
+}
+.highlight-last-item > ul > li:last-of-type,
+.highlight-last-item > ol > li:last-of-type {
+  opacity: 1;
+}
+```
+
+# Outline 
+
+- Intervals for Regression
+
+--
+
+- Confidence interval for $\mu_Y$
+
+--
+
+- Prediction interval for $Y$
+
+
+  
+---
+## Accuracy of Predictions
+
+### Example
+
+Recall model for predicting Final grade from Midterm Grade.
+
+$$\widehat{\mbox{Final}}=18.67+1.49\cdot\mbox{Midterm}$$
+
+
+**Problem**: A student has a midterm grade of 41. What grade would we predict for the final?
+
+$$\widehat{\mbox{Final}}=18.67+1.49 (41)=79.76$$
+
+--
+
+$\Longrightarrow$ How accurate is the prediction?
+
+---
+
+## Two Forms of Intervals for Regression 
+
+1) Confidence interval for $\mu_Y$ (mean $Y$)
+
+  - Where is the "true" line for a given $x$?
+  
+  - Where is the **average** $Y$ for the population of cases with a given $x$?
+  
+--
+
+2) Prediction interval for individual $Y$
+
+  - What are plausible $Y$ values for individuals with a given $x$ value?
+  
+---
+## Confidence interval for $\mu_Y$ when $X=x^*$
+
+$$\hat y \pm t^* \hat\sigma_{\epsilon} \sqrt{\frac 1n + \frac{(x^*-\bar x)^2}{\sum(x-\bar x)^2}}$$
+<br>
+The value of $t^*$ is the critical value for $t$ with $\mbox{df}=n-2$
+
+--
+
+**Question:** What factors affect the width of the interval?
+
+---
+
+## Prediction interval for individual $Y$ when $X=x^*$
+
+$$\hat y \pm t^* \hat\sigma_{\epsilon} \sqrt{1+ \frac 1n + \frac{(x^*-\bar x)^2}{\sum(x-\bar x)^2}}$$
+
+<br>
+
+- This interval is much wider to account for individual variability in $Y$ values.
+
+---
+
+## Using R to calculate intervals for a new X
+
+
+.panelset[
+
+```{r, panelset = TRUE, fig.height = 3.5}
+mod1 <- lm(Final ~ Midterm, data = MidtermFinal)
+newx <- data.frame(Midterm = c(41))
+predict(mod1, newdata = newx, interval = "confidence")
+predict(mod1,  newdata = newx, interval = "prediction")
+```
+]
+
+---
+
+### Using R to calculate intervals: More Detail
+
+
+- `se.fit` = $\mbox{SE}_{\hat Y}$ 
+
+- `residual.scale` = $\hat\sigma_{\epsilon}$
+
+.panelset[
+
+```{r, panelset = TRUE, fig.height = 3.5}
+mod1 <- lm(Final ~ Midterm, data = MidtermFinal)
+newx <- data.frame(Midterm = c(42))
+predict(mod1, newdata = newx, interval = "confidence", se.fit = TRUE)
+```
+]
+
+
+
+---
+
+### Visualizing the  Intervals
+
+
+```{r, echo = FALSE, warning = FALSE}
+mod1 <- lm(Final~Midterm,data=MidtermFinal)
+MidFin_with_pred <- data.frame(MidtermFinal, predict(mod1, interval = 'prediction'))
+
+gf_point(Final ~ Midterm, data=MidFin_with_pred) %>%
+  gf_smooth(method = "lm") %>%
+  gf_smooth(method = "lm", fill = ~"Confidence", alpha = 0.5, level = .95, se = TRUE) %>%
+  gf_ribbon(lwr + upr ~ Midterm, fill = ~"Prediction",alpha = 0.2) %>%
+  gf_refine(scale_fill_manual("Interval",values = c("green", "blue"))) %>%
+  gf_theme(legend.position=c(.25, .85))
+
+```
+
+--
+
+**Question:** Why isn't the prediction interval narrower near $\bar x$?
+
+---
+
+background-image: url(https://source.unsplash.com/-dChkgNLmp4)
+background-position: top right
+background-size: 300px
+
+## Your turn
+### Inference for the used car data
+
+1. Fit the regression of Price against Mileage
+
+2. Obtain an interval for the predicted average price of all cars with `Mileage` = 100 thousand.
+
+3. Obtain an interval for the predicted price of an individual car for sale with `Mileage` = 100 thousand.
+
+4. Which of your intervals is wider? Can you explain why?
+
+
+---
+
+## Summary 
+
+- Two types of intervals associated with $\hat Y$.
+
+- Prediction intervals (for $Y$) are always wider than confidence intervals (for $\mu_Y$).
+
+- Value of $X=x^*$ determines both $\hat Y$ and the width of the intervals.
+
+  - The more extreme $x^*$ is, the wider the intervals.
+

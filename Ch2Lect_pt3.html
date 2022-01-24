@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Chapter 2: Inference for Simple Linear Regression</title>
+    <meta charset="utf-8" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset-0.2.6/panelset.js"></script>
+    <script src="libs/clipboard-2.0.6/clipboard.min.js"></script>
+    <link href="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.js"></script>
+    <script>window.xaringanExtraClipboard(null, {"button":"Copy Code","success":"Copied!","error":"Press Ctrl+C to Copy"})</script>
+    <link href="libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view-0.2.6/tile-view.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+    <link rel="stylesheet" href="extra.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Chapter 2: Inference for Simple Linear Regression
+## Part 3: Section 2.4
+### Applied Statistics II
+
+---
+
+class: highlight-last-item
+
+
+
+
+
+
+
+
+
+
+&lt;style type="text/css"&gt;
+.highlight-last-item &gt; ul &gt; li,
+.highlight-last-item &gt; ol &gt; li {
+  opacity: 0.5;
+}
+.highlight-last-item &gt; ul &gt; li:last-of-type,
+.highlight-last-item &gt; ol &gt; li:last-of-type {
+  opacity: 1;
+}
+&lt;/style&gt;
+
+# Outline 
+
+- Intervals for Regression
+
+--
+
+- Confidence interval for `\(\mu_Y\)`
+
+--
+
+- Prediction interval for `\(Y\)`
+
+
+  
+---
+## Accuracy of Predictions
+
+### Example
+
+Recall model for predicting Final grade from Midterm Grade.
+
+`$$\widehat{\mbox{Final}}=18.67+1.49\cdot\mbox{Midterm}$$`
+
+
+**Problem**: A student has a midterm grade of 41. What grade would we predict for the final?
+
+`$$\widehat{\mbox{Final}}=18.67+1.49 (41)=79.76$$`
+
+--
+
+`\(\Longrightarrow\)` How accurate is the prediction?
+
+---
+
+## Two Forms of Intervals for Regression 
+
+1) Confidence interval for `\(\mu_Y\)` (mean `\(Y\)`)
+
+  - Where is the "true" line for a given `\(x\)`?
+  
+  - Where is the **average** `\(Y\)` for the population of cases with a given `\(x\)`?
+  
+--
+
+2) Prediction interval for individual `\(Y\)`
+
+  - What are plausible `\(Y\)` values for individuals with a given `\(x\)` value?
+  
+---
+## Confidence interval for `\(\mu_Y\)` when `\(X=x^*\)`
+
+`$$\hat y \pm t^* \hat\sigma_{\epsilon} \sqrt{\frac 1n + \frac{(x^*-\bar x)^2}{\sum(x-\bar x)^2}}$$`
+&lt;br&gt;
+The value of `\(t^*\)` is the critical value for `\(t\)` with `\(\mbox{df}=n-2\)`
+
+--
+
+**Question:** What factors affect the width of the interval?
+
+---
+
+## Prediction interval for individual `\(Y\)` when `\(X=x^*\)`
+
+`$$\hat y \pm t^* \hat\sigma_{\epsilon} \sqrt{1+ \frac 1n + \frac{(x^*-\bar x)^2}{\sum(x-\bar x)^2}}$$`
+
+&lt;br&gt;
+
+- This interval is much wider to account for individual variability in `\(Y\)` values.
+
+---
+
+## Using R to calculate intervals for a new X
+
+
+.panelset[
+
+.panel[.panel-name[Code]
+
+```r
+mod1 &lt;- lm(Final ~ Midterm, data = MidtermFinal)
+newx &lt;- data.frame(Midterm = c(41))
+predict(mod1, newdata = newx, interval = "confidence")
+predict(mod1,  newdata = newx, interval = "prediction")
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+```
+##       fit      lwr      upr
+## 1 79.8646 76.02267 83.70652
+##       fit      lwr      upr
+## 1 79.8646 59.75512 99.97408
+```
+
+
+
+]
+]
+
+---
+
+### Using R to calculate intervals: More Detail
+
+
+- `se.fit` = `\(\mbox{SE}_{\hat Y}\)` 
+
+- `residual.scale` = `\(\hat\sigma_{\epsilon}\)`
+
+.panelset[
+
+.panel[.panel-name[Code]
+
+```r
+mod1 &lt;- lm(Final ~ Midterm, data = MidtermFinal)
+newx &lt;- data.frame(Midterm = c(42))
+predict(mod1, newdata = newx, interval = "confidence", se.fit = TRUE)
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+```
+## $fit
+##       fit      lwr      upr
+## 1 81.3571 77.29938 85.41481
+## 
+## $se.fit
+## [1] 1.98399
+## 
+## $df
+## [1] 29
+## 
+## $residual.scale
+## [1] 9.651273
+```
+
+
+
+]
+]
+
+
+
+---
+
+### Visualizing the  Intervals
+
+
+&lt;img src="Ch2Lect_pt3_files/figure-html/unnamed-chunk-4-1.png" width="90%" /&gt;
+
+--
+
+**Question:** Why isn't the prediction interval narrower near `\(\bar x\)`?
+
+---
+
+background-image: url(https://source.unsplash.com/-dChkgNLmp4)
+background-position: top right
+background-size: 300px
+
+## Your turn
+### Inference for the used car data
+
+1. Fit the regression of Price against Mileage
+
+2. Obtain an interval for the predicted average price of all cars with `Mileage` = 100 thousand.
+
+3. Obtain an interval for the predicted price of an individual car for sale with `Mileage` = 100 thousand.
+
+4. Which of your intervals is wider? Can you explain why?
+
+
+---
+
+## Summary 
+
+- Two types of intervals associated with `\(\hat Y\)`.
+
+- Prediction intervals (for `\(Y\)`) are always wider than confidence intervals (for `\(\mu_Y\)`).
+
+- Value of `\(X=x^*\)` determines both `\(\hat Y\)` and the width of the intervals.
+
+  - The more extreme `\(x^*\)` is, the wider the intervals.
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"ratio": "16:9",
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
