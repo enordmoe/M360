@@ -162,7 +162,7 @@ $$
 ```{r, fig.height = 6, eval = FALSE}
 # Change proportion to Percent to make coefficients easier to work with
 NFLStandings2016 <- mutate(NFLStandings2016, WinPct = 100*WinPct)
-plot_ly(data = NFLStandings2016, x=~PointsFor, y=~PointsAgainst, z=~WinPct, type="scatter3d", mode="markers", color=~WinPct)
+plot_ly(data = NFLStandings2016, x=~PointsFor, y=~PointsAgainst, z=~WinPct, type="scatter3d", mode="markers", color=~WinPct,  text= ~Team)
 ```
 
 
