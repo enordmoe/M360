@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Chapter 3: Inference for Simple Linear Regression</title>
+    <meta charset="utf-8" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset-0.2.6/panelset.js"></script>
+    <script src="libs/clipboard-2.0.6/clipboard.min.js"></script>
+    <link href="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.js"></script>
+    <script>window.xaringanExtraClipboard(null, {"button":"Copy Code","success":"Copied!","error":"Press Ctrl+C to Copy"})</script>
+    <link href="libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view-0.2.6/tile-view.js"></script>
+    <script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
+    <script src="libs/plotly-binding-4.10.0/plotly.js"></script>
+    <script src="libs/typedarray-0.1/typedarray.min.js"></script>
+    <script src="libs/jquery-3.5.1/jquery.min.js"></script>
+    <link href="libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
+    <script src="libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
+    <link href="libs/plotly-htmlwidgets-css-2.5.1/plotly-htmlwidgets.css" rel="stylesheet" />
+    <script src="libs/plotly-main-2.5.1/plotly-latest.min.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+    <link rel="stylesheet" href="extra.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Chapter 3: Inference for Simple Linear Regression
+## Part 1: Sections 3.1-3.2
+### Applied Statistics II
+
+---
+
+class: highlight-last-item
+
+
+
+
+
+
+
+
+
+
+&lt;style type="text/css"&gt;
+.highlight-last-item &gt; ul &gt; li,
+.highlight-last-item &gt; ol &gt; li {
+  opacity: 0.5;
+}
+.highlight-last-item &gt; ul &gt; li:last-of-type,
+.highlight-last-item &gt; ol &gt; li:last-of-type {
+  opacity: 1;
+}
+&lt;/style&gt;
+
+# Outline 
+
+- Multiple regression
+
+  - Model
+  
+  - Prediction equation
+  
+  - Standard error of the residuals
+  
+  - Correlation matrix
+
+  - Inference in Multiple Regression
+  
+  - Partitioning Variability
+  
+  - Adjusted `\(R^2\)`
+  
+  - Multiple Regression for Confidence and Prediction Intervals
+
+---
+
+## Simple Linear Regression Model Review
+
+$$
+`\begin{gather}
+Y = \beta_0 + \beta _1 X + \epsilon \\[2ex]
+\mbox{where } \epsilon \overset{\text{iid}}{\sim} N(0, \sigma_\epsilon)
+\end{gather}`
+$$
+
+--
+
+**Question:** What if we have more than one predictor?
+
+---
+
+## Multiple Regression Model
+
+$$
+`\begin{gather}
+Y = \beta_0 + \beta _1 X_1 + \beta_2 X_2 + \cdots + \beta_k X_k+ \epsilon \\[2ex]
+\mbox{where } \epsilon \overset{\text{iid}}{\sim} N(0, \sigma_\epsilon)
+\end{gather}`
+$$
+
+--
+
+### Data 
+
+  - A dataframe with `\(n\)` rows
+  
+  - Quantitative response variable `\(Y\)`
+  
+  - Predictors `\(X_1, X_2, \ldots, X_k\)` 
+
+
+---
+
+## Multiple Regression: The 4-Step Process
+
+.pull-left[
+(1) **Choose** a form of the model
+
+  - Select predictors
+  
+  - Determine appropriate functions of predictors
+  
+(2) **Fit** the model
+
+  - Estimate coefficients `\(\hat\beta_0, \hat\beta_1, \ldots, \hat\beta_k\)`
+  
+  - Estimate standard error of the residuals `\(\hat\sigma_\epsilon\)`
+]
+
+--
+
+.pull-right[
+(3) **Assess** the fit
+
+  - Check residual plots
+  
+  - Test the overall fit using ANOVA, `\(R^2\)`, and `\(R^2_{\text{adj}}\)`
+  
+  - Test individual predictors using `\(t\)`-tests
+
+(4) **Use**
+
+  - Obtain predictions `\(\hat Y\)`
+  
+  - Compute **prediction** intervals and **confidence intervals**
+]
+  
+---
+
+## Example: Multiple Predictors using NFL Standings Data
+
+- Response variable: `\(Y=\text{WinPct}\)`
+- Predictors:
+  - `\(X_1=\text{PointsFor}\)`
+  - `\(X_2=\text{PointsAgainst}\)`
+  
+---
+
+## NFL Example: Data Plots Plotly Code
+
+
+```r
+# Change proportion to Percent to make coefficients easier to work with
+NFLStandings2016 &lt;- mutate(NFLStandings2016, WinPct = 100*WinPct)
+plot_ly(data = NFLStandings2016, x=~PointsFor, y=~PointsAgainst, z=~WinPct, type="scatter3d", mode="markers", color=~WinPct)
+```
+
+
+---
+
+## NFL Example: Data Plots Output
+
+<div id="htmlwidget-bdcb648773912e592947" style="width:90%;height:432px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-bdcb648773912e592947">{"x":{"visdat":{"4f0e77484061":["function () ","plotlyVisDat"]},"cur_data":"4f0e77484061","attrs":{"4f0e77484061":{"x":{},"y":{},"z":{},"mode":"markers","color":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter3d"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"scene":{"xaxis":{"title":"PointsFor"},"yaxis":{"title":"PointsAgainst"},"zaxis":{"title":"WinPct"}},"hovermode":"closest","showlegend":false,"legend":{"yanchor":"top","y":0.5}},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"x":[441,421,389,416,540,310,399,354,432,363,333,346,279,354,381,396,343,411,327,418,399,469,367,325,369,275,410,224,279,318,309,264],"y":[250,306,311,385,406,284,327,292,388,380,297,358,328,369,378,383,321,392,307,362,378,454,331,315,402,409,423,394,399,400,480,452],"z":[87.5,81.3,75,75,68.8,68.8,68.8,65.6,62.5,62.5,56.3,56.3,56.3,56.3,56.3,53.1,50,50,50,46.9,43.8,43.8,43.8,40.6,37.5,31.3,31.3,25,18.8,18.8,12.5,6.3],"mode":"markers","type":"scatter3d","marker":{"colorbar":{"title":"WinPct","ticklen":2},"cmin":6.3,"cmax":87.5,"colorscale":[["0","rgba(68,1,84,1)"],["0.0416666666666667","rgba(70,19,97,1)"],["0.0833333333333333","rgba(72,32,111,1)"],["0.125","rgba(71,45,122,1)"],["0.166666666666667","rgba(68,58,128,1)"],["0.208333333333333","rgba(64,70,135,1)"],["0.25","rgba(60,82,138,1)"],["0.291666666666667","rgba(56,93,140,1)"],["0.333333333333333","rgba(49,104,142,1)"],["0.375","rgba(46,114,142,1)"],["0.416666666666667","rgba(42,123,142,1)"],["0.458333333333333","rgba(38,133,141,1)"],["0.5","rgba(37,144,140,1)"],["0.541666666666667","rgba(33,154,138,1)"],["0.583333333333333","rgba(39,164,133,1)"],["0.625","rgba(47,174,127,1)"],["0.666666666666667","rgba(53,183,121,1)"],["0.708333333333333","rgba(79,191,110,1)"],["0.75","rgba(98,199,98,1)"],["0.791666666666667","rgba(119,207,85,1)"],["0.833333333333333","rgba(147,214,70,1)"],["0.875","rgba(172,220,52,1)"],["0.916666666666667","rgba(199,225,42,1)"],["0.958333333333333","rgba(226,228,40,1)"],["1","rgba(253,231,37,1)"]],"showscale":false,"color":[87.5,81.3,75,75,68.8,68.8,68.8,65.6,62.5,62.5,56.3,56.3,56.3,56.3,56.3,53.1,50,50,50,46.9,43.8,43.8,43.8,40.6,37.5,31.3,31.3,25,18.8,18.8,12.5,6.3],"line":{"colorbar":{"title":"","ticklen":2},"cmin":6.3,"cmax":87.5,"colorscale":[["0","rgba(68,1,84,1)"],["0.0416666666666667","rgba(70,19,97,1)"],["0.0833333333333333","rgba(72,32,111,1)"],["0.125","rgba(71,45,122,1)"],["0.166666666666667","rgba(68,58,128,1)"],["0.208333333333333","rgba(64,70,135,1)"],["0.25","rgba(60,82,138,1)"],["0.291666666666667","rgba(56,93,140,1)"],["0.333333333333333","rgba(49,104,142,1)"],["0.375","rgba(46,114,142,1)"],["0.416666666666667","rgba(42,123,142,1)"],["0.458333333333333","rgba(38,133,141,1)"],["0.5","rgba(37,144,140,1)"],["0.541666666666667","rgba(33,154,138,1)"],["0.583333333333333","rgba(39,164,133,1)"],["0.625","rgba(47,174,127,1)"],["0.666666666666667","rgba(53,183,121,1)"],["0.708333333333333","rgba(79,191,110,1)"],["0.75","rgba(98,199,98,1)"],["0.791666666666667","rgba(119,207,85,1)"],["0.833333333333333","rgba(147,214,70,1)"],["0.875","rgba(172,220,52,1)"],["0.916666666666667","rgba(199,225,42,1)"],["0.958333333333333","rgba(226,228,40,1)"],["1","rgba(253,231,37,1)"]],"showscale":false,"color":[87.5,81.3,75,75,68.8,68.8,68.8,65.6,62.5,62.5,56.3,56.3,56.3,56.3,56.3,53.1,50,50,50,46.9,43.8,43.8,43.8,40.6,37.5,31.3,31.3,25,18.8,18.8,12.5,6.3]}},"frame":null},{"x":[224,540],"y":[250,480],"type":"scatter3d","mode":"markers","opacity":0,"hoverinfo":"none","showlegend":false,"marker":{"colorbar":{"title":"WinPct","ticklen":2,"len":0.5,"lenmode":"fraction","y":1,"yanchor":"top"},"cmin":6.3,"cmax":87.5,"colorscale":[["0","rgba(68,1,84,1)"],["0.0416666666666667","rgba(70,19,97,1)"],["0.0833333333333333","rgba(72,32,111,1)"],["0.125","rgba(71,45,122,1)"],["0.166666666666667","rgba(68,58,128,1)"],["0.208333333333333","rgba(64,70,135,1)"],["0.25","rgba(60,82,138,1)"],["0.291666666666667","rgba(56,93,140,1)"],["0.333333333333333","rgba(49,104,142,1)"],["0.375","rgba(46,114,142,1)"],["0.416666666666667","rgba(42,123,142,1)"],["0.458333333333333","rgba(38,133,141,1)"],["0.5","rgba(37,144,140,1)"],["0.541666666666667","rgba(33,154,138,1)"],["0.583333333333333","rgba(39,164,133,1)"],["0.625","rgba(47,174,127,1)"],["0.666666666666667","rgba(53,183,121,1)"],["0.708333333333333","rgba(79,191,110,1)"],["0.75","rgba(98,199,98,1)"],["0.791666666666667","rgba(119,207,85,1)"],["0.833333333333333","rgba(147,214,70,1)"],["0.875","rgba(172,220,52,1)"],["0.916666666666667","rgba(199,225,42,1)"],["0.958333333333333","rgba(226,228,40,1)"],["1","rgba(253,231,37,1)"]],"showscale":true,"color":[6.3,87.5],"line":{"color":"rgba(255,127,14,1)"}},"z":[6.3,87.5],"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+
+---
+
+## NFL Example: More Scatterplots
+
+.panelset[
+
+.panel[.panel-name[Code]
+
+```r
+# scatterplot3d uses different syntax from ggplot2
+library(scatterplot3d)
+s3d &lt;- with(NFLStandings2016,
+           scatterplot3d(PointsFor,PointsAgainst,WinPct, 
+                         type = "h",color = "blue", angle = 70, 
+                         scale.y = 1, pch = 16, main = "3d Scatterplot")
+           )
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+&lt;img src="Ch3Lect_pt1_files/figure-html/unnamed-chunk-4-1.png" width="90%" /&gt;
+
+]
+]
+
+---
+
+### NFL Example: Scatterplot with Fitted Regression Model
+
+&lt;img src="Ch3Lect_pt1_files/figure-html/unnamed-chunk-5-1.png" width="90%" /&gt;
+
+---
+
+### Fitted Prediction Equation
+
+
+```r
+mod1 &lt;- lm(WinPct ~ PointsFor + PointsAgainst, data = NFLStandings2016)
+mod1
+```
+
+```
+## 
+## Call:
+## lm(formula = WinPct ~ PointsFor + PointsAgainst, data = NFLStandings2016)
+## 
+## Coefficients:
+##   (Intercept)      PointsFor  PointsAgainst  
+##       78.5370         0.1699        -0.2482
+```
+
+$$
+\widehat{\text{WinPct}} = 78.54 + 0.1699\text{ PointsFor} -0.2482\text{ PointsAgainst}
+$$
+
+
+
+---
+
+## NFL Example: Regression Summary Output
+
+.panelset[
+
+.panel[.panel-name[Code]
+
+```r
+mod1 &lt;- lm(WinPct ~ PointsFor + PointsAgainst, data = NFLStandings2016)
+summary(mod1)
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+```
+## 
+## Call:
+## lm(formula = WinPct ~ PointsFor + PointsAgainst, data = NFLStandings2016)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -14.9898  -7.3482  -0.6821   7.2569  21.3189 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   78.53698   15.37422   5.108 1.88e-05 ***
+## PointsFor      0.16992    0.02628   6.466 4.48e-07 ***
+## PointsAgainst -0.24816    0.03204  -7.744 1.54e-08 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 9.653 on 29 degrees of freedom
+## Multiple R-squared:  0.7824,	Adjusted R-squared:  0.7674 
+## F-statistic: 52.13 on 2 and 29 DF,  p-value: 2.495e-10
+```
+
+
+
+]
+]
+
+---
+
+## T-tests for Slopes  
+
+- Multiple "slopes" to test (each coefficient)
+
+.pull-left[
+**Hypotheses**
+$$
+`\begin{align}
+H_0:&amp;\beta_i=0 \\
+H_a:&amp;\beta_i\neq 0 \\
+\end{align}`
+$$
+]
+.pull-right[
+**Test statistic**
+`$$t=\frac{\hat\beta_i}{\mbox{SE}_{\hat\beta_i}}\sim t_{n-k-1}$$`
+]
+
+
+---
+
+## Standard Error of the Multiple Regression Model
+
+- Recall condition: `\(\epsilon\sim N(0, \sigma_\epsilon)\)`
+
+&lt;br&gt;
+
+- Estimate standard error:
+
+
+$$
+\hat\sigma_\epsilon = \sqrt{\text{MSE}}= \sqrt{\frac{\text{SSE}}{n-k-1}}
+$$
+
+- Note that degrees of freedom depend on number of predictors.
+
+---
+
+## NFL Example: ANOVA  Output
+
+.panelset[
+
+.panel[.panel-name[Code]
+
+```r
+anova(mod1)
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+```
+## Analysis of Variance Table
+## 
+## Response: WinPct
+##               Df Sum Sq Mean Sq F value    Pr(&gt;F)    
+## PointsFor      1 4126.2  4126.2  44.280 2.692e-07 ***
+## PointsAgainst  1 5588.4  5588.4  59.972 1.537e-08 ***
+## Residuals     29 2702.3    93.2                      
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+
+
+]
+]
+
+---
+
+## t-test for Correlation versus t-test for Slope
+
+- `\(t\)`-test for slope `\(H_0:\beta_i=0\)`: 
+
+  - Assesses the linear association *after* accounting for the other predictors in the model.
+
+- `\(t\)`-test for correlation `\(\rho =0\)`: 
+
+  - Assesses the linear association between two variables by themselves.
+
+
+
+```r
+cor.test(WinPct ~ PointsFor, data = NFLStandings2016)
+```
+
+```
+## 
+## 	Pearson's product-moment correlation
+## 
+## data:  WinPct and PointsFor
+## t = 3.864, df = 30, p-value = 0.0005541
+## alternative hypothesis: true correlation is not equal to 0
+## 95 percent confidence interval:
+##  0.2850621 0.7703124
+## sample estimates:
+##       cor 
+## 0.5764566
+```
+
+---
+
+## ANOVA Test for Overall Variability
+
+- Test the following hypotheses
+
+$$
+`\begin{align}
+H_0&amp;:\beta_1=\beta_2=\cdots=\beta_k=0\\[1ex]
+H_a&amp;: \text{At least one } \beta_i\neq 0
+\end{align}`
+$$
+
+&lt;br&gt;
+
+|   Source  |    df   | Sum of&lt;br&gt;Squares |   Mean&lt;br&gt;Square  |      F      |   `\(p\)`-value   |
+|---------|:-------:|:-----------------:|:-----------------:|:-----------:|:-------------:|
+| Model     |   `\(k\)`   |     `\(SSModel\)`     |    `\(SSModel/k\)`    | `\(MSModel/MSE\)` | `\(F_{k,n-k-1}\)` |
+| Residuals | `\(n-k-1\)` |       `\(SSE\)`       | `\(MSE=SSE/(n-k-1)\)` |             |               |
+| Total     |  `\(n-1\)`  |     `\(SSTotal\)`     |                   |             |               |
+
+&lt;br&gt;
+
+- Test using `\(F=MSModelMSE\)` with `\(k\)` and `\(n-k-1\)` degrees of freedom.
+
+---
+
+## NFL Example: ANOVA Table
+
+- Use `anova_alt.r` to create the `anova_alt()` function.
+
+
+```r
+mod1 &lt;- lm(WinPct ~ PointsFor + PointsAgainst, data = NFLStandings2016)
+# The file anova_alt.r must be in the same folder
+source("anova_alt.r")
+anova_alt(mod1)
+```
+
+```
+## Analysis of Variance Table
+## 
+##        Df      SS     MS      F          P
+## Source  2  9714.6 4857.3 52.126 2.4948e-10
+## Error  29  2702.3   93.2                  
+## Total  31 12416.9  400.5
+```
+
+
+
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"ratio": "16:9",
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

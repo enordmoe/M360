@@ -1,6 +1,6 @@
 ---
 title: "Chapter 3: Inference for Simple Linear Regression"
-subtitle: "Part 3: Sections 2.4-2.5"
+subtitle: "Part 1: Sections 3.1-3.2"
 date: "Applied Statistics II"
 output:
   xaringan::moon_reader:
@@ -31,10 +31,8 @@ library(mosaic)
 library(Stat2Data)
 library(gridExtra)
 library(plotly)
-data("SpeciesArea")
-data("CountyHealth")
-data("LongJumpOlympics")
-MidtermFinal <- read.csv("http://people.kzoo.edu/enordmoe/math360/MidtermFinal.csv")
+data("NFLStandings2016")
+
 ```
 
 ```{r xaringanExtra, echo=FALSE}
@@ -57,157 +55,291 @@ xaringanExtra::use_tile_view()
 
 # Outline 
 
-- Intervals for Regression
+- Multiple regression
+
+  - Model
+  
+  - Prediction equation
+  
+  - Standard error of the residuals
+  
+  - Correlation matrix
+
+  - Inference in Multiple Regression
+  
+  - Partitioning Variability
+  
+  - Adjusted $R^2$
+  
+  - Multiple Regression for Confidence and Prediction Intervals
+
+---
+
+## Simple Linear Regression Model Review
+
+$$
+\begin{gather}
+Y = \beta_0 + \beta _1 X + \epsilon \\[2ex]
+\mbox{where } \epsilon \overset{\text{iid}}{\sim} N(0, \sigma_\epsilon)
+\end{gather}
+$$
 
 --
 
-- Confidence interval for $\mu_Y$
+**Question:** What if we have more than one predictor?
+
+---
+
+## Multiple Regression Model
+
+$$
+\begin{gather}
+Y = \beta_0 + \beta _1 X_1 + \beta_2 X_2 + \cdots + \beta_k X_k+ \epsilon \\[2ex]
+\mbox{where } \epsilon \overset{\text{iid}}{\sim} N(0, \sigma_\epsilon)
+\end{gather}
+$$
 
 --
 
-- Prediction interval for $Y$
+### Data 
+
+  - A dataframe with $n$ rows
+  
+  - Quantitative response variable $Y$
+  
+  - Predictors $X_1, X_2, \ldots, X_k$ 
 
 
+---
+
+## Multiple Regression: The 4-Step Process
+
+.pull-left[
+(1) **Choose** a form of the model
+
+  - Select predictors
+  
+  - Determine appropriate functions of predictors
+  
+(2) **Fit** the model
+
+  - Estimate coefficients $\hat\beta_0, \hat\beta_1, \ldots, \hat\beta_k$
+  
+  - Estimate standard error of the residuals $\hat\sigma_\epsilon$
+]
+
+--
+
+.pull-right[
+(3) **Assess** the fit
+
+  - Check residual plots
+  
+  - Test the overall fit using ANOVA, $R^2$, and $R^2_{\text{adj}}$
+  
+  - Test individual predictors using $t$-tests
+
+(4) **Use**
+
+  - Obtain predictions $\hat Y$
+  
+  - Compute **prediction** intervals and **confidence intervals**
+]
   
 ---
-## Accuracy of Predictions
 
-### Example
+## Example: Multiple Predictors using NFL Standings Data
 
-Recall model for predicting Final grade from Midterm Grade.
-
-$$\widehat{\mbox{Final}}=18.67+1.49\cdot\mbox{Midterm}$$
-
-
-**Problem**: A student has a midterm grade of 41. What grade would we predict for the final?
-
-$$\widehat{\mbox{Final}}=18.67+1.49 (41)=79.76$$
-
---
-
-$\Longrightarrow$ How accurate is the prediction?
-
----
-
-## Two Forms of Intervals for Regression 
-
-1) Confidence interval for $\mu_Y$ (mean $Y$)
-
-  - Where is the "true" line for a given $x$?
-  
-  - Where is the **average** $Y$ for the population of cases with a given $x$?
-  
---
-
-2) Prediction interval for individual $Y$
-
-  - What are plausible $Y$ values for individuals with a given $x$ value?
+- Response variable: $Y=\text{WinPct}$
+- Predictors:
+  - $X_1=\text{PointsFor}$
+  - $X_2=\text{PointsAgainst}$
   
 ---
-## Confidence interval for $\mu_Y$ when $X=x^*$
 
-$$\hat y \pm t^* \hat\sigma_{\epsilon} \sqrt{\frac 1n + \frac{(x^*-\bar x)^2}{\sum(x-\bar x)^2}}$$
-<br>
-The value of $t^*$ is the critical value for $t$ with $\mbox{df}=n-2$
+## NFL Example: Data Plots Plotly Code
 
---
+```{r, fig.height = 6, eval = FALSE}
+# Change proportion to Percent to make coefficients easier to work with
+NFLStandings2016 <- mutate(NFLStandings2016, WinPct = 100*WinPct)
+plot_ly(data = NFLStandings2016, x=~PointsFor, y=~PointsAgainst, z=~WinPct, type="scatter3d", mode="markers", color=~WinPct)
+```
 
-**Question:** What factors affect the width of the interval?
-
----
-
-## Prediction interval for individual $Y$ when $X=x^*$
-
-$$\hat y \pm t^* \hat\sigma_{\epsilon} \sqrt{1+ \frac 1n + \frac{(x^*-\bar x)^2}{\sum(x-\bar x)^2}}$$
-
-<br>
-
-- This interval is much wider to account for individual variability in $Y$ values.
 
 ---
 
-## Using R to calculate intervals for a new X
+## NFL Example: Data Plots Output
 
+```{r, echo = FALSE, fig.height = 6}
+# Change proportion to Percent to make coefficients easier to work with
+NFLStandings2016 <- mutate(NFLStandings2016, WinPct = 100*WinPct)
+plot_ly(data = NFLStandings2016, x=~PointsFor, y=~PointsAgainst, z=~WinPct, type="scatter3d", mode="markers", color=~WinPct)
+```
+
+---
+
+## NFL Example: More Scatterplots
 
 .panelset[
 
-```{r, panelset = TRUE, fig.height = 3.5}
-mod1 <- lm(Final ~ Midterm, data = MidtermFinal)
-newx <- data.frame(Midterm = c(41))
-predict(mod1, newdata = newx, interval = "confidence")
-predict(mod1,  newdata = newx, interval = "prediction")
+```{r, panelset = TRUE}
+# scatterplot3d uses different syntax from ggplot2
+library(scatterplot3d)
+s3d <- with(NFLStandings2016,
+           scatterplot3d(PointsFor,PointsAgainst,WinPct, 
+                         type = "h",color = "blue", angle = 70, 
+                         scale.y = 1, pch = 16, main = "3d Scatterplot")
+           )
+
 ```
 ]
 
 ---
 
-### Using R to calculate intervals: More Detail
+### NFL Example: Scatterplot with Fitted Regression Model
+
+```{r, echo = FALSE}
+mod1 <- lm(WinPct ~ PointsFor + PointsAgainst, data = NFLStandings2016)
+s3d <- with(NFLStandings2016,
+         scatterplot3d(PointsFor, PointsAgainst, WinPct, type = "h", color = "blue", pch = 16, angle = 50, main = "3d Scatterplot",xlim = c(250, 550), ylim = c(250,500))
+)
+s3d$plane3d(mod1, lty.box = "solid")
+```
+
+---
+
+### Fitted Prediction Equation
+
+```{r}
+mod1 <- lm(WinPct ~ PointsFor + PointsAgainst, data = NFLStandings2016)
+mod1
+```
+
+$$
+\widehat{\text{WinPct}} = 78.54 + 0.1699\text{ PointsFor} -0.2482\text{ PointsAgainst}
+$$
 
 
-- `se.fit` = $\mbox{SE}_{\hat Y}$ 
 
-- `residual.scale` = $\hat\sigma_{\epsilon}$
+---
+
+## NFL Example: Regression Summary Output
 
 .panelset[
 
 ```{r, panelset = TRUE, fig.height = 3.5}
-mod1 <- lm(Final ~ Midterm, data = MidtermFinal)
-newx <- data.frame(Midterm = c(42))
-predict(mod1, newdata = newx, interval = "confidence", se.fit = TRUE)
+mod1 <- lm(WinPct ~ PointsFor + PointsAgainst, data = NFLStandings2016)
+summary(mod1)
 ```
 ]
 
+---
+
+## T-tests for Slopes  
+
+- Multiple "slopes" to test (each coefficient)
+
+.pull-left[
+**Hypotheses**
+$$
+\begin{align}
+H_0:&\beta_i=0 \\
+H_a:&\beta_i\neq 0 \\
+\end{align}
+$$
+]
+.pull-right[
+**Test statistic**
+$$t=\frac{\hat\beta_i}{\mbox{SE}_{\hat\beta_i}}\sim t_{n-k-1}$$
+]
 
 
 ---
 
-### Visualizing the  Intervals
+## Standard Error of the Multiple Regression Model
+
+- Recall condition: $\epsilon\sim N(0, \sigma_\epsilon)$
+
+<br>
+
+- Estimate standard error:
 
 
-```{r, echo = FALSE, warning = FALSE}
-mod1 <- lm(Final~Midterm,data=MidtermFinal)
-MidFin_with_pred <- data.frame(MidtermFinal, predict(mod1, interval = 'prediction'))
+$$
+\hat\sigma_\epsilon = \sqrt{\text{MSE}}= \sqrt{\frac{\text{SSE}}{n-k-1}}
+$$
 
-gf_point(Final ~ Midterm, data=MidFin_with_pred) %>%
-  gf_smooth(method = "lm") %>%
-  gf_smooth(method = "lm", fill = ~"Confidence", alpha = 0.5, level = .95, se = TRUE) %>%
-  gf_ribbon(lwr + upr ~ Midterm, fill = ~"Prediction",alpha = 0.2) %>%
-  gf_refine(scale_fill_manual("Interval",values = c("green", "blue"))) %>%
-  gf_theme(legend.position=c(.25, .85))
+- Note that degrees of freedom depend on number of predictors.
 
+---
+
+## NFL Example: ANOVA  Output
+
+.panelset[
+
+```{r, panelset = TRUE, fig.height = 3.5}
+anova(mod1)
+```
+]
+
+---
+
+## t-test for Correlation versus t-test for Slope
+
+- $t$-test for slope $H_0:\beta_i=0$: 
+
+  - Assesses the linear association *after* accounting for the other predictors in the model.
+
+- $t$-test for correlation $\rho =0$: 
+
+  - Assesses the linear association between two variables by themselves.
+
+
+```{r}
+cor.test(WinPct ~ PointsFor, data = NFLStandings2016)
 ```
 
---
+---
 
-**Question:** Why isn't the prediction interval narrower near $\bar x$?
+## ANOVA Test for Overall Variability
+
+- Test the following hypotheses
+
+$$
+\begin{align}
+H_0&:\beta_1=\beta_2=\cdots=\beta_k=0\\[1ex]
+H_a&: \text{At least one } \beta_i\neq 0
+\end{align}
+$$
+
+<br>
+
+|   Source  |    df   | Sum of<br>Squares |   Mean<br>Square  |      F      |   $p$-value   |
+|---------|:-------:|:-----------------:|:-----------------:|:-----------:|:-------------:|
+| Model     |   $k$   |     $SSModel$     |    $SSModel/k$    | $MSModel/MSE$ | $F_{k,n-k-1}$ |
+| Residuals | $n-k-1$ |       $SSE$       | $MSE=SSE/(n-k-1)$ |             |               |
+| Total     |  $n-1$  |     $SSTotal$     |                   |             |               |
+
+<br>
+
+- Test using $F=MSModelMSE$ with $k$ and $n-k-1$ degrees of freedom.
 
 ---
 
-background-image: url(https://source.unsplash.com/-dChkgNLmp4)
-background-position: top right
-background-size: 300px
+## NFL Example: ANOVA Table
 
-## Your turn
-### Inference for the used car data
+- Use `anova_alt.r` to create the `anova_alt()` function.
 
-1. Fit the regression of Price against Mileage
-
-2. Obtain an interval for the predicted average price of all cars with `Mileage` = 100 thousand.
-
-3. Obtain an interval for the predicted price of an individual car for sale with `Mileage` = 100 thousand.
-
-4. Which of your intervals is wider? Can you explain why?
+```{r anova_alt1}
+mod1 <- lm(WinPct ~ PointsFor + PointsAgainst, data = NFLStandings2016)
+# The file anova_alt.r must be in the same folder
+source("anova_alt.r")
+anova_alt(mod1)
+```
 
 
----
 
-## Summary 
 
-- Two types of intervals associated with $\hat Y$.
 
-- Prediction intervals (for $Y$) are always wider than confidence intervals (for $\mu_Y$).
 
-- Value of $X=x^*$ determines both $\hat Y$ and the width of the intervals.
-
-  - The more extreme $x^*$ is, the wider the intervals.
 
