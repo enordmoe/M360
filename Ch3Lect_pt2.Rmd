@@ -1,6 +1,6 @@
 ---
 title: "Chapter 3: Inference for Simple Linear Regression"
-subtitle: "Part 1: Sections 3.1-3.2"
+subtitle: "Part 2: Sections 3.3-3.4"
 date: "Applied Statistics II"
 output:
   xaringan::moon_reader:
@@ -253,18 +253,6 @@ $$
 $$t=\frac{\hat\beta_i}{\mbox{SE}_{\hat\beta_i}}\sim t_{n-k-1}$$
 ]
 
----
-## Confidence Intervals for Slopes  
-
-- A confidence interval for the true value of any multiple regression coefficient, $\beta_i$
- has the form
-$$\hat\beta_i\pm t^* \cdot\text{SE}_{\hat\beta_i}$$
-
-  - $t^*$ is the critical value from the $t$-distribution with $n-k-1$ degrees of freedom.
-  
-  - $\text{SE}_{\hat\beta_i}$ is otained from R output.
-  
-- Confidence intervals can be obtained directly using the `confint()` function in R.
 
 ---
 
@@ -298,25 +286,19 @@ anova(mod1)
 
 ## t-test for Correlation versus t-test for Slope
 
-.pull-left[
 - $t$-test for slope $H_0:\beta_i=0$: 
 
-  - Assesses the linear association **after accounting for the other predictors** in the model.
+  - Assesses the linear association *after* accounting for the other predictors in the model.
 
 - $t$-test for correlation $\rho =0$: 
 
-  - Assesses the linear association between two variables **by themselves**.
+  - Assesses the linear association between two variables by themselves.
 
-**Important**: These two tests are not equivalent in multiple regression.
-
-]
-.pull-right[
 
 ```{r}
 cor.test(WinPct ~ PointsFor, data = NFLStandings2016)
 ```
 
-]
 ---
 
 ## ANOVA Test for Overall Variability
@@ -356,130 +338,8 @@ anova_alt(mod1)
 ```
 
 
----
-
-## Why do we call it $R^2$?
-
-$$
-R^2=\frac{\text{SSModel}}{\text{SSTotal}}
-$$
-
-- For a simple linear model:
-  - $R^2$ is the squared correlation coefficient $R^2=r^2$.
-<br>
-- For multiple regression:
-  - Each predictor $X_i$ has a different correlation with $Y$.
-  - $R^2$ is correlation between the observed and predicted values:
-  $$R^2=\text{corr}(y,\hat y)$$
-  
-<br>
-**Note:** This interpretation is not needed for simple correlation but also holds there.
-
----
-
-## What makes a good multiple regression model?
-
-.center[
-![](figures/good_model.png)
-]
-.footnote[Source: Stat2e Resources]
-
----
-
-## Purposes and Approaches to Regression Modeling
-
-.pull-left[
-### Purposes
-
-1. Model and understand
-
-2. Predict 
-
-### Competing goals
-
-1. **Parsimony**: construct a simple model
-
-2. **Increase $R^2$**: construct a complex model
-
-]
-
---
-
-.pull-right[
-### Tradeoffs
-
-- Adding terms to a model:
-
-  - Increases SSModel
-  
-  - Decreases SSE
-  
-  - Increases $R^2$
-
-### Practical question 
-
-- Is the increase in $R^2$ worth the added complexity?
-]
-
----
-background-image: url(https://source.unsplash.com/7-ToFEHzMNw)
-background-size: 200px
-background-position: 90% 8%
-
-### Adjusted $R^2$ to the Rescue
-
-- For simple regression we used:
-
-$$
-R^2 = \frac{SSModel}{SSTotal}=1-\frac{SSE}{SSTotal}
-$$
-
-- An "adjusted" version is preferred for multiple regression:
-
-$$R^2 = 1-\frac{SSE/(n-k-1)}{SSTotal/(n-1)}=1-\frac{\hat\sigma^2_{\epsilon}}{s^2_y}$$
-
-- The adjustment is a "penalty" for adding parameters to the model.
-
-- Can be used to compare models with different numbers of predictors.
----
-
-### NFL Regression Output Revisited
-
-.panelset[
-
-```{r, panelset = TRUE, fig.height = 3.5}
-mod1 <- lm(WinPct ~ PointsFor + PointsAgainst, data = NFLStandings2016)
-summary(mod1)
-```
-]
-
----
-
-## Confidence Intervals and Prediction Intervals for Multiple Regression
-
-- Obtain predictions by substituting $x$ values of interest:
-
-$$\hat y = \hat\beta_0 + \hat\beta_1 x_1^* + \cdots + \hat\beta_k x_k^*$$
-
-- As before, prediction intervals are much wider than confidence intervals
-
-- Use R to obtain confidence and prediction intervals
-
----
-
-### NFL Regression Prediction Examples
-
-- Average (expected) winning percent for all teams with `PointsFor=350` and `PointsAgainst=300`.
-
-```{r fig.height = 3.5}
-newxvals <- data.frame(PointsFor = 350, PointsAgainst = 300)
-predict(mod1, newdata = newxvals, interval = "confidence")
-```
 
 
-- Winning percent for a single team with `PointsFor=350` and `PointsAgainst=300`.
 
-```{r fig.height = 3.5}
-predict(mod1, newdata = newxvals, interval = "prediction")
-```
-]
+
+
