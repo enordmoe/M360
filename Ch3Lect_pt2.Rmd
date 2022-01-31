@@ -1,6 +1,6 @@
 ---
 title: "Chapter 3: Inference for Simple Linear Regression"
-subtitle: "Part 2: Sections 3.3"
+subtitle: "Part 2: Section 3.3"
 date: "Applied Statistics II"
 output:
   xaringan::moon_reader:
