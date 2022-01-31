@@ -436,7 +436,7 @@ $$
 
 - An "adjusted" version is preferred for multiple regression:
 
-$$R^2 = 1-\frac{SSE/(n-k-1)}{SSTotal/(n-1)}=1-\frac{\hat\sigma^2_{\epsilon}}{s^2_y}$$
+$$R^2_{\text{adj    }} = 1-\frac{SSE/(n-k-1)}{SSTotal/(n-1)}=1-\frac{\hat\sigma^2_{\epsilon}}{s^2_y}$$
 
 - The adjustment is a "penalty" for adding parameters to the model.
 

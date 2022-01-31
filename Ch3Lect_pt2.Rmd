@@ -219,7 +219,7 @@ summary(lm.dummy)
 
 **low**: $X_2 = 0$ so 
 $$\begin{align}Y=& \beta_0 + \beta_1 X_1+ \beta_2\cdot 0 + \epsilon \\[1ex]
-=&\beta_1 X_1+  \epsilon\end{align}$$
+=&\beta_0 + \beta_1 X_1+  \epsilon\end{align}$$
 
   
 **high**: $X_2 = 1$ so 
