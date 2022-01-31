@@ -15,10 +15,12 @@ library(gridExtra)
 .panelset[
 
 ```{r, panelset = TRUE, fig.height = 3.5}
-
+lm.2lines = lm(tswirl ~ dist + height.hi + dist * height.hi, data = funnel.hilo)
+summary(lm.2lines)
 ```
 ]
 
+---
 
 ## Panelsets
 

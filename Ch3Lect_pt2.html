@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Chapter 3: Inference for Simple Linear Regression</title>
+    <meta charset="utf-8" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset-0.2.6/panelset.js"></script>
+    <script src="libs/clipboard-2.0.6/clipboard.min.js"></script>
+    <link href="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.js"></script>
+    <script>window.xaringanExtraClipboard(null, {"button":"Copy Code","success":"Copied!","error":"Press Ctrl+C to Copy"})</script>
+    <link href="libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view-0.2.6/tile-view.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+    <link rel="stylesheet" href="extra.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Chapter 3: Inference for Simple Linear Regression
+## Part 2: Sections 3.3
+### Applied Statistics II
+
+---
+
+class: highlight-last-item
+
+
+
+
+
+
+
+
+
+
+&lt;style type="text/css"&gt;
+.highlight-last-item &gt; ul &gt; li,
+.highlight-last-item &gt; ol &gt; li {
+  opacity: 0.5;
+}
+.highlight-last-item &gt; ul &gt; li:last-of-type,
+.highlight-last-item &gt; ol &gt; li:last-of-type {
+  opacity: 1;
+}
+&lt;/style&gt;
+
+# Outline 
+
+- "Dummy variable" predictors
+
+  - As a single predictor
+
+  - With a quantitative predictor
+  
+--
+  
+- Comparing two lines
+
+  - Different intercepts
+  
+  - Different lines
+  
+--
+
+- Extend to more than two lines
+
+---
+
+## Height as a Categorical Predictor
+
+.pull-left[
+
+
+- Use height `\((x)\)` to predict swirling time `\((y)\)`
+
+- Compare high (13 inches) vs low (10 inches)
+
+]
+
+--
+.pull-right[
+
+&lt;img src="Ch3Lect_pt2_files/figure-html/unnamed-chunk-2-1.png" width="90%" /&gt;
+
+]
+
+---
+### Two-Sample `\(t\)` Test for Means (using pooled variances)
+
+- Test for equal swirling times:
+
+$$
+`\begin{gather}
+H_0:\mu_1=\mu_2\\
+H_a:\mu_1\neq\mu_2
+\end{gather}`
+$$
+
+- using pooled `\(t\)`-test:
+`$$t=\frac{\bar y_1-\bar y_2}{s_p\sqrt{\frac 1n_1 + \frac 1n_2}}$$`
+
+- where we assume constant variability `\((\sigma_1=\sigma_2)\)` and use the pooled standard deviation:
+$$
+s_p=\sqrt{\frac{(n_1-1)s_1^2+(n_2-1)s_2^2}{n_1+n_2-2}}\quad .
+$$
+
+
+---
+
+### Two-sample `\(t\)`-test in R
+
+.panelset[
+
+.panel[.panel-name[Code]
+
+```r
+t.test(tswirl ~ height.hi, var.equal = TRUE, data = funnel.hilo)
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+```
+## 
+## 	Two Sample t-test
+## 
+## data:  tswirl by height.hi
+## t = -8.3465, df = 18, p-value = 1.333e-07
+## alternative hypothesis: true difference in means between group 0 and group 1 is not equal to 0
+## 95 percent confidence interval:
+##  -14.032968  -8.389032
+## sample estimates:
+## mean in group 0 mean in group 1 
+##          10.565          21.776
+```
+
+
+
+]
+]
+
+---
+
+### Recast this as a dummy variable regression question
+
+.pull-left[
+
+- Regression model:
+
+$$
+\text{tswirl} = \beta_0 + \beta_1 X + \epsilon
+$$
+where
+`$$X=\begin{cases} 0 &amp; \text{height } =10 \\1 &amp; \text{height } =13 \end{cases}$$`
+
+- We call `\(X\)` an **indicator** or **dummy** variable.
+
+]
+.pull-right[
+&lt;img src="Ch3Lect_pt2_files/figure-html/unnamed-chunk-4-1.png" width="90%" /&gt;
+
+
+]
+
+
+---
+
+### Dummy variable regression input and output
+
+.panelset[
+
+.panel[.panel-name[Code]
+
+```r
+lm.dummy &lt;- lm(tswirl ~ height.hi, data = funnel.hilo)
+summary(lm.dummy)
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+```
+## 
+## Call:
+## lm(formula = tswirl ~ height.hi, data = funnel.hilo)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -4.0650 -2.3825 -0.7455  2.9448  4.6150 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  10.5650     0.9498  11.124 1.69e-09 ***
+## height.hi    11.2110     1.3432   8.346 1.33e-07 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 3.003 on 18 degrees of freedom
+## Multiple R-squared:  0.7947,	Adjusted R-squared:  0.7833 
+## F-statistic: 69.66 on 1 and 18 DF,  p-value: 1.333e-07
+```
+
+
+
+]
+]
+
+---
+
+### Comparing the t-test and regression output?
+
+- Compare `\(t\)` statistics and p-values.
+
+- Interpret regression intercept.
+
+- Interpret regression slope.
+
+- Where does `\(s_p\)` appear in the output?
+
+
+---
+
+## Quantitative plus indicator predictors
+### Parallel lines model
+
+.pull-left[
+
+- Example:
+
+  - `\(Y\)` = swirling time
+  
+  - `\(X_1\)` = distance up the channel
+  
+  - `\(X_2\)` = height (low = 0, high = 1)
+  
+- Overall model
+
+  - `\(Y=\beta_0+\beta_1 X_1+\beta_2 X_2 +\epsilon\)`
+  
+]
+
+.pull-right[
+  
+- Identify models for each height
+
+**low**: `\(X_2 = 0\)` so 
+`$$\begin{align}Y=&amp; \beta_0 + \beta_1 X_1+ \beta_2\cdot 0 + \epsilon \\[1ex]
+=&amp;\beta_1 X_1+  \epsilon\end{align}$$`
+
+  
+**high**: `\(X_2 = 1\)` so 
+`$$\begin{align}Y=&amp;\beta_0 + \beta_1 X_1 + \beta_2\cdot 1 + \epsilon\\[1ex]
+=&amp; (\beta_0+\beta_2) + \beta_1 X_1 + \epsilon\end{align}$$`
+  
+]
+
+---
+
+### Funnel Data Example: Parallel Lines Regression
+
+.panelset[
+
+.panel[.panel-name[Code]
+
+```r
+lm.parallel = lm(tswirl ~ dist + height.hi, data = funnel.hilo)
+summary(lm.parallel)
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+```
+## 
+## Call:
+## lm(formula = tswirl ~ dist + height.hi, data = funnel.hilo)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -1.5200 -0.6068 -0.2290  0.8135  1.5980 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  2.93700    0.70527   4.164  0.00065 ***
+## dist         0.31783    0.02628  12.092 8.95e-10 ***
+## height.hi   11.21100    0.44605  25.134 6.95e-15 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.9974 on 17 degrees of freedom
+## Multiple R-squared:  0.9786,	Adjusted R-squared:  0.9761 
+## F-statistic:   389 on 2 and 17 DF,  p-value: 6.398e-15
+```
+
+
+
+]
+
+]
+
+---
+
+### Plotting the fitted parallel lines
+
+.panelset[
+
+.panel[.panel-name[Code]
+
+```r
+gf_point(tswirl ~ dist, color = ~factor(height.hi), data = funnel.hilo) %&gt;%
+  gf_smooth(method = "lm")
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+&lt;img src="Ch3Lect_pt2_files/figure-html/unnamed-chunk-7-1.png" width="90%" /&gt;
+
+]
+]
+
+---
+
+### Comparing Parallel Regression Lines
+
+- Is there a significant difference in the intercepts?
+
+- The `\(t\)`-test for the `height.hi` (dummy variable) coefficient is a test of whether the intercepts differ:
+
+`$$H_0: \beta_2=0\\H_a: \beta_2\neq 0$$`
+
+
+---
+
+### Assessing the Fit
+
+
+
+.panelset[
+
+.panel[.panel-name[Code]
+
+```r
+# Optional: Code gets a bit messy to color residuals by height
+# Don't worry about that
+p1 &lt;- gf_point(resid(lm.parallel)~fitted(lm.parallel), 
+               color = ~factor(lm.parallel$model$height.hi)) %&gt;%
+  gf_labs(color = "Height")
+p2 &lt;- gf_qq(~resid(lm.parallel)) %&gt;%
+  gf_qqline()
+grid.arrange(p1, p2, ncol = 2)
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+&lt;img src="Ch3Lect_pt2_files/figure-html/unnamed-chunk-8-1.png" width="90%" /&gt;
+
+]
+
+]
+
+
+---
+
+### Specify Fitted Models by Height
+
+- Height = Low `\((X_2=0)\)`:
+
+$$
+\widehat{\text{tswirl}} = 2.937 + 0.318 \cdot \text{dist}
+$$
+
+--
+
+&lt;br&gt;
+
+- Height = High `\((X_2=1)\)`:
+
+$$
+`\begin{align}
+\widehat{\text{tswirl}} =&amp; 2.937 + 0.318 \cdot \text{dist} + 11.211(1)\\[1ex]
+=&amp; 14.148 + 0.318 \cdot \text{dist} 
+\end{align}`
+$$
+
+---
+
+### Interaction (Two Lines) Model
+
+- Allow both intercepts and slopes to differ
+
+- The two lines model:
+
+$$
+Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1\cdot X_2 + \epsilon
+$$
+
+- `\(\beta_2\)` models the difference in **intercepts**.
+
+- `\(\beta_3\)` models the difference in **slopes**.
+
+---
+### Interaction (Two Lines) Model for Funnel Data
+
+- The complete model
+
+$$
+\text{tswirl} = \beta_0 + \beta_1 (\text{dist}) + \beta_2 (\text{funnel.hi}) + \beta_3 (\text{dist}\cdot \text{funnel.hi}) + \epsilon
+$$
+
+- Specifying the model for each height:
+
+(1) Height = Low 
+  
+$$
+`\begin{align}
+\text{tswirl} &amp;= \beta_0 + \beta_1 (\text{dist}) + \beta_2 (0) + \beta_3 (\text{dist}\cdot 0) + \epsilon \\[1ex]
+ &amp;= \beta_0 + \beta_1 (\text{dist}) + \epsilon
+\end{align}`
+$$
+  
+(2) Height = High 
+  
+$$
+`\begin{align}
+\text{tswirl} &amp;= \beta_0 + \beta_1 (\text{dist}) + \beta_2 (1) + \beta_3 (\text{dist}\cdot 1) + \epsilon \\[1ex]
+ &amp;= (\beta_0+\beta_2) + (\beta_1+\beta_3) (\text{dist}) + \epsilon
+\end{align}`
+$$
+
+---
+
+### R Output for the Interaction Model
+
+
+.panelset[
+
+.panel[.panel-name[Code]
+
+```r
+lm.2lines = lm(tswirl ~ dist + height.hi + dist * height.hi, data = funnel.hilo)
+summary(lm.2lines)
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+```
+## 
+## Call:
+## lm(formula = tswirl ~ dist + height.hi + dist * height.hi, data = funnel.hilo)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -1.2310 -0.6528 -0.1785  0.7065  1.7140 
+## 
+## Coefficients:
+##                Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)     2.22900    0.93851   2.375   0.0304 *  
+## dist            0.34733    0.03687   9.421 6.26e-08 ***
+## height.hi      12.62700    1.32726   9.514 5.47e-08 ***
+## dist:height.hi -0.05900    0.05214  -1.132   0.2745    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.9893 on 16 degrees of freedom
+## Multiple R-squared:  0.9802,	Adjusted R-squared:  0.9765 
+## F-statistic:   264 on 3 and 16 DF,  p-value: 7.819e-14
+```
+
+
+
+]
+]
+
+
+---
+
+## Using the R Output for the Interaction Model
+
+### Use coefficient `\(t\)`-tests
+
+- Test for different slopes:
+
+  - `\(H_0: \beta_3=0\text{ versus } H_a: \beta_3\neq 0\)`
+  
+- Test for different intercepts:
+
+  - `\(H_0: \beta_3=0\text{ versus } H_a: \beta_3\neq 0\)`
+  
+
+**Note:** Joint test for both requires a nested `\(F\)`-test (to come)  
+
+---
+
+### The Two Lines Models Can Be Generalized to More than Two Heights
+
+.panelset[
+.panel[.panel-name[3 parallel lines code]
+
+```r
+lm.parallel3 &lt;- lm(tswirl ~ dist + factor(height), data = funneldata)
+summary(lm.parallel3)
+```
+]
+.panel[.panel-name[3 parallel lines output]
+
+```
+## 
+## Call:
+## lm(formula = tswirl ~ dist + factor(height), data = funneldata)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -1.5800 -0.6760 -0.1425  0.8460  1.5680 
+## 
+## Coefficients:
+##                    Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)         2.81700    0.58404   4.823 5.36e-05 ***
+## dist                0.32283    0.02075  15.556 1.10e-14 ***
+## factor(height)11.5  8.50400    0.43134  19.715  &lt; 2e-16 ***
+## factor(height)13   11.21100    0.43134  25.991  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.9645 on 26 degrees of freedom
+## Multiple R-squared:  0.9741,	Adjusted R-squared:  0.9711 
+## F-statistic: 325.9 on 3 and 26 DF,  p-value: &lt; 2.2e-16
+```
+
+]
+.panel[.panel-name[3 lines code]
+
+```r
+lm.3lines &lt;- lm(tswirl ~ dist + factor(height) + dist:factor(height), 
+             data = funneldata)
+summary(lm.3lines)
+```
+]
+.panel[.panel-name[3 lines output]
+
+```
+## 
+## Call:
+## lm(formula = tswirl ~ dist + factor(height) + dist:factor(height), 
+##     data = funneldata)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -1.3850 -0.6560 -0.1785  0.7715  1.7140 
+## 
+## Coefficients:
+##                         Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)              2.22900    0.92519   2.409    0.024 *  
+## dist                     0.34733    0.03635   9.557 1.18e-09 ***
+## factor(height)11.5       8.85200    1.30842   6.765 5.36e-07 ***
+## factor(height)13        12.62700    1.30842   9.651 9.80e-10 ***
+## dist:factor(height)11.5 -0.01450    0.05140  -0.282    0.780    
+## dist:factor(height)13   -0.05900    0.05140  -1.148    0.262    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.9752 on 24 degrees of freedom
+## Multiple R-squared:  0.9756,	Adjusted R-squared:  0.9705 
+## F-statistic: 191.6 on 5 and 24 DF,  p-value: &lt; 2.2e-16
+```
+]
+]
+
+---
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"ratio": "16:9",
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

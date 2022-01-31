@@ -1,6 +1,6 @@
 ---
 title: "Chapter 3: Inference for Simple Linear Regression"
-subtitle: "Part 2: Sections 3.3-3.4"
+subtitle: "Part 2: Sections 3.3"
 date: "Applied Statistics II"
 output:
   xaringan::moon_reader:
@@ -31,7 +31,14 @@ library(mosaic)
 library(Stat2Data)
 library(gridExtra)
 library(plotly)
-data("NFLStandings2016")
+library(readr)
+funneldata <- read_csv("http://people.kzoo.edu/enordmoe/math360/funneldata.csv", col_types = cols(trial = col_factor(levels = c("1","2"))))
+funnel.hi <- filter(funneldata, height == 13)
+funnel.hilo <- filter(funneldata, height == 13 | height == 10)
+funnel.hilo <- mutate(funnel.hilo, height.hi = ifelse(height==13,1,0))
+funneldata <- mutate(funneldata, height.hi = ifelse(height==13, 1, 0),
+                   height.mid = ifelse(height == 11.5, 1, 0))
+
 
 ```
 
@@ -55,291 +62,356 @@ xaringanExtra::use_tile_view()
 
 # Outline 
 
-- Multiple regression
+- "Dummy variable" predictors
 
-  - Model
-  
-  - Prediction equation
-  
-  - Standard error of the residuals
-  
-  - Correlation matrix
+  - As a single predictor
 
-  - Inference in Multiple Regression
+  - With a quantitative predictor
   
-  - Partitioning Variability
+--
   
-  - Adjusted $R^2$
+- Comparing two lines
+
+  - Different intercepts
   
-  - Multiple Regression for Confidence and Prediction Intervals
-
----
-
-## Simple Linear Regression Model Review
-
-$$
-\begin{gather}
-Y = \beta_0 + \beta _1 X + \epsilon \\[2ex]
-\mbox{where } \epsilon \overset{\text{iid}}{\sim} N(0, \sigma_\epsilon)
-\end{gather}
-$$
-
+  - Different lines
+  
 --
 
-**Question:** What if we have more than one predictor?
+- Extend to more than two lines
 
 ---
 
-## Multiple Regression Model
-
-$$
-\begin{gather}
-Y = \beta_0 + \beta _1 X_1 + \beta_2 X_2 + \cdots + \beta_k X_k+ \epsilon \\[2ex]
-\mbox{where } \epsilon \overset{\text{iid}}{\sim} N(0, \sigma_\epsilon)
-\end{gather}
-$$
-
---
-
-### Data 
-
-  - A dataframe with $n$ rows
-  
-  - Quantitative response variable $Y$
-  
-  - Predictors $X_1, X_2, \ldots, X_k$ 
-
-
----
-
-## Multiple Regression: The 4-Step Process
+## Height as a Categorical Predictor
 
 .pull-left[
-(1) **Choose** a form of the model
 
-  - Select predictors
-  
-  - Determine appropriate functions of predictors
-  
-(2) **Fit** the model
 
-  - Estimate coefficients $\hat\beta_0, \hat\beta_1, \ldots, \hat\beta_k$
-  
-  - Estimate standard error of the residuals $\hat\sigma_\epsilon$
+- Use height $(x)$ to predict swirling time $(y)$
+
+- Compare high (13 inches) vs low (10 inches)
+
 ]
 
 --
-
 .pull-right[
-(3) **Assess** the fit
-
-  - Check residual plots
-  
-  - Test the overall fit using ANOVA, $R^2$, and $R^2_{\text{adj}}$
-  
-  - Test individual predictors using $t$-tests
-
-(4) **Use**
-
-  - Obtain predictions $\hat Y$
-  
-  - Compute **prediction** intervals and **confidence intervals**
-]
-  
----
-
-## Example: Multiple Predictors using NFL Standings Data
-
-- Response variable: $Y=\text{WinPct}$
-- Predictors:
-  - $X_1=\text{PointsFor}$
-  - $X_2=\text{PointsAgainst}$
-  
----
-
-## NFL Example: Data Plots Plotly Code
-
-```{r, fig.height = 6, eval = FALSE}
-# Change proportion to Percent to make coefficients easier to work with
-NFLStandings2016 <- mutate(NFLStandings2016, WinPct = 100*WinPct)
-plot_ly(data = NFLStandings2016, x=~PointsFor, y=~PointsAgainst, z=~WinPct, type="scatter3d", mode="markers", color=~WinPct,  text= ~Team)
-```
-
-
----
-
-## NFL Example: Data Plots Output
-
-```{r, echo = FALSE, fig.height = 6}
-# Change proportion to Percent to make coefficients easier to work with
-NFLStandings2016 <- mutate(NFLStandings2016, WinPct = 100*WinPct)
-plot_ly(data = NFLStandings2016, x=~PointsFor, y=~PointsAgainst, z=~WinPct, type="scatter3d", mode="markers", color=~WinPct,  text= ~Team)
-```
-
----
-
-## NFL Example: More Scatterplots
-
-.panelset[
-
-```{r, panelset = TRUE}
-# scatterplot3d uses different syntax from ggplot2
-library(scatterplot3d)
-s3d <- with(NFLStandings2016,
-           scatterplot3d(PointsFor,PointsAgainst,WinPct, 
-                         type = "h",color = "blue", angle = 70, 
-                         scale.y = 1, pch = 16, main = "3d Scatterplot")
-           )
-
-```
-]
-
----
-
-### NFL Example: Scatterplot with Fitted Regression Model
 
 ```{r, echo = FALSE}
-mod1 <- lm(WinPct ~ PointsFor + PointsAgainst, data = NFLStandings2016)
-s3d <- with(NFLStandings2016,
-         scatterplot3d(PointsFor, PointsAgainst, WinPct, type = "h", color = "blue", pch = 16, angle = 50, main = "3d Scatterplot",xlim = c(250, 550), ylim = c(250,500))
-)
-s3d$plane3d(mod1, lty.box = "solid")
+gf_boxplot(tswirl ~ factor(height.hi), data = funnel.hilo) %>%
+  gf_labs(title = "Swirling time by height", x = "0 = 10 inches, 1 = 13 inches" ) %>% 
+gf_theme(
+    legend.position = "top",
+    plot.title = element_text(hjust = 0.5, color = "#166DA0", size = 32),
+  )
+
 ```
+
+]
+
+---
+### Two-Sample $t$ Test for Means (using pooled variances)
+
+- Test for equal swirling times:
+
+$$
+\begin{gather}
+H_0:\mu_1=\mu_2\\
+H_a:\mu_1\neq\mu_2
+\end{gather}
+$$
+
+- using pooled $t$-test:
+$$t=\frac{\bar y_1-\bar y_2}{s_p\sqrt{\frac 1n_1 + \frac 1n_2}}$$
+
+- where we assume constant variability $(\sigma_1=\sigma_2)$ and use the pooled standard deviation:
+$$
+s_p=\sqrt{\frac{(n_1-1)s_1^2+(n_2-1)s_2^2}{n_1+n_2-2}}\quad .
+$$
+
 
 ---
 
-### Fitted Prediction Equation
-
-```{r}
-mod1 <- lm(WinPct ~ PointsFor + PointsAgainst, data = NFLStandings2016)
-mod1
-```
-
-$$
-\widehat{\text{WinPct}} = 78.54 + 0.1699\text{ PointsFor} -0.2482\text{ PointsAgainst}
-$$
-
-
-
----
-
-## NFL Example: Regression Summary Output
+### Two-sample $t$-test in R
 
 .panelset[
 
 ```{r, panelset = TRUE, fig.height = 3.5}
-mod1 <- lm(WinPct ~ PointsFor + PointsAgainst, data = NFLStandings2016)
-summary(mod1)
+t.test(tswirl ~ height.hi, var.equal = TRUE, data = funnel.hilo)
 ```
 ]
 
 ---
 
-## T-tests for Slopes  
-
-- Multiple "slopes" to test (each coefficient)
+### Recast this as a dummy variable regression question
 
 .pull-left[
-**Hypotheses**
+
+- Regression model:
+
 $$
-\begin{align}
-H_0:&\beta_i=0 \\
-H_a:&\beta_i\neq 0 \\
-\end{align}
+\text{tswirl} = \beta_0 + \beta_1 X + \epsilon
 $$
+where
+$$X=\begin{cases} 0 & \text{height } =10 \\1 & \text{height } =13 \end{cases}$$
+
+- We call $X$ an **indicator** or **dummy** variable.
+
 ]
 .pull-right[
-**Test statistic**
-$$t=\frac{\hat\beta_i}{\mbox{SE}_{\hat\beta_i}}\sim t_{n-k-1}$$
+```{r, echo = FALSE}
+gf_point(tswirl ~ height.hi, data = funnel.hilo) +
+  stat_summary(fun=mean, geom="line", color="#166DA0", lwd =2 )
+```
+
+
 ]
 
 
 ---
 
-## Standard Error of the Multiple Regression Model
-
-- Recall condition: $\epsilon\sim N(0, \sigma_\epsilon)$
-
-<br>
-
-- Estimate standard error:
-
-
-$$
-\hat\sigma_\epsilon = \sqrt{\text{MSE}}= \sqrt{\frac{\text{SSE}}{n-k-1}}
-$$
-
-- Note that degrees of freedom depend on number of predictors.
-
----
-
-## NFL Example: ANOVA  Output
+### Dummy variable regression input and output
 
 .panelset[
 
 ```{r, panelset = TRUE, fig.height = 3.5}
-anova(mod1)
+lm.dummy <- lm(tswirl ~ height.hi, data = funnel.hilo)
+summary(lm.dummy)
 ```
 ]
 
 ---
 
-## t-test for Correlation versus t-test for Slope
+### Comparing the t-test and regression output?
 
-- $t$-test for slope $H_0:\beta_i=0$: 
+- Compare $t$ statistics and p-values.
 
-  - Assesses the linear association *after* accounting for the other predictors in the model.
+- Interpret regression intercept.
 
-- $t$-test for correlation $\rho =0$: 
+- Interpret regression slope.
 
-  - Assesses the linear association between two variables by themselves.
+- Where does $s_p$ appear in the output?
 
-
-```{r}
-cor.test(WinPct ~ PointsFor, data = NFLStandings2016)
-```
 
 ---
 
-## ANOVA Test for Overall Variability
+## Quantitative plus indicator predictors
+### Parallel lines model
 
-- Test the following hypotheses
+.pull-left[
+
+- Example:
+
+  - $Y$ = swirling time
+  
+  - $X_1$ = distance up the channel
+  
+  - $X_2$ = height (low = 0, high = 1)
+  
+- Overall model
+
+  - $Y=\beta_0+\beta_1 X_1+\beta_2 X_2 +\epsilon$
+  
+]
+
+.pull-right[
+  
+- Identify models for each height
+
+**low**: $X_2 = 0$ so 
+$$\begin{align}Y=& \beta_0 + \beta_1 X_1+ \beta_2\cdot 0 + \epsilon \\[1ex]
+=&\beta_1 X_1+  \epsilon\end{align}$$
+
+  
+**high**: $X_2 = 1$ so 
+$$\begin{align}Y=&\beta_0 + \beta_1 X_1 + \beta_2\cdot 1 + \epsilon\\[1ex]
+=& (\beta_0+\beta_2) + \beta_1 X_1 + \epsilon\end{align}$$
+  
+]
+
+---
+
+### Funnel Data Example: Parallel Lines Regression
+
+.panelset[
+
+```{r,panelset = TRUE, fig.height = 3.5}
+lm.parallel = lm(tswirl ~ dist + height.hi, data = funnel.hilo)
+summary(lm.parallel)
+```
+
+]
+
+---
+
+### Plotting the fitted parallel lines
+
+.panelset[
+
+```{r, panelset = TRUE, fig.height = 3.5}
+gf_point(tswirl ~ dist, color = ~factor(height.hi), data = funnel.hilo) %>%
+  gf_smooth(method = "lm")
+```
+]
+
+---
+
+### Comparing Parallel Regression Lines
+
+- Is there a significant difference in the intercepts?
+
+- The $t$-test for the `height.hi` (dummy variable) coefficient is a test of whether the intercepts differ:
+
+$$H_0: \beta_2=0\\H_a: \beta_2\neq 0$$
+
+
+---
+
+### Assessing the Fit
+
+
+
+.panelset[
+
+```{r, panelset = TRUE, fig.height = 3.5}
+# Optional: Code gets a bit messy to color residuals by height
+# Don't worry about that
+p1 <- gf_point(resid(lm.parallel)~fitted(lm.parallel), 
+               color = ~factor(lm.parallel$model$height.hi)) %>%
+  gf_labs(color = "Height")
+p2 <- gf_qq(~resid(lm.parallel)) %>%
+  gf_qqline()
+grid.arrange(p1, p2, ncol = 2)
+```
+
+]
+
+
+---
+
+### Specify Fitted Models by Height
+
+- Height = Low $(X_2=0)$:
+
+$$
+\widehat{\text{tswirl}} = 2.937 + 0.318 \cdot \text{dist}
+$$
+
+--
+
+<br>
+
+- Height = High $(X_2=1)$:
 
 $$
 \begin{align}
-H_0&:\beta_1=\beta_2=\cdots=\beta_k=0\\[1ex]
-H_a&: \text{At least one } \beta_i\neq 0
+\widehat{\text{tswirl}} =& 2.937 + 0.318 \cdot \text{dist} + 11.211(1)\\[1ex]
+=& 14.148 + 0.318 \cdot \text{dist} 
 \end{align}
 $$
 
-<br>
+---
 
-|   Source  |    df   | Sum of<br>Squares |   Mean<br>Square  |      F      |   $p$-value   |
-|---------|:-------:|:-----------------:|:-----------------:|:-----------:|:-------------:|
-| Model     |   $k$   |     $SSModel$     |    $SSModel/k$    | $MSModel/MSE$ | $F_{k,n-k-1}$ |
-| Residuals | $n-k-1$ |       $SSE$       | $MSE=SSE/(n-k-1)$ |             |               |
-| Total     |  $n-1$  |     $SSTotal$     |                   |             |               |
+### Interaction (Two Lines) Model
 
-<br>
+- Allow both intercepts and slopes to differ
 
-- Test using $F=MSModelMSE$ with $k$ and $n-k-1$ degrees of freedom.
+- The two lines model:
+
+$$
+Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1\cdot X_2 + \epsilon
+$$
+
+- $\beta_2$ models the difference in **intercepts**.
+
+- $\beta_3$ models the difference in **slopes**.
+
+---
+### Interaction (Two Lines) Model for Funnel Data
+
+- The complete model
+
+$$
+\text{tswirl} = \beta_0 + \beta_1 (\text{dist}) + \beta_2 (\text{funnel.hi}) + \beta_3 (\text{dist}\cdot \text{funnel.hi}) + \epsilon
+$$
+
+- Specifying the model for each height:
+
+(1) Height = Low 
+  
+$$
+\begin{align}
+\text{tswirl} &= \beta_0 + \beta_1 (\text{dist}) + \beta_2 (0) + \beta_3 (\text{dist}\cdot 0) + \epsilon \\[1ex]
+ &= \beta_0 + \beta_1 (\text{dist}) + \epsilon
+\end{align}
+$$
+  
+(2) Height = High 
+  
+$$
+\begin{align}
+\text{tswirl} &= \beta_0 + \beta_1 (\text{dist}) + \beta_2 (1) + \beta_3 (\text{dist}\cdot 1) + \epsilon \\[1ex]
+ &= (\beta_0+\beta_2) + (\beta_1+\beta_3) (\text{dist}) + \epsilon
+\end{align}
+$$
 
 ---
 
-## NFL Example: ANOVA Table
+### R Output for the Interaction Model
 
-- Use `anova_alt.r` to create the `anova_alt()` function.
 
-```{r anova_alt1}
-mod1 <- lm(WinPct ~ PointsFor + PointsAgainst, data = NFLStandings2016)
-# The file anova_alt.r must be in the same folder
-source("anova_alt.r")
-anova_alt(mod1)
+.panelset[
+
+```{r, panelset = TRUE, fig.height = 3.5}
+lm.2lines = lm(tswirl ~ dist + height.hi + dist * height.hi, data = funnel.hilo)
+summary(lm.2lines)
+```
+]
+
+
+---
+
+## Using the R Output for the Interaction Model
+
+### Use coefficient $t$-tests
+
+- Test for different slopes:
+
+  - $H_0: \beta_3=0\text{ versus } H_a: \beta_3\neq 0$
+  
+- Test for different intercepts:
+
+  - $H_0: \beta_3=0\text{ versus } H_a: \beta_3\neq 0$
+  
+
+**Note:** Joint test for both requires a nested $F$-test (to come)  
+
+---
+
+### The Two Lines Models Can Be Generalized to More than Two Heights
+
+.panelset[
+.panel[.panel-name[3 parallel lines code]
+```{r parmod_code,eval = FALSE, fig.height=3}
+lm.parallel3 <- lm(tswirl ~ dist + factor(height), data = funneldata)
+summary(lm.parallel3)
+```
+]
+.panel[.panel-name[3 parallel lines output]
+```{r parmod_code-out, ref.label="parmod_code", echo = FALSE}
 ```
 
+]
+.panel[.panel-name[3 lines code]
+```{r lines_mod_code, eval = FALSE, fig.height = 3}
+lm.3lines <- lm(tswirl ~ dist + factor(height) + dist:factor(height), 
+             data = funneldata)
+summary(lm.3lines)
+```
+]
+.panel[.panel-name[3 lines output]
+```{r lines_mod-out, ref.label = "lines_mod_code", echo=FALSE}
+```
+]
+]
 
-
-
-
-
-
+---

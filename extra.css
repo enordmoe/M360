@@ -5,3 +5,7 @@
 .red        { color:   #DA291C }
 .warmyellow { color:   #FFB81C }
 
+
+.remark-code {
+  font-size: 16px;
+}
