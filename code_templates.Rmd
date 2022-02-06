@@ -99,3 +99,4 @@ background-size: contain
 ```{r, out.width='90%', fig.align='center'}
 knitr::include_graphics('figures/second_order.png')
 ```
+

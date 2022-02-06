@@ -428,6 +428,7 @@ M <- MidtermFinalA %>%
   cor()
 M
 # or use cor(MidtermFinalA[2:5])
+options(digits=5)
 ```
 ]
 
@@ -441,5 +442,68 @@ M
   
   - `Class` participation is independent of the others.
   
-- Link to [SimMultiFinal.R]("https://www.dropbox.com/s/w9y31uny2tyejwd/SimMultiFinal.R")
+- Link to download <a href="https://www.dropbox.com/s/w9y31uny2tyejwd/SimMultiFinal.R" download>SimMultiFinal.R</a>
 
+---
+
+## How to Detect Multicollinearity?
+### 2. Variance Inflation Factor (VIF)
+
+$$
+\text{VIF} = \frac{1}{1-R_i^2} 
+$$
+where $R_i^2$ is the $R^2$ for the regression predicting variable $X_i$ from the other *predictor variables*.
+
+<br>
+
+**Beware** if $\text{VIF}>5$ $\Longleftrightarrow$ $R_i^2>80\%$.
+
+<br>
+
+- Obtain $\text{VIF}$ using **car** package in R.
+
+---
+
+### Example: MidtermFinalA Dataset
+
+.panelset[
+
+```{r, panelset = TRUE, fig.height = 3.5}
+finalmodel <- lm(Final ~ Midterm + Quiz + Class, data = MidtermFinalA)
+summary(finalmodel)
+#install.packages(car)
+library(car)
+vif(finalmodel)
+```
+]
+
+---
+
+### Output for Checking VIF calculation
+
+- The calculation agrees up to rounding: 
+$\text{VIF} = \frac{1}{1-.948} = 19.23$
+
+.panelset[
+
+```{r, panelset = TRUE, fig.height = 3.5}
+summary(lm(Midterm  ~  Quiz + Class, data = MidtermFinalA))
+```
+]
+
+
+---
+
+### What to Do if You Have Multicollinearity?
+
+1. Choose a better set of predictors.
+
+1. Eliminate some of the redundant predictors.
+
+1. Combine predictors to create a (possibly weighted) scale.
+
+1. "Ignore" the individual coefficients and tests if prediction is the primary goal.
+
+<br>
+
+- Best remedies depend on the purpose of the analysis.

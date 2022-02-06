@@ -576,6 +576,7 @@ M &lt;- MidtermFinalA %&gt;%
   cor()
 M
 # or use cor(MidtermFinalA[2:5])
+options(digits=5)
 ```
 
 
@@ -607,8 +608,143 @@ M
   
   - `Class` participation is independent of the others.
   
-- Link to [SimMultiFinal.R]("https://www.dropbox.com/s/w9y31uny2tyejwd/SimMultiFinal.R")
+- Link to download &lt;a href="https://www.dropbox.com/s/w9y31uny2tyejwd/SimMultiFinal.R" download&gt;SimMultiFinal.R&lt;/a&gt;
 
+---
+
+## How to Detect Multicollinearity?
+### 2. Variance Inflation Factor (VIF)
+
+$$
+\text{VIF} = \frac{1}{1-R_i^2} 
+$$
+where `\(R_i^2\)` is the `\(R^2\)` for the regression predicting variable `\(X_i\)` from the other *predictor variables*.
+
+&lt;br&gt;
+
+**Beware** if `\(\text{VIF}&gt;5\)` `\(\Longleftrightarrow\)` `\(R_i^2&gt;80\%\)`.
+
+&lt;br&gt;
+
+- Obtain `\(\text{VIF}\)` using **car** package in R.
+
+---
+
+### Example: MidtermFinalA Dataset
+
+.panelset[
+
+.panel[.panel-name[Code]
+
+```r
+finalmodel &lt;- lm(Final ~ Midterm + Quiz + Class, data = MidtermFinalA)
+summary(finalmodel)
+#install.packages(car)
+library(car)
+vif(finalmodel)
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+```
+## 
+## Call:
+## lm(formula = Final ~ Midterm + Quiz + Class, data = MidtermFinalA)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -19.35  -6.17   0.41   5.90  17.41 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept)   19.158      9.679    1.98    0.058 .
+## Midterm        1.271      1.091    1.17    0.254  
+## Quiz           0.499      2.024    0.25    0.807  
+## Class         -0.117      0.232   -0.51    0.616  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 9.93 on 27 degrees of freedom
+## Multiple R-squared:  0.575,	Adjusted R-squared:  0.527 
+## F-statistic: 12.2 on 3 and 27 DF,  p-value: 3.22e-05
+## 
+## Midterm    Quiz   Class 
+## 19.2840 18.8098  1.1158
+```
+
+
+
+]
+]
+
+---
+
+### Output for Checking VIF calculation
+
+- The calculation agrees up to rounding: 
+`\(\text{VIF} = \frac{1}{1-.948} = 19.23\)`
+
+.panelset[
+
+.panel[.panel-name[Code]
+
+```r
+summary(lm(Midterm  ~  Quiz + Class, data = MidtermFinalA))
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+```
+## 
+## Call:
+## lm(formula = Midterm ~ Quiz + Class, data = MidtermFinalA)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -3.478 -1.127  0.141  1.004  3.939 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   2.9568     1.5812    1.87    0.072 .  
+## Quiz          1.8026     0.0832   21.67   &lt;2e-16 ***
+## Class         0.0484     0.0391    1.24    0.226    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 1.72 on 28 degrees of freedom
+## Multiple R-squared:  0.948,	Adjusted R-squared:  0.944 
+## F-statistic:  256 on 2 and 28 DF,  p-value: &lt;2e-16
+```
+
+
+
+]
+]
+
+
+---
+
+### What to Do if You Have Multicollinearity?
+
+1. Choose a better set of predictors.
+
+1. Eliminate some of the redundant predictors.
+
+1. Combine predictors to create a (possibly weighted) scale.
+
+1. "Ignore" the individual coefficients and tests if prediction is the primary goal.
+
+&lt;br&gt;
+
+- Best remedies depend on the purpose of the analysis.
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
