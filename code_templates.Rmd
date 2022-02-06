@@ -42,6 +42,34 @@ mod2
 ]
 ]
 
+## Access Chunk Label
+
+.panelset[
+.panel[.panel-name[3 parallel lines code]
+```{r parmod_code,eval = FALSE, fig.height=3}
+lm.parallel3 <- lm(tswirl ~ dist + factor(height), data = funneldata)
+summary(lm.parallel3)
+```
+]
+.panel[.panel-name[3 parallel lines output]
+```{r parmod_code-out, ref.label="parmod_code", echo = FALSE}
+```
+
+]
+.panel[.panel-name[3 lines code]
+```{r lines_mod_code, eval = FALSE, fig.height = 3}
+lm.3lines <- lm(tswirl ~ dist + factor(height) + dist:factor(height), 
+             data = funneldata)
+summary(lm.3lines)
+```
+]
+.panel[.panel-name[3 lines output]
+```{r lines_mod-out, ref.label = "lines_mod_code", echo=FALSE}
+```
+]
+]
+
+
 ## Grid Plots
 
 ```{r}
@@ -58,4 +86,16 @@ grid.arrange(plot1, plot2, ncol=2)
 library(plotly)
 p <- gf_point(Gold ~ Year, data = LongJumpOlympics)
 ggplotly(p)
+```
+
+## Full screen image
+
+background-image: url(https://www.liverpool.ac.uk/pfg/Who/Blog/files/2088_c953_512.gif)
+background-size: contain
+
+
+## Image using R code
+
+```{r, out.width='90%', fig.align='center'}
+knitr::include_graphics('figures/second_order.png')
 ```
