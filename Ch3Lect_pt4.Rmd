@@ -221,7 +221,7 @@ sat_full <- lm(SAT ~ Takers + Expend + I(Takers^2)
                  + I(Expend^2) + I(Takers*Expend), data = state_sat)
 summary(sat_second)
 anova(sat_second)
-sat_reduced <- lm(SAT ~ Takers + (Takers^2), data = state_sat)
+sat_reduced <- lm(SAT ~ Takers + I(Takers^2), data = state_sat)
 anova(sat_reduced)
 anova(sat_reduced, sat_full)
 ```
@@ -241,7 +241,7 @@ anova(sat_second)
 ]
 .panel[.panel-name[reduced model output]
 ```{r nested3, echo = FALSE}
-sat_reduced <- lm(SAT ~ Takers + (Takers^2), data = state_sat)
+sat_reduced <- lm(SAT ~ Takers + I(Takers^2), data = state_sat)
 anova(sat_reduced)
 ```
 
@@ -264,7 +264,7 @@ F&=\frac{(\text{SSE}_\text{Reduced}-\text{SSE}_\text{Full})/(\#\text{ of extra p
 \end{align}$$
 
 ```{r}
-1-pf(17.978, 4,44)
+1-pf(10.364, 3, 44)
 ```
 
 ---
