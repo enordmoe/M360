@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Chapter 3: Inference for Simple Linear Regression</title>
+    <meta charset="utf-8" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset-0.2.6/panelset.js"></script>
+    <script src="libs/clipboard-2.0.6/clipboard.min.js"></script>
+    <link href="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.js"></script>
+    <script>window.xaringanExtraClipboard(null, {"button":"Copy Code","success":"Copied!","error":"Press Ctrl+C to Copy"})</script>
+    <link href="libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view-0.2.6/tile-view.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+    <link rel="stylesheet" href="extra.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Chapter 3: Inference for Simple Linear Regression
+## Part 3: Section 3.6
+### Applied Statistics II
+
+---
+
+class: highlight-last-item
+
+
+
+
+
+
+
+
+
+
+&lt;style type="text/css"&gt;
+.highlight-last-item &gt; ul &gt; li,
+.highlight-last-item &gt; ol &gt; li {
+  opacity: 0.5;
+}
+.highlight-last-item &gt; ul &gt; li:last-of-type,
+.highlight-last-item &gt; ol &gt; li:last-of-type {
+  opacity: 1;
+}
+&lt;/style&gt;
+
+# Outline 
+
+- Comparing Two Lines
+
+--
+
+- Nested `\(F\)`-test
+
+
+---
+
+### Funnel Data Model for Two Regression Lines
+
+Recall the funnel data model for two regression lines:
+
+$$
+\text{tswirl} = \beta_0 + \beta_1 (\text{dist}) + \beta_2 (\text{funnel.hi}) + \beta_3 (\text{dist}\cdot \text{funnel.hi}) + \epsilon
+$$
+
+- Test for different slopes:
+
+  - **t-test:** `\(H_0:\beta_3=0\)` versus `\(H_a:\beta_3\neq 0\)`
+  
+--
+  
+- Test for different intercepts:
+
+  - **t-test:** `\(H_0:\beta_2=0\)` versus `\(H_a:\beta_2\neq 0\)`
+
+--
+  
+- Test for different lines:
+
+  - Test: `\(H_0: \beta_2=\beta_3=0\)` versus `\(\text{At least one }\beta_i\neq 0\)`.
+  
+    - How?
+    
+---
+### Second Order Model for SAT Data  Revisited
+
+.panelset[
+
+.panel[.panel-name[Code]
+
+```r
+state_sat &lt;- read.csv("http://people.kzoo.edu/enordmoe/math360/StateSAT.csv")
+sat_second &lt;- lm(SAT ~ Takers + Expend + I(Takers^2) 
+                 + I(Expend^2) + I(Takers*Expend), data = state_sat)
+summary(sat_second)
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+```
+## 
+## Call:
+## lm(formula = SAT ~ Takers + Expend + I(Takers^2) + I(Expend^2) + 
+##     I(Takers * Expend), data = state_sat)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -50.472 -13.535   1.023   8.866  60.870 
+## 
+## Coefficients:
+##                     Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)        893.66283   36.14094  24.727  &lt; 2e-16 ***
+## Takers              -7.05561    0.83740  -8.426 9.96e-11 ***
+## Expend              10.33333    2.49600   4.140 0.000155 ***
+## I(Takers^2)          0.07725    0.01328   5.816 6.28e-07 ***
+## I(Expend^2)         -0.11775    0.04426  -2.660 0.010851 *  
+## I(Takers * Expend)  -0.03344    0.03716  -0.900 0.373087    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 23.68 on 44 degrees of freedom
+## Multiple R-squared:  0.8997,	Adjusted R-squared:  0.8883 
+## F-statistic: 78.96 on 5 and 44 DF,  p-value: &lt; 2.2e-16
+```
+
+
+
+]
+]
+
+---
+### Second Order Model for SAT Data  Revisited
+
+**Inference Questions**
+
+  - Do we need both quadratic terms?
+  
+--
+  
+  - Do we need the terms with Expend
+  
+--
+
+**Q**: How to test just a subset of predictors?
+
+--
+
+**A**: Nested `\(F\)`-test
+
+
+---
+
+### Nested Models
+
+**Definition**: If all of the predictors in Model A are also in a bigger Model B, we say that Model A is &lt;br&gt;**nested** in Model B.
+
+--
+
+**Example:**
+
+  - `\(\text{tswirl} = \beta_0 + \beta_1 (\text{dist}) + \epsilon\)` is *nested* in
+  
+  - `\(\text{tswirl} = \beta_0 + \beta_1 (\text{dist}) + \beta_2 (\text{funnel.hi}) + \beta_3 (\text{dist}\cdot \text{funnel.hi}) + \epsilon\)`
+
+--
+
+**Test for nested models:**
+
+  - Do we really need the *extra* terms in Model B? 
+  
+  - Do the extra terms significantly improve on Model A?
+
+---
+
+### Nested `\(F\)` test Procedure
+
+1. Find how much "extra" variability is explained when the "new" terms being tested are added.
+
+--
+
+2. Divide by the number of new terms to get a mean square for the new part of the model.
+
+--
+
+3. Divide this mean square by the MSE for the "full" model to get an `\(F\)` statistic.
+
+--
+
+4. Compare to an F distribution to find the `\(P\)`-value
+
+---
+
+## How much variability is explained by the "extra" predictors? 
+
+- `\(\text{SSE}_\text{Full}\)` - SS left unexplained by the full model
+
+- `\(\text{SSE}_\text{Reduced}\)` - SS left unexplained by the reduced model
+
+  - Note  `\(\text{SSE}_\text{Full}\le \text{SSE}_\text{Reduced}\)` for nested models.
+  
+--
+
+&lt;br&gt;
+
+**Difference in variability explained:**
+
+`$$\text{SSE}_\text{Reduced}-\text{SSE}_\text{Full}$$`
+
+`\(\Longrightarrow\)` the difference is the "new" variability explained by the "extra" predictors in the full model.
+
+---
+## Nested `\(F\)`-test
+
+Test:
+- `\(H_0: \beta_i=0\)` for a "subset" of predictors
+
+- `\(H_a: \text{At least one }\beta_i\neq 0\)` 
+
+`$$F=\frac{(\text{SSE}_\text{Reduced}-\text{SSE}_\text{Full})/(\#\text{ of extra predictors})}{\text{SSE}_\text{Full}/(n-k-1)}$$`
+
+--
+
+or, equivalently
+
+
+`$$F=\frac{(\text{SSE}_\text{Reduced}-\text{SSE}_\text{Full})/(\#\text{ of extra predictors})}{\text{MSE}_\text{Full}}$$`
+
+- Compare to `\(F\)` with `\(df_1=\#\text{ of extra predictors}\)` and `\(df_2=\text{error df in full model}\)`.
+---
+
+### Example: Comparing Models with Nested F-Test in R
+
+
+
+.panelset[
+.panel[.panel-name[R code]
+
+```r
+sat_full &lt;- lm(SAT ~ Takers + Expend + I(Takers^2) 
+                 + I(Expend^2) + I(Takers*Expend), data = state_sat)
+summary(sat_second)
+anova(sat_second)
+sat_reduced &lt;- lm(SAT ~ Takers + (Takers^2), data = state_sat)
+anova(sat_reduced)
+anova(sat_reduced, sat_full)
+```
+]
+.panel[.panel-name[full model output]
+
+```
+## 
+## Call:
+## lm(formula = SAT ~ Takers + Expend + I(Takers^2) + I(Expend^2) + 
+##     I(Takers * Expend), data = state_sat)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -50.472 -13.535   1.023   8.866  60.870 
+## 
+## Coefficients:
+##                     Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)        893.66283   36.14094  24.727  &lt; 2e-16 ***
+## Takers              -7.05561    0.83740  -8.426 9.96e-11 ***
+## Expend              10.33333    2.49600   4.140 0.000155 ***
+## I(Takers^2)          0.07725    0.01328   5.816 6.28e-07 ***
+## I(Expend^2)         -0.11775    0.04426  -2.660 0.010851 *  
+## I(Takers * Expend)  -0.03344    0.03716  -0.900 0.373087    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 23.68 on 44 degrees of freedom
+## Multiple R-squared:  0.8997,	Adjusted R-squared:  0.8883 
+## F-statistic: 78.96 on 5 and 44 DF,  p-value: &lt; 2.2e-16
+```
+]
+.panel[.panel-name[full model anova]
+
+```
+## Analysis of Variance Table
+## 
+## Response: SAT
+##                    Df Sum Sq Mean Sq  F value    Pr(&gt;F)    
+## Takers              1 181024  181024 322.8794 &lt; 2.2e-16 ***
+## Expend              1   8709    8709  15.5334 0.0002865 ***
+## I(Takers^2)         1  25877   25877  46.1541 2.295e-08 ***
+## I(Expend^2)         1   5278    5278   9.4148 0.0036773 ** 
+## I(Takers * Expend)  1    454     454   0.8098 0.3730865    
+## Residuals          44  24669     561                       
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+]
+.panel[.panel-name[reduced model output]
+
+```
+## Analysis of Variance Table
+## 
+## Response: SAT
+##           Df Sum Sq Mean Sq F value    Pr(&gt;F)    
+## Takers     1 181024  181024  133.71 1.768e-15 ***
+## Residuals 48  64987    1354                      
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+]
+.panel[.panel-name[nested F test]
+
+```
+## Analysis of Variance Table
+## 
+## Model 1: SAT ~ Takers + (Takers^2)
+## Model 2: SAT ~ Takers + Expend + I(Takers^2) + I(Expend^2) + I(Takers * 
+##     Expend)
+##   Res.Df   RSS Df Sum of Sq      F    Pr(&gt;F)    
+## 1     48 64987                                  
+## 2     44 24669  4     40318 17.978 8.146e-09 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+]
+]
+
+---
+
+### Example: Nested F Calculation
+
+`$$\begin{align}
+F&amp;=\frac{(\text{SSE}_\text{Reduced}-\text{SSE}_\text{Full})/(\#\text{ of extra predictors})}{\text{MSE}_\text{Full}}\\[2ex]
+&amp;=\frac{(64987-24669)/(48-44)}{24669/44}\\[2ex]
+&amp;=\frac{(40318)/4}{24669/44}= 17.978
+\end{align}$$`
+
+
+```r
+1-pf(17.978, 4,44)
+```
+
+```
+## [1] 8.145866e-09
+```
+
+---
+
+### Special Cases for Nested F Test
+
+
+- Test all predictors
+
+  - "Usual" ANOVA `\(F\)`-test for the full model
+
+- Test a single predictor (set one `\(\beta_i=0\)`)
+
+  - "F test" equivalent of `\(t\)`- test
+  
+  ---
+  
+  ### Your Turn
+  
+  - Funnel Data
+  
+  - Car data
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"ratio": "16:9",
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

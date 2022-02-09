@@ -1,0 +1,289 @@
+---
+title: "Chapter 3: Inference for Simple Linear Regression"
+subtitle: "Part 3: Section 3.6"
+date: "Applied Statistics II"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: ["xaringan-themer.css", "extra.css"]
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      ratio: 16:9
+      countIncrementalSlides: false
+---
+class: highlight-last-item
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  fig.width=9, fig.height=4,  
+  out.width="90%",
+  message = FALSE
+)
+
+```
+
+
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(mosaic)
+library(Stat2Data)
+library(gridExtra)
+library(plotly)
+library(readr)
+funneldata <- read_csv("http://people.kzoo.edu/enordmoe/math360/funneldata.csv", col_types = cols(trial = col_factor(levels = c("1","2"))))
+funnel.hi <- filter(funneldata, height == 13)
+funnel.hilo <- filter(funneldata, height == 13 | height == 10)
+funnel.hilo <- mutate(funnel.hilo, height.hi = ifelse(height==13,1,0))
+funneldata <- mutate(funneldata, height.hi = ifelse(height==13, 1, 0),
+                   height.mid = ifelse(height == 11.5, 1, 0))
+data("Perch")
+
+```
+
+```{r xaringanExtra, echo=FALSE}
+xaringanExtra::use_xaringan_extra(c("panelset"))
+xaringanExtra::use_clipboard()
+xaringanExtra::use_tile_view()
+```
+
+
+```{css echo=FALSE}
+.highlight-last-item > ul > li,
+.highlight-last-item > ol > li {
+  opacity: 0.5;
+}
+.highlight-last-item > ul > li:last-of-type,
+.highlight-last-item > ol > li:last-of-type {
+  opacity: 1;
+}
+```
+
+# Outline 
+
+- Comparing Two Lines
+
+--
+
+- Nested $F$-test
+
+
+---
+
+### Funnel Data Model for Two Regression Lines
+
+Recall the funnel data model for two regression lines:
+
+$$
+\text{tswirl} = \beta_0 + \beta_1 (\text{dist}) + \beta_2 (\text{funnel.hi}) + \beta_3 (\text{dist}\cdot \text{funnel.hi}) + \epsilon
+$$
+
+- Test for different slopes:
+
+  - **t-test:** $H_0:\beta_3=0$ versus $H_a:\beta_3\neq 0$
+  
+--
+  
+- Test for different intercepts:
+
+  - **t-test:** $H_0:\beta_2=0$ versus $H_a:\beta_2\neq 0$
+
+--
+  
+- Test for different lines:
+
+  - Test: $H_0: \beta_2=\beta_3=0$ versus $\text{At least one }\beta_i\neq 0$.
+  
+    - How?
+    
+---
+### Second Order Model for SAT Data  Revisited
+
+.panelset[
+
+```{r, panelset = TRUE, fig.height = 3.5}
+state_sat <- read.csv("http://people.kzoo.edu/enordmoe/math360/StateSAT.csv")
+sat_second <- lm(SAT ~ Takers + Expend + I(Takers^2) 
+                 + I(Expend^2) + I(Takers*Expend), data = state_sat)
+summary(sat_second)
+```
+]
+
+---
+### Second Order Model for SAT Data  Revisited
+
+**Inference Questions**
+
+  - Do we need both quadratic terms?
+  
+--
+  
+  - Do we need the terms with Expend
+  
+--
+
+**Q**: How to test just a subset of predictors?
+
+--
+
+**A**: Nested $F$-test
+
+
+---
+
+### Nested Models
+
+**Definition**: If all of the predictors in Model A are also in a bigger Model B, we say that Model A is <br>**nested** in Model B.
+
+--
+
+**Example:**
+
+  - $\text{tswirl} = \beta_0 + \beta_1 (\text{dist}) + \epsilon$ is *nested* in
+  
+  - $\text{tswirl} = \beta_0 + \beta_1 (\text{dist}) + \beta_2 (\text{funnel.hi}) + \beta_3 (\text{dist}\cdot \text{funnel.hi}) + \epsilon$
+
+--
+
+**Test for nested models:**
+
+  - Do we really need the *extra* terms in Model B? 
+  
+  - Do the extra terms significantly improve on Model A?
+
+---
+
+### Nested $F$ test Procedure
+
+1. Find how much "extra" variability is explained when the "new" terms being tested are added.
+
+--
+
+2. Divide by the number of new terms to get a mean square for the new part of the model.
+
+--
+
+3. Divide this mean square by the MSE for the "full" model to get an $F$ statistic.
+
+--
+
+4. Compare to an F distribution to find the $P$-value
+
+---
+
+## How much variability is explained by the "extra" predictors? 
+
+- $\text{SSE}_\text{Full}$ - SS left unexplained by the full model
+
+- $\text{SSE}_\text{Reduced}$ - SS left unexplained by the reduced model
+
+  - Note  $\text{SSE}_\text{Full}\le \text{SSE}_\text{Reduced}$ for nested models.
+  
+--
+
+<br>
+
+**Difference in variability explained:**
+
+$$\text{SSE}_\text{Reduced}-\text{SSE}_\text{Full}$$
+
+$\Longrightarrow$ the difference is the "new" variability explained by the "extra" predictors in the full model.
+
+---
+## Nested $F$-test
+
+Test:
+- $H_0: \beta_i=0$ for a "subset" of predictors
+
+- $H_a: \text{At least one }\beta_i\neq 0$ 
+
+$$F=\frac{(\text{SSE}_\text{Reduced}-\text{SSE}_\text{Full})/(\#\text{ of extra predictors})}{\text{SSE}_\text{Full}/(n-k-1)}$$
+
+--
+
+or, equivalently
+
+
+$$F=\frac{(\text{SSE}_\text{Reduced}-\text{SSE}_\text{Full})/(\#\text{ of extra predictors})}{\text{MSE}_\text{Full}}$$
+
+- Compare to $F$ with $df_1=\#\text{ of extra predictors}$ and $df_2=\text{error df in full model}$.
+---
+
+### Example: Comparing Models with Nested F-Test in R
+
+
+
+.panelset[
+.panel[.panel-name[R code]
+```{r nested1,eval = FALSE, fig.height=3}
+sat_full <- lm(SAT ~ Takers + Expend + I(Takers^2) 
+                 + I(Expend^2) + I(Takers*Expend), data = state_sat)
+summary(sat_second)
+anova(sat_second)
+sat_reduced <- lm(SAT ~ Takers + (Takers^2), data = state_sat)
+anova(sat_reduced)
+anova(sat_reduced, sat_full)
+```
+]
+.panel[.panel-name[full model output]
+```{r nested2a, echo = FALSE}
+sat_full <- lm(SAT ~ Takers + Expend + I(Takers^2) 
+                 + I(Expend^2) + I(Takers*Expend), data = state_sat)
+summary(sat_second)
+```
+]
+.panel[.panel-name[full model anova]
+```{r nested2b, echo = FALSE}
+anova(sat_second)
+```
+
+]
+.panel[.panel-name[reduced model output]
+```{r nested3, echo = FALSE}
+sat_reduced <- lm(SAT ~ Takers + (Takers^2), data = state_sat)
+anova(sat_reduced)
+```
+
+]
+.panel[.panel-name[nested F test]
+```{r nested4, echo = FALSE, fig.height = 3}
+anova(sat_reduced, sat_full)
+```
+]
+]
+
+---
+
+### Example: Nested F Calculation
+
+$$\begin{align}
+F&=\frac{(\text{SSE}_\text{Reduced}-\text{SSE}_\text{Full})/(\#\text{ of extra predictors})}{\text{MSE}_\text{Full}}\\[2ex]
+&=\frac{(64987-24669)/(48-44)}{24669/44}\\[2ex]
+&=\frac{(40318)/4}{24669/44}= 17.978
+\end{align}$$
+
+```{r}
+1-pf(17.978, 4,44)
+```
+
+---
+
+### Special Cases for Nested F Test
+
+
+- Test all predictors
+
+  - "Usual" ANOVA $F$-test for the full model
+
+- Test a single predictor (set one $\beta_i=0$)
+
+  - "F test" equivalent of $t$- test
+  
+  ---
+  
+  ### Your Turn
+  
+  - Funnel Data
+  
+  - Car data
