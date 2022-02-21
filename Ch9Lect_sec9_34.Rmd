@@ -1,0 +1,241 @@
+---
+title: "Chapter 9:  Logistic Regression"
+subtitle: "Sections 9.3-9.4"
+date: "Applied Statistics II"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: ["xaringan-themer.css", "extra.css"]
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      ratio: 16:9
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  fig.width=9, fig.height=4,  
+  out.width="90%",
+  message = FALSE
+)
+
+```
+
+
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(mosaic)
+library(Stat2Data)
+library(gridExtra)
+library(plotly)
+library(readr)
+trashball <- read_csv("http://people.kzoo.edu/enordmoe/math360/trashball.csv")
+data("Putts1")
+data("Putts2")
+data("MedGPA")
+
+```
+
+```{r xaringanExtra, echo=FALSE}
+xaringanExtra::use_xaringan_extra(c("panelset"))
+xaringanExtra::use_clipboard()
+xaringanExtra::use_tile_view()
+```
+
+
+```{css echo=FALSE}
+.highlight-last-item > ul > li,
+.highlight-last-item > ol > li {
+  opacity: 0.5;
+}
+.highlight-last-item > ul > li:last-of-type,
+.highlight-last-item > ol > li:last-of-type {
+  opacity: 1;
+}
+```
+
+# Outline 
+
+- Conditions for logistic regression
+
+  - Linearity
+  
+  - Empirical logit plot
+  
+- Tests and CIs for slope
+
+- Evaluating overall fit
+
+  - G statistic
+
+  - Disaggregate (long)/Aggregate (short) form in R
+
+---
+
+## Inference Conditions for Logistic Regression
+
+- **Linearity**: The logits (log odds) should have a linear relationship with the predictor.
+
+--
+
+- **Independence**: No pairing or clustering of data.
+
+--
+
+- **Random**: Either a random sample from a population OR random assignment within an experiment.
+
+--
+
+- **~~Normality~~**: This does not apply.
+
+  - The responses are 0/1.
+
+--
+
+- **~~Constant variance~~**: Does not apply.
+
+  - Variability in $Y$ is highest when $\pi$ is near 1/2 lowest when $\pi$ is near 0 or 1.
+
+
+---
+
+## Checking Linearity for Logistic Regression
+
+### Empirical Logit Plot
+
+1. Find the sample proportion $\hat p$ for each value of the predictor.
+
+2. Plot $\log\left(\frac{\hat p}{1-\hat p}\right)$ vs $x$ and look for a linear trend.
+
+<br>
+
+**Note:** When  the predictor has many values (few repeats),  choose intervals of predictor values and plot the group logits versus the group predictor means.
+
+  - The function `emplogitplot1()` in **Stat2Data** is very useful for constructing these plots.
+  
+---
+
+## Two Forms of Logistic Daa
+
+1. **Disaggregate (long) form**: Response variable $Y=$ Success/Failure or 1/0 and each case is a row
+
+  - **Binary (Bernoulli) response** logistic regression
+
+  - e.g., **Putts1** data
+  
+--
+  
+2. **Aggegrate (short) form**: Response variable $Y=$ Count of Successes for a group of data with a common $X$ value
+
+  - **Binomial counts** logistic regression
+  
+  - e.g., **Putts2** has 5 cases for each distance of putt
+
+--
+
+<br> 
+
+**Note:**The aggregate form simplifies construction of empirical logit plots.
+
+---
+
+### Empirical Plots Using Putts2 Data
+
+.panelset[
+
+```{r, panelset = TRUE, fig.height = 3.5}
+Putts2 <- mutate(Putts2, LogitMade = log(Made/Missed))
+lmod_Putts2 <- glm(cbind(Made, Missed) ~ Length, family = binomial, data = Putts2)
+mymod_fun <- makeFun(lmod_Putts2)
+gf_point(LogitMade ~ Length, data = Putts2) %>%
+  gf_coefline(model = lmod_Putts2, color = "red")
+```
+]
+
+---
+
+### Empirical Logit Plot Using Putts1
+
+.panelset[
+
+```{r, panelset = TRUE, fig.height = 3.5}
+# Automate plot with emplogitplot1() function in Stat2Data
+# 
+emplogitplot1(Made ~ Length, data = Putts1, ngroups = "all")
+```
+]
+
+
+---
+
+## Empirical Logit Plots
+
+### Two possible problems:
+
+1. Typically, there may be many different x-values with few (or only one) cases at each.
+  
+  - Solution: Group the predictor values into bins of similar values and plot vs. the mean predictor for each bin.
+  
+2. A sample proportion could be 0 or 1 (making log(odds) undefined).
+  
+  - Solution: Define adjusted proportion as
+    
+    $$\hat p_\text{adj}=\frac{\#\text{Yes}+1/2}{\#\text{Yes}+\#\text{No}+1}$$
+
+---
+
+### Empirical Logit Plot for MedGPA Data
+
+There are 15 different MCAT scort values (18 to 48)
+
+  - Use 5 ad hoc groups (18-30), (31-34), (35-38), (39-42), (43-48)
+
+```{r, eval = FALSE}
+emplogitplot1(Acceptance ~ MCAT, breaks = c(0, 30, 34, 38, 42, 48), data = MedGPA, out = TRUE)
+```
+
+```{r, echo = FALSE}
+emplogitplot1(Acceptance ~ MCAT, breaks = c(0, 30, 34, 38, 42, 48), data = MedGPA, out = TRUE, showplot = FALSE)
+```
+
+---
+
+### Empirical Logit Plot for MedGPA Data
+
+```{r, echo = FALSE}
+emplogitplot1(Acceptance ~ MCAT, breaks = c(0, 30, 34, 38, 42, 48), data = MedGPA)
+```
+
+---
+
+### Empirical Logit Plot for MedGPA Data
+
+Specify number of groups and R picks intervals to make group size (rougly) equal
+
+```{r, eval = FALSE}
+emplogitplot1(Acceptance ~ MCAT, ngroups = 5, data = MedGPA, out = TRUE)
+```
+
+```{r, echo = FALSE}
+emplogitplot1(Acceptance ~ MCAT, ngroups = 5, data = MedGPA, out = TRUE, showplot = FALSE)
+```
+
+
+--
+
+<br>
+
+**Note:** Means for $X$ values are the actual means of those in the group, not the midpoint of the interval.
+
+---
+
+class: center, middle, inverse
+
+# Formal Inference: Tests and Intervals
+
+---
+
+
+

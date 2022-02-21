@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Chapter 9: Logistic Regression</title>
+    <meta charset="utf-8" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset-0.2.6/panelset.js"></script>
+    <script src="libs/clipboard-2.0.6/clipboard.min.js"></script>
+    <link href="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.js"></script>
+    <script>window.xaringanExtraClipboard(null, {"button":"Copy Code","success":"Copied!","error":"Press Ctrl+C to Copy"})</script>
+    <link href="libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view-0.2.6/tile-view.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+    <link rel="stylesheet" href="extra.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Chapter 9: Logistic Regression
+## Sections 9.3-9.4
+### Applied Statistics II
+
+---
+
+
+
+
+
+
+
+
+
+
+
+&lt;style type="text/css"&gt;
+.highlight-last-item &gt; ul &gt; li,
+.highlight-last-item &gt; ol &gt; li {
+  opacity: 0.5;
+}
+.highlight-last-item &gt; ul &gt; li:last-of-type,
+.highlight-last-item &gt; ol &gt; li:last-of-type {
+  opacity: 1;
+}
+&lt;/style&gt;
+
+# Outline 
+
+- Conditions for logistic regression
+
+  - Linearity
+  
+  - Empirical logit plot
+  
+- Tests and CIs for slope
+
+- Evaluating overall fit
+
+  - G statistic
+
+  - Disaggregate (long)/Aggregate (short) form in R
+
+---
+
+## Inference Conditions for Logistic Regression
+
+- **Linearity**: The logits (log odds) should have a linear relationship with the predictor.
+
+--
+
+- **Independence**: No pairing or clustering of data.
+
+--
+
+- **Random**: Either a random sample from a population OR random assignment within an experiment.
+
+--
+
+- **~~Normality~~**: This does not apply.
+
+  - The responses are 0/1.
+
+--
+
+- **~~Constant variance~~**: Does not apply.
+
+  - Variability in `\(Y\)` is highest when `\(\pi\)` is near 1/2 lowest when `\(\pi\)` is near 0 or 1.
+
+
+---
+
+## Checking Linearity for Logistic Regression
+
+### Empirical Logit Plot
+
+1. Find the sample proportion `\(\hat p\)` for each value of the predictor.
+
+2. Plot `\(\log\left(\frac{\hat p}{1-\hat p}\right)\)` vs `\(x\)` and look for a linear trend.
+
+&lt;br&gt;
+
+**Note:** When  the predictor has many values (few repeats),  choose intervals of predictor values and plot the group logits versus the group predictor means.
+
+  - The function `emplogitplot1()` in **Stat2Data** is very useful for constructing these plots.
+  
+---
+
+## Two Forms of Logistic Daa
+
+1. **Disaggregate (long) form**: Response variable `\(Y=\)` Success/Failure or 1/0 and each case is a row
+
+  - **Binary (Bernoulli) response** logistic regression
+
+  - e.g., **Putts1** data
+  
+--
+  
+2. **Aggegrate (short) form**: Response variable `\(Y=\)` Count of Successes for a group of data with a common `\(X\)` value
+
+  - **Binomial counts** logistic regression
+  
+  - e.g., **Putts2** has 5 cases for each distance of putt
+
+--
+
+&lt;br&gt; 
+
+**Note:**The aggregate form simplifies construction of empirical logit plots.
+
+---
+
+### Empirical Plots Using Putts2 Data
+
+.panelset[
+
+.panel[.panel-name[Code]
+
+```r
+Putts2 &lt;- mutate(Putts2, LogitMade = log(Made/Missed))
+lmod_Putts2 &lt;- glm(cbind(Made, Missed) ~ Length, family = binomial, data = Putts2)
+mymod_fun &lt;- makeFun(lmod_Putts2)
+gf_point(LogitMade ~ Length, data = Putts2) %&gt;%
+  gf_coefline(model = lmod_Putts2, color = "red")
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+&lt;img src="Ch9Lect_sec9_34_files/figure-html/unnamed-chunk-2-1.png" width="90%" /&gt;
+
+]
+]
+
+---
+
+### Empirical Logit Plot Using Putts1
+
+.panelset[
+
+.panel[.panel-name[Code]
+
+```r
+# Automate plot with emplogitplot1() function in Stat2Data
+# 
+emplogitplot1(Made ~ Length, data = Putts1, ngroups = "all")
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+&lt;img src="Ch9Lect_sec9_34_files/figure-html/unnamed-chunk-3-1.png" width="90%" /&gt;
+
+]
+]
+
+
+---
+
+## Empirical Logit Plots
+
+### Two possible problems:
+
+1. Typically, there may be many different x-values with few (or only one) cases at each.
+  
+  - Solution: Group the predictor values into bins of similar values and plot vs. the mean predictor for each bin.
+  
+2. A sample proportion could be 0 or 1 (making log(odds) undefined).
+  
+  - Solution: Define adjusted proportion as
+    
+    `$$\hat p_\text{adj}=\frac{\#\text{Yes}+1/2}{\#\text{Yes}+\#\text{No}+1}$$`
+
+---
+
+### Empirical Logit Plot for MedGPA Data
+
+There are 15 different MCAT scort values (18 to 48)
+
+  - Use 5 ad hoc groups (18-30), (31-34), (35-38), (39-42), (43-48)
+
+
+```r
+emplogitplot1(Acceptance ~ MCAT, breaks = c(0, 30, 34, 38, 42, 48), data = MedGPA, out = TRUE)
+```
+
+
+```
+##   Group Cases XMin XMax    XMean NumYes  Prop AdjProp      Logit
+## 1     1     2   18   27 22.50000      0 0.000   0.167 -1.6070398
+## 2     2    18   31   34 32.77778      6 0.333   0.342 -0.6543942
+## 3     3    15   35   38 36.20000      9 0.600   0.594  0.3805262
+## 4     4    17   39   41 39.76471     12 0.706   0.694  0.8188869
+## 5     5     3   45   48 47.00000      3 1.000   0.875  1.9459101
+```
+
+---
+
+### Empirical Logit Plot for MedGPA Data
+
+&lt;img src="Ch9Lect_sec9_34_files/figure-html/unnamed-chunk-6-1.png" width="90%" /&gt;
+
+---
+
+### Empirical Logit Plot for MedGPA Data
+
+Specify number of groups and R picks intervals to make group size (rougly) equal
+
+
+```r
+emplogitplot1(Acceptance ~ MCAT, ngroups = 5, data = MedGPA, out = TRUE)
+```
+
+
+```
+##   Group Cases XMin XMax    XMean NumYes  Prop AdjProp      Logit
+## 1     1    11   18   32 30.00000      2 0.182   0.208 -1.3370233
+## 2     2    14   33   35 34.28571      8 0.571   0.567  0.2696216
+## 3     3    10   36   38 36.80000      5 0.500   0.500  0.0000000
+## 4     4    13   39   40 39.38462      9 0.692   0.679  0.7491800
+## 5     5     7   41   48 43.57143      6 0.857   0.812  1.4630584
+```
+
+
+--
+
+&lt;br&gt;
+
+**Note:** Means for `\(X\)` values are the actual means of those in the group, not the midpoint of the interval.
+
+---
+
+class: center, middle, inverse
+
+# Formal Inference: Tests and Intervals
+
+---
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"ratio": "16:9",
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
