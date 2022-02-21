@@ -263,8 +263,460 @@ class: center, middle, inverse
 
 ---
 
+### Logistic Output for Putting Example (Putts1)
 
 
+```r
+lmod_putts &lt;- glm(Made ~ Length, family = binomial, data = Putts1)
+summary(lmod_putts)
+```
+
+```
+## 
+## Call:
+## glm(formula = Made ~ Length, family = binomial, data = Putts1)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.8705  -1.1186   0.6181   1.0026   1.4882  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  3.25684    0.36893   8.828   &lt;2e-16 ***
+## Length      -0.56614    0.06747  -8.391   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 800.21  on 586  degrees of freedom
+## Residual deviance: 719.89  on 585  degrees of freedom
+## AIC: 723.89
+## 
+## Number of Fisher Scoring iterations: 4
+```
+
+---
+
+### Logistic Output for Putting Example (Putts1)
+
+- What are the the `\(z\)`-tests?
+
+- What is the deviance about?
+
+- Is there a test like the overall `\(F\)`-test?
+
+---
+
+### Recall: Ordinary Linear Regression Output
+
+
+```r
+regmod_putts &lt;- lm(Made ~ Length, data = Putts1)
+summary(regmod_putts)
+```
+
+```
+## 
+## Call:
+## lm(formula = Made ~ Length, data = Putts1)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -0.8440 -0.4650  0.1560  0.4087  0.6613 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  1.22295    0.07155  17.091   &lt;2e-16 ***
+## Length      -0.12633    0.01346  -9.383   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.4616 on 585 degrees of freedom
+## Multiple R-squared:  0.1308,	Adjusted R-squared:  0.1293 
+## F-statistic: 88.04 on 1 and 585 DF,  p-value: &lt; 2.2e-16
+```
+
+???
+
+- `\(t\)`-Tests for individual coefficients
+
+- Residual standard error and `\(R^2\)` to compare models
+
+- `\(F\)`-test for overall fit
+
+
+---
+
+### Wald’s `\(z\)`-Test for Individual Coefficients
+
+**Hypotheses**
+
+- `\(H_0:\beta_i=0\)` versus `\(H_a:\beta_i\neq 0\)`
+  
+--
+
+**Test statistic**
+
+- `\(\displaystyle z=\frac{\hat\beta_i}{SE(\hat\beta_i)}\)`
+
+--
+
+**P-value**
+
+- `\(P\)`-value `\(=2P(Z&gt;|z|)\)`
+
+---
+
+### Confidence Intervals for Slope and Odds Ratio
+
+- For simple logistic regression, use the SE to find a confidence interval for `\(\beta_1\)`:
+
+  - Calculate `\(\hat\beta_i\pm z^*\cdot\text{SE}\)`
+
+---
+
+## Example: Putting Data
+
+**Logistic Model Output**
+
+```
+Coefficients:
+            Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)  3.25684    0.36893   8.828   &lt;2e-16 ***
+Length      -0.56614    0.06747  -8.391   &lt;2e-16 ***
+```
+
+**Calculations**
+
+- **CI for slope**: `\(-0.566 \pm 1.96(0.06747) = (-0.698, -0.434)\)`
+
+- **CI for the odds ratio `\((e^{\hat\beta_1})\)`:** exponentiate the CI for `\(\beta_1\)`
+
+  - **CI for OR:** `\((e^{-0.698}, e^{-0.434})=(0.497,0.648)\)`
+  
+- **Interpretation** in context:
+
+  - "We are 95% confident that the **odds of making** a putt decrease by a factor between 0.50 and 0.65 for every extra foot in length."
+  
+---
+
+### R commands for CI for Slope and Odds Ratio
+
+**CIs for coefficient**
+
+
+```r
+confint(lmod_putts)
+```
+
+```
+##                  2.5 %     97.5 %
+## (Intercept)  2.5492465  3.9972923
+## Length      -0.7010561 -0.4362681
+```
+
+&lt;br&gt;
+
+**CIs for Odds Ratio**
+
+
+```r
+exp(confint(lmod_putts))
+```
+
+```
+##                  2.5 %     97.5 %
+## (Intercept) 12.7974573 54.4505172
+## Length       0.4960611  0.6464444
+```
+
+
+---
+
+class: center, middle, inverse
+
+# Estimating Parameters in Logistic Regression
+
+---
+
+## Estimating Parameters in Logistic Regression
+
+- **Maximum Likelihood Estimation**: Parameters are chosen to maximize the *likelihood* of the observed sample.
+
+- **The likelihood function:** `$$L=\prod \hat\pi_i^{y_i}(1-\hat\pi)^{1-y_i}$$`
+
+  - If the `\(i\)`th data point is YES `\((y_i=1)\)`, calculate `\(\hat\pi_i\)`
+
+  - If the `\(i\)`th data point is NO `\((y_i=0)\)`, calculate `\(1-\hat\pi_i\)`
+
+&lt;br&gt;
+
+- Want `\(L\)` to be as large as possible
+
+  - Coefficients of the logistic regression model are chosen to make `\(\log(L)\)` as large as possible
+  
+  - `\(\hat\beta_1\)` is the **maximum likelihood estimator** of `\(\beta_1\)`
+  
+---
+
+### Residual Deviance: R Output
+
+- In assessing the overall fit, we often look at `\(-2\log(L)\)`, labeled as the **residual deviance** in R.
+
+```
+Coefficients:
+            Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)  3.25684    0.36893   8.828   &lt;2e-16 ***
+Length      -0.56614    0.06747  -8.391   &lt;2e-16 ***
+---
+
+    Null deviance: 800.21  on 586  degrees of freedom
+Residual deviance: 719.89  on 585  degrees of freedom
+AIC: 723.89
+```
+
+- For the **Putts1** data, `\(-2\log(L)=-2\cdot(-359.95)=719.9\)`
+
+
+```r
+# Extract log-likelihood but we never need to do this
+logLik(lmod_putts)
+```
+
+```
+## 'log Lik.' -359.9456 (df=2)
+```
+
+
+- **Usage note:** We want deviance to be small (like SSE of linear regression).
+
+
+---
+
+### Example: Predict Acceptance for MedGPA Data
+
+**Using GPA**
+
+
+```r
+lmmod_gpa &lt;- glm(Acceptance ~ GPA, family = binomial, data = MedGPA)
+summary(lmmod_gpa)
+```
+
+```
+            Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)  -19.207      5.629  -3.412 0.000644 ***
+GPA            5.454      1.579   3.454 0.000553 ***
+---
+    Null deviance: 75.791  on 54  degrees of freedom
+Residual deviance: 56.839  on 53  degrees of freedom
+```
+
+
+
+**Using MCAT**
+
+
+```r
+lmmod_mcat &lt;- glm(Acceptance ~ MCAT, family = binomial, data = MedGPA)
+summary(lmmod_mcat)
+```
+
+```
+            Estimate Std. Error z value Pr(&gt;|z|)   
+(Intercept) -8.71245    3.23645  -2.692  0.00710 **
+MCAT         0.24596    0.08938   2.752  0.00592 **
+---
+    Null deviance: 75.791  on 54  degrees of freedom
+Residual deviance: 64.697  on 53  degrees of freedom
+```
+
+---
+
+### Example: Predict Acceptance for MedGPA Data
+
+- We prefer the GPA model with:
+
+  - Lower **Residual deviance** (56.84)
+  
+  - Greater **reduction in deviance**: (75.78-64.70) vs (75.78-56.84) 
+  
+---
+  
+### Evaluating Overall Fit: Drop in Deviance Test
+
+- Test for overall fit (simlilar to regression ANOVA)
+
+  - `\(G=\)` improvement in `\(-2\log(L)\)` over a model with constant only (null deviance) 
+  
+  - Compare to `\(\chi^2\)` with `\(k\)` degrees of freedom (chi-square)
+  
+  - Obtain `\(p\)`-value from R or by using the `pchisq()` function.
+  
+---
+
+###  Drop in Deviance (G) Test: Putts1 data
+
+.panelset[
+.panel[.panel-name[R code]
+
+```r
+summary(lmod_putts)
+anova(lmod_putts, test = "Chisq")
+```
+]
+.panel[.panel-name[summary output]
+
+```
+## 
+## Call:
+## glm(formula = Made ~ Length, family = binomial, data = Putts1)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.8705  -1.1186   0.6181   1.0026   1.4882  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  3.25684    0.36893   8.828   &lt;2e-16 ***
+## Length      -0.56614    0.06747  -8.391   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 800.21  on 586  degrees of freedom
+## Residual deviance: 719.89  on 585  degrees of freedom
+## AIC: 723.89
+## 
+## Number of Fisher Scoring iterations: 4
+```
+
+]
+.panel[.panel-name[anova output]
+
+```
+## Analysis of Deviance Table
+## 
+## Model: binomial, link: logit
+## 
+## Response: Made
+## 
+## Terms added sequentially (first to last)
+## 
+## 
+##        Df Deviance Resid. Df Resid. Dev  Pr(&gt;Chi)    
+## NULL                     586     800.21              
+## Length  1   80.317       585     719.89 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+]
+]
+
+
+---
+
+###  Drop in Deviance (G) Test: Putts2 (aggregate) data
+
+.panelset[
+.panel[.panel-name[R code]
+
+```r
+summary(lmod_Putts2)
+anova(lmod_Putts2, test = "Chisq")
+```
+]
+.panel[.panel-name[summary output]
+
+```
+## 
+## Call:
+## glm(formula = cbind(Made, Missed) ~ Length, family = binomial, 
+##     data = Putts2)
+## 
+## Deviance Residuals: 
+##        1         2         3         4         5  
+##  0.14800   0.24555  -0.84871   0.51388  -0.05149  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  3.25684    0.36893   8.828   &lt;2e-16 ***
+## Length      -0.56614    0.06747  -8.391   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 81.3865  on 4  degrees of freedom
+## Residual deviance:  1.0692  on 3  degrees of freedom
+## AIC: 30.175
+## 
+## Number of Fisher Scoring iterations: 3
+```
+
+]
+.panel[.panel-name[anova output]
+
+```
+## Analysis of Deviance Table
+## 
+## Model: binomial, link: logit
+## 
+## Response: cbind(Made, Missed)
+## 
+## Terms added sequentially (first to last)
+## 
+## 
+##        Df Deviance Resid. Df Resid. Dev  Pr(&gt;Chi)    
+## NULL                       4     81.387              
+## Length  1   80.317         3      1.069 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+]
+]
+
+
+---
+
+### Test for Overall Model: Logistic Regression
+
+**Drop-in-Deviance Test**
+
+- Is there something effective in the model?
+
+.pull-left[
+
+- **Null hypothesis**
+
+  - `\(H_0:\beta_1=0\)`
+  
+  - `\(\log\left(\frac{\pi}{1-\pi}\right)=\beta_0\)`
+  
+  - Same odds for all values of `\(x\)`
+  
+  
+- **Alternative hypothesis**
+
+  - `\(H_0: \beta_1\neq 0\)`
+  
+  - `\(\log\left(\frac{\pi}{1-\pi}\right)=\beta_0+\beta_1 x\)`
+  
+  - Odds are a linear function of `\(x\)`
+  
+]
+
+--
+
+.pull-right[
+
+- `\(G=-2\log(L_0)-(-2\log(L))\)` and compare to `\(\chi^2_1\)`
+
+  - Improvement in `\(-2\log(L)\)` when using linear function of `\(x\)`.
+  
+]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
