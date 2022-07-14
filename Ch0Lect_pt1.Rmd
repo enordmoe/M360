@@ -1,8 +1,7 @@
 ---
-title: "Chapter 0: What is a Statistical Model For"
+title: "Chapter 0: What is a Statistical Model"
 subtitle: "Part 1"
 author: "Applied Statistics II"
-date: "July 14, 2022"
 output:
   xaringan::moon_reader:
     lib_dir: libs
