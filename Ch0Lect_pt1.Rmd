@@ -1,5 +1,5 @@
 ---
-title: "Chapter 0: What is a Statistical Model?"
+title: "Chapter 0: What is a Statistical Model For?"
 subtitle: "Part 1"
 author: "Applied Statistics II"
 date: "July 14, 2022"
