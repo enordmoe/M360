@@ -1,3 +1,4 @@
+
 # Creates function called anova_alt() that gives an
 # ANOVA table corresponding to the one in our text
 # Code contributed by Russ Steele on community.rstudio.com 
