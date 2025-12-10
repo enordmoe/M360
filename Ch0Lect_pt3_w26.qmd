@@ -1,0 +1,217 @@
+---
+title: "Chapter 0: What is a Statistical Model?"
+subtitle: "Part 3"
+author: "Applied Statistics II"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: xaringan-themer.css
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      ratio: 16:9
+      countIncrementalSlides: false
+---
+class: highlight-last-item
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  fig.width=9, fig.height=4, 
+  out.width="90%",
+  message = FALSE
+)
+
+```
+
+
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(rvest)
+library(mosaic)
+library(Stat2Data)
+data("WeightLossIncentive4")
+```
+
+```{r xaringanExtra, echo=FALSE}
+xaringanExtra::use_xaringan_extra(c("panelset", "scribble"))
+xaringanExtra::use_clipboard()
+xaringanExtra::use_tile_view()
+```
+
+
+```{css echo=FALSE}
+.highlight-last-item > ul > li,
+.highlight-last-item > ol > li {
+  opacity: 0.5;
+}
+.highlight-last-item > ul > li:last-of-type,
+.highlight-last-item > ol > li:last-of-type {
+  opacity: 1;
+}
+```
+
+# Outline 
+
+- 4-step process review
+
+--
+
+- The Use Step
+
+--
+
+- Effect size
+
+
+---
+class: highlight-last-item
+
+# Four-step Modeling Process
+
+1. **Choose**: Pick a form for the model.
+
+--
+
+1. **Fit**: Estimate any parameters.
+
+--
+
+1. **Assess**: Is the model adequate? Could it be simpler? Are conditions met?
+
+--
+
+1. **Use**: Answer the question of interest
+
+---
+
+# Study: Financial incentives for weight loss 
+
+.pull-left[
+- **Research question**: Do financial incentives help people lose weight more successfully?
+]
+.pull-right[
+```{r echo = FALSE}
+# local
+knitr::include_graphics("https://source.unsplash.com/1fzyz-bmKBw")
+```
+]
+
+---
+### Two-sample t-test for financial incentives data
+
+**Which model is preferred?**
+
+.panelset[
+```{r, panelset = TRUE}
+t.test(WeightLoss ~ Group, data = WeightLossIncentive4)
+```
+]
+
+---
+background-image: url(figures/pvalue_controversy.png)
+background-size: contain
+
+## The p-valaue controversy
+
+---
+
+# The Trouble with the p-value
+
+- The $p$-value tells the strength of evidence of an "effect"
+
+--
+
+- The $p$-value tells nothing about the size or importance of an "effect"
+
+
+---
+# Step 4: Use: Answer the question of interest
+
+- Confidence interval: size of the effect
+
+--
+
+- Scope of inference.  
+
+  - Can causal inference be concluded? 
+  - To what population(s) can we generalize? 
+  - Is the **effect size** large enough to be *important*? 
+
+---
+# Effect size
+
+- **Effect size**: "an often standardized measure of the magnitude of a certain phenomenon of scientific interest."<sup>*</sup>
+
+--
+
+- **Two quantitative variables**
+
+  - Correlation coefficient $r$
+  
+  - Regression slope $b$ (or Beta coefficients or Cohen's $f^2$)
+  
+--
+
+-  **Comparing populations**
+
+  - Standardized mean difference $\theta$
+$$
+\theta = \frac{\mu_1-\mu_2}{\sigma}
+$$
+where $\sigma$ is the standard deviation of one (or both) of the populations being compared.
+
+
+.footnote[[*] Schafer T and Schwarz MA (2019) The Meaningfulness of Effect Sizes in Psychological Research: Differences Between Sub-Disciplines and the Impact of Potential Biases. Front. Psychol. 10:813. doi: 10.3389/fpsyg.2019.00813
+]
+
+---
+# Estimated Effect Size for Difference in Means
+
+$$
+\mbox{effect size} = \frac{\mbox{Difference in sample means}}{\mbox{Estimated Standard Deviation}} = \frac{\bar y_1-\bar y_2}{s_p}
+$$
+Where $s_p$ is "pooled" standard deviation defined as:
+$$
+s_p=\sqrt{\frac{(n_1-1)s_1^2 + (n_2-1)s_2^2}{n_1+n_2-2}}
+$$
+
+- Alternatively, for financial incentives data, we might estimate $\sigma$ by $s$, the standard deviation of weight losses for control ("untreated") individuals
+
+---
+# Example: Effect Size from Study of Financial Incentives for Weight Loss
+
+
+```{r}
+favstats(WeightLoss ~ Group, data = WeightLossIncentive4)
+```
+
+
+Using $s_p$ in the denominator:
+$$
+\mbox{effect size} = \frac{|\bar y_1 - \bar y_2|}{s_p} =  \frac{|15.68 - 3.92|}{9.25} = 1.27
+$$
+--
+Using $s_C$ (control sd) in the denominator:
+$$
+\mbox{effect size} = \frac{|\bar y_1 - \bar y_2|}{s_p} =  \frac{|15.68 - 3.92|}{9.11} = 1.29
+$$
+
+---
+# Assessing Effect Sizes
+
+- General guidelines for effect sizes
+
+  - Small: 0.2
+  
+  - Medium: 0.5
+  
+  - Large: 1.0
+  
+--
+
+- But these are no substitute for judgement in context.
+
+  - How does difference in average weight loss of 11.76 pounds compare with starting weights?
+  
+  - Was weight loss sustained?
