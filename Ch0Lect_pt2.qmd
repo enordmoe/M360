@@ -1,0 +1,343 @@
+---
+title: "Chapter 0: What is a Statistical Model<br><span style='font-size:70%'>Part 2</span>"
+subtitle: "Statistical Modeling"
+author: "MATH 360"
+format:
+  revealjs:
+    chalkboard: true
+    theme: [default, custom.scss]
+    toc: false
+    toc-depth: 1
+    reveal-options:
+      slideNumber: true
+    html-math-method: mathjax
+    incremental: false
+    transition: fade
+    preview-links: auto
+    notes: true
+title-slide-attributes:
+  data-background-color: "#EA6820"
+from: markdown+emoji
+execute:
+  echo: true
+  cache: false
+editor:
+  markdown:
+    wrap: 72
+---
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(rvest)
+library(mosaic)
+library(Stat2Data)
+data("WeightLossIncentive4")
+```
+
+## Topics :pushpin:
+
+::: incremental
+-   Statistical model
+
+-   4-step process
+
+-   Case study
+
+-   R Code
+:::
+
+## Statistical modeling
+
+-   A general statistical model:
+
+$$
+Y = f(X) + \epsilon
+$$
+
+-   Goal: Find a model for a relationship between a **response
+    variable** ($Y$) and one or more **explanatory/predictor** variables
+    $(X_1, X_2, \ldots, X_k)$.
+
+##  {background-image="figures/nyt_model.png" background-size="contain" background-position="center"}
+
+## Four-step Modeling Process
+
+::: {.incremental .highlight-last}
+1.  **Choose**: Pick a form for the model.
+
+2.  **Fit**: Estimate any parameters.
+
+3.  **Assess**: Is the model adequate? Could it be simpler? Are
+    conditions met?
+
+4.  **Use**: Answer the question of interest
+:::
+
+## Study: Financial incentives for weight loss {.smaller}
+
+::::: columns
+::: {.column width="50%"}
+```{r echo = FALSE}
+# local
+knitr::include_graphics("figures/wt_loss_title.png")
+```
+
+-   **Research question**: Do financial incentives help people lose
+    weight more successfully?
+:::
+
+::: {.column .fragment width="50%"}
+-   **Participants**: healthy adults 30-70 with BMI of 30-40
+
+-   **Treatment groups**: Randomly assigned to treatment groups
+    (*Group*):
+
+    -   Financial incentives vs
+
+    -   Control (monthly weigh-ins, no financial incentive)
+
+-   **Response**: *WeightLoss* = Before - After
+
+    -   Positive $\Rightarrow$ weight loss
+
+-   R Dataset: **WeightLossIncentive4**
+:::
+:::::
+
+------------------------------------------------------------------------
+
+### Study: Financial incentives for weight loss
+
+#### The data
+
+::: panel-tabset
+## Access and Group Size
+
+```{r fi1}
+# Load data set
+data("WeightLossIncentive4")
+tally(~Group, data = WeightLossIncentive4)
+```
+
+## Control
+
+```{r fi2}
+filter(WeightLossIncentive4, Group == "Control")
+```
+
+## Incentive
+
+```{r fi3}
+filter(WeightLossIncentive4, Group == "Incentive")
+```
+:::
+
+------------------------------------------------------------------------
+
+### Describing the Data Graphically and Nummerically
+
+::: panel-tabset
+## R Code
+
+```{r figraph1, eval = FALSE}
+# coord_flip makes dotplot vertical
+gf_dotplot(~WeightLoss | Group, data = WeightLossIncentive4) + 
+  coord_flip()
+gf_boxplot(Group ~ WeightLoss, data = WeightLossIncentive4)
+# summary statistics by group
+favstats(WeightLoss ~ Group, data = WeightLossIncentive4)
+```
+
+## Dotplot
+
+```{r figraph2, echo = FALSE}
+gf_dotplot(~WeightLoss | Group, data = WeightLossIncentive4) + 
+  coord_flip()
+```
+
+## Boxplot
+
+```{r figraph3, echo = FALSE}
+gf_boxplot(Group ~ WeightLoss, data = WeightLossIncentive4) 
+```
+
+## Summary Statistics
+
+```{r fi_stats, echo = FALSE}
+favstats(WeightLoss ~ Group, data = WeightLossIncentive4)
+```
+:::
+
+## Step 1: Choose a Model
+
+::::: columns
+::: {.column width="50%"}
+### Characteristics
+
+Consider a model suggested by the data:
+
+-   Different means for each treatment group ( $\mu_i$ )
+
+-   Common variability ( $\sigma$ )
+
+-   Normally distributed (symmetric) errors ( $\epsilon$ )
+:::
+
+::: {.column .fragment width="50%"}
+### Formally stated:
+
+$$
+Y = \mu_i + \epsilon \mbox{ where } \epsilon \sim N(0, \sigma_i)
+$$
+
+### By group:
+
+-   Control Group:\
+    $\displaystyle Y = \mu_1 + \epsilon \mbox{ so } Y \sim N(\mu_1, \sigma_1)$
+-   Incentives Group:\
+    $\displaystyle Y = \mu_2 + \epsilon \mbox{ so } Y \sim N(\mu_2, \sigma_2)$
+:::
+:::::
+
+## Step 2: Fit the Model {.smaller}
+
+### Process
+
+-   Depends on study design, types of variables, and proposed model.
+
+::: fragment
+### Financial incentives model
+
+-   Compute sample estimates of means $\bar y_i$ and standard deviations
+    $s_i$
+
+-   Fitted values differ by treatment group:
+
+$\qquad \hat y = \bar y_i$
+
+-   **Note**: No error term in the *fitted model*
+
+-   **Interpretation**: Predicted weight loss for a member of group $i$.
+:::
+
+## Step 3: Assess the Model
+
+-   Determine whether the conditions of the model hold
+
+    -   Look at residual $y-\hat y_i$
+
+-   Consider whether a different (simpler) model might fit.
+
+## Check conditions on residuals
+
+-   Use R function `lm()` to fit the two-mean model (see code example)
+
+-   Verify fitted values
+
+-   Plot residuals to check conditions
+
+## R code and output for checking conditions on residuals {.smaller}
+
+::: panel-tabset
+## R Code
+
+```{r fimod1, eval = FALSE}
+# fits two-means model
+wl_mod <- lm(WeightLoss ~ Group, data = WeightLossIncentive4)
+
+# adds fitted and residual values to the dataset
+WeightLossIncentive4 <- WeightLossIncentive4 |>  
+  mutate(yhat = fitted(wl_mod), resid = resid(wl_mod))
+
+# check the values
+head(filter(WeightLossIncentive4, Group == "Control"))
+head(filter(WeightLossIncentive4, Group == "Incentive"))
+
+# residual dotplots 
+gf_dotplot(~resid | Group, data = WeightLossIncentive4) + 
+  coord_flip()
+
+# residual quantile plots
+gf_qq(~ resid | Group, data = WeightLossIncentive4) |> 
+  gf_qqline()
+```
+
+## Fitted values and residuals
+
+```{r fimod2, echo = FALSE}
+# fits two-means model
+wl_mod <- lm(WeightLoss ~ Group, data = WeightLossIncentive4)
+
+# adds fitted and residual values to the dataset
+WeightLossIncentive4 <- WeightLossIncentive4 %>% 
+  mutate(yhat = fitted(wl_mod), resid = resid(wl_mod))
+
+# check the values
+head(filter(WeightLossIncentive4, Group == "Control"))
+head(filter(WeightLossIncentive4, Group == "Incentive"))
+```
+
+## Dotplot
+
+```{r fimod3, echo = FALSE}
+gf_dotplot(~resid | Group, data = WeightLossIncentive4) + 
+  coord_flip()
+```
+
+## Normal quantile plots
+
+```{r fimod4, echo = FALSE}
+gf_qq(~ resid | Group, data = WeightLossIncentive4) %>% gf_qqline()
+```
+:::
+
+## Test versus a simpler model
+
+Carry out a two-sample $t$-test for financial incentives data
+
+$$
+H_0: \mu_1 = \mu_2  \quad\Rightarrow \quad Y = \mu + \epsilon \quad \mbox{ (one mean model)} 
+$$
+
+versus
+
+$$
+H_a: \mu_1 \neq \mu_2 \quad \Rightarrow \quad Y = \mu_i + \epsilon \quad \mbox{ (two means model)}
+$$
+
+------------------------------------------------------------------------
+
+### Two-sample t-test for financial incentives data
+
+**Which model is preferred?**
+
+```{r}
+#| output-location: fragment
+t.test(WeightLoss ~ Group, data = WeightLossIncentive4)
+```
+
+## Step 4: Use the Model
+
+-   The data point to the **two means model** ($H_a$)
+
+-   Estimate treatment effect
+
+-   Fund more studies
+
+-   Health care policy implications
+
+## Summary
+
+-   **Statistical models** express relationships as
+    $Y = f(X) + \epsilon$, with a focus on prediction, explanation, and
+    uncertainty.
+
+-   We applied the **Four-Step Modeling Process**
+
+1.  **Choose** an appropriate model form
+2.  **Fit** model parameters using data
+3.  **Assess** adequacy via diagnostics and residuals
+4.  **Use** the model to answer scientific questions
+
+-   The Financial incentives for weight loss case study illustrates the
+    process

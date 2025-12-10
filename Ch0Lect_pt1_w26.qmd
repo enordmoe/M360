@@ -188,16 +188,17 @@ head(Day1Survey, n = 6)
 
 ### A Brief Summary of the Course
 
-+--------------+----------------------+
-| Explanatory\ | Response Variable    |
-| Variable(s)  |                      |
-+==============+:====================:+
-| Quantitative | Binary               |
-+--------------+----------------------+
-| Quantitative | Regression           |
-+--------------+----------------------+
-| Categorical  | Analysis of Variance |
-+--------------+----------------------+
++---------------+--------------------+
+| Explanatory\  | Response Variable  |
+| Variable(s)   |                    |
++===============+:==================:+
+| Quantitative  | Binary             |
++---------------+--------------------+
+| Quantitative  | Regression         |
++---------------+--------------------+
+| Categorical   | Analysis of        |
+|               | Variance           |
++---------------+--------------------+
 
 #  {background-color="#FAD9C7"}
 
