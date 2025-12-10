@@ -4,9 +4,9 @@
     <title>Chapter 0: What is a Statistical Model</title>
     <meta charset="utf-8" />
     <meta name="author" content="Applied Statistics II" />
-    <script src="libs/header-attrs-2.14/header-attrs.js"></script>
-    <link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet" />
-    <script src="libs/panelset-0.2.6/panelset.js"></script>
+    <script src="libs/header-attrs-2.29/header-attrs.js"></script>
+    <link href="libs/panelset-0.3.0/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset-0.3.0/panelset.js"></script>
     <script src="libs/fabric-4.3.1/fabric.min.js"></script>
     <link href="libs/xaringanExtra-scribble-0.0.1/scribble.css" rel="stylesheet" />
     <script src="libs/xaringanExtra-scribble-0.0.1/scribble.js"></script>
@@ -217,7 +217,7 @@ Source: *Statistics: Unlocking the Power of Data*
 .panelset[
 .panel[.panel-name[Code]
 
-```r
+``` r
 # Show the first ten rows of Day1Survey
 head(Day1Survey, n = 6)
 ```
@@ -301,7 +301,7 @@ class: inverse, center, middle
 .panelset[
 .panel[.panel-name[Code]
 
-```r
+``` r
 # Import the data from the web
 anorexia &lt;- read.csv("http://people.kzoo.edu/enordmoe/math260/data/anorexia.csv")
 # View the first few rows of the data
@@ -345,9 +345,9 @@ tally(~group, data = anorexia)
 .panelset[
 .panel[.panel-name[R Code]
 
-```r
+``` r
 gf_dotplot(~gain | group~., data = anorexia)
-gf_boxploth(group ~ gain, data = anorexia)
+gf_boxplot(gain ~ group, data = anorexia)
 ```
 ]
 .panel[.panel-name[Dotplot]
@@ -363,10 +363,10 @@ gf_boxploth(group ~ gain, data = anorexia)
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
 <script>var slideshow = remark.create({
-"highlightStyle": "github",
-"highlightLines": true,
-"ratio": "16:9",
-"countIncrementalSlides": false
+  "highlightStyle": "github",
+  "highlightLines": true,
+  "ratio": "16:9",
+  "countIncrementalSlides": false
 });
 if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   window.dispatchEvent(new Event('resize'));

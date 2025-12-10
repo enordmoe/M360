@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Chapter 0: What is a Statistical Model</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Applied Statistics II" />
+    <script src="libs/header-attrs-2.29/header-attrs.js"></script>
+    <link href="libs/panelset-0.3.0/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset-0.3.0/panelset.js"></script>
+    <script src="libs/fabric-4.3.1/fabric.min.js"></script>
+    <link href="libs/xaringanExtra-scribble-0.0.1/scribble.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-scribble-0.0.1/scribble.js"></script>
+    <script>document.addEventListener('DOMContentLoaded', function() { window.xeScribble = new Scribble({"pen_color":["#FF0000"],"pen_size":3,"eraser_size":30,"palette":[]}) })</script>
+    <script src="libs/clipboard-2.0.6/clipboard.min.js"></script>
+    <link href="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.js"></script>
+    <script>window.xaringanExtraClipboard(null, {"button":"Copy Code","success":"Copied!","error":"Press Ctrl+C to Copy"})</script>
+    <link href="libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view-0.2.6/tile-view.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Chapter 0: What is a Statistical Model
+]
+.subtitle[
+## Part 1
+]
+.author[
+### Applied Statistics II
+]
+
+---
+
+class: highlight-last-item
+
+
+
+
+
+
+
+
+
+
+&lt;style type="text/css"&gt;
+.highlight-last-item &gt; ul &gt; li,
+.highlight-last-item &gt; ol &gt; li {
+  opacity: 0.5;
+}
+.highlight-last-item &gt; ul &gt; li:last-of-type,
+.highlight-last-item &gt; ol &gt; li:last-of-type {
+  opacity: 1;
+}
+&lt;/style&gt;
+
+# Outline 
+
+- Review of Stats I
+
+--
+
+- Statistical modeling
+
+--
+
+- Fundamentals
+
+--
+
+- Design and Inference
+
+--
+
+- Examples
+
+
+---
+background-image: url(figures/Inference_Roadmap_Review.png)
+background-size: contain
+
+
+
+---
+class: highlight-last-item
+
+# Data  
+
+- Data are numbers with a context. 
+
+--
+
+- Modeling mindset
+$$
+\mbox{Data} = \mbox{Pattern} + \mbox{Departures from a pattern}
+$$
+
+--
+
+- How to identify the pattern?
+
+---
+# General form of a model
+
+- The intuitive statistical modeling idea:
+
+$$
+\mbox{Data} = \mbox{Model} + \mbox{Error}
+$$
+
+--
+
+- More formally, we have:
+
+$$
+Y= f(X) + \epsilon
+$$
+
+---
+background-image: url(figures/chris-leipelt-IYOJOCQOtBg-unsplash.jpg)
+background-size: 300px
+background-position: 75% 75%
+
+# Purposes of Statistical Modeling
+
+.pull-left[
+1. Making predictions
+
+1. Understanding relationships
+
+1. Assessing differences
+]
+
+--
+
+.pull-right[
+- Obtaining confidence intervals
+
+- Testing hypotheses
+]
+
+---
+background-image: url(figures/alan-king-KZv7w34tluA-unsplash.jpg)
+background-size: 200px
+background-position: 90% 8%
+
+# Fundamentals  
+
+## Building blocks  
+
+--
+
+  - **Observational units.** in a study are the people, objects, or cases on&lt;br&gt; which
+  data are recorded. 
+
+--
+
+
+## Variables in a modeling framework
+
+--
+
+**Response variable.** the variable that measures the outcome of interest; typically the variable whose value we would like to predict.  
+
+--
+
+**Explanatory variable(s).** the variable(s) whose relationship to the response is being studied.  
+
+
+---
+class: highlight-last-item
+
+# Types of Variables
+
+- **Quantitative**: expressible as numbers for which arithmetic makes sense
+
+--
+
+- **Categorical**: divides sample observations into groups
+
+--
+
+  - **Binary**: categorical with just two groups
+
+---
+
+---
+class: highlight-last-item
+
+# Types of Studies
+
+
+- **Observational study**: Data are recorded without "manipulating" any of the variables.
+
+--
+
+- **Statistical experiment**: One or more of the explanatory variables is/are assigned/controlled for all experimental units.
+
+--
+
+**Question:** How is the type of study related to the kinds of inference that can be made? 
+
+
+---
+# Design and Inference
+
+&lt;img src="figures/statistics1e_fig_01_03.jpg" width="90%" /&gt;
+
+Source: *Statistics: Unlocking the Power of Data*
+
+---
+
+# Sample Dataset
+.panelset[
+.panel[.panel-name[Code]
+
+``` r
+# Show the first ten rows of Day1Survey
+head(Day1Survey, n = 6)
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+```
+##   Section    Class Sex Distance Height Handedness Coins WhiteString BlackString
+## 1       1   Senior   F      400     62      Right  1.12          42           6
+## 2       1        *   F      450     61       Left 29.00          45           5
+## 3       1 Freshman   F     3000     61      Right  1.50          22           4
+## 4       1 Freshman   M      100     72      Right  0.07          40           4
+## 5       1      N/A   F     2000     69      Right  0.12          48           7
+## 6       1   Senior   M      500     73      Right  8.00          30           8
+##   Reading TV Pulse Texting
+## 1      80  3    71       3
+## 2     100 10    78     100
+## 3     100  4    80       2
+## 4      50 25    63     200
+## 5     200  5    63     100
+## 6     100  0    56       1
+```
+
+
+
+]
+]
+
+
+
+
+---
+# Modeling Matrix: Our Course Summary
+
+
+
+&lt;img src="figures/mod_matrix.png" width="90%" /&gt;
+
+---
+class: inverse, center, middle
+
+
+# Case Study 
+
+---
+# Study of Treaments of Anorexia
+
+- A study of the effect of  therapies for anorexia patients
+
+  - Family Therapy
+  
+  - Cognitive Behavioral Therapy
+  
+  - A Control Therapy
+  
+--
+
+- Variables of interest
+
+  - *gain*: weight gain over the course of the study
+  
+  - *group*: treatment group
+  
+--
+  
+- Research question of interest
+
+  - Does Family Therapy increase weight gain compared to the control therapy?
+
+---
+
+## Describing the Data: Numerically
+
+
+
+
+.panelset[
+.panel[.panel-name[Code]
+
+``` r
+# Import the data from the web
+anorexia &lt;- read.csv("http://people.kzoo.edu/enordmoe/math260/data/anorexia.csv")
+# View the first few rows of the data
+head(anorexia, n=10)
+tally(~group, data = anorexia)
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+```
+##    wtbef wtaft   group  gain gained
+## 1   87.3  75.1 Control -12.2  FALSE
+## 2   86.0  75.4 Control -10.6  FALSE
+## 3   88.3  78.1 Control -10.2  FALSE
+## 4   89.0  78.8 Control -10.2  FALSE
+## 5   89.4  80.1 Control  -9.3  FALSE
+## 6   88.7  79.5 Control  -9.2  FALSE
+## 7   80.6  73.5 Control  -7.1  FALSE
+## 8   79.7  73.0 Control  -6.7  FALSE
+## 9   91.8  86.4 Control  -5.4  FALSE
+## 10  84.1  79.5 Control  -4.6  FALSE
+## group
+## Control  Family 
+##      26      17
+```
+
+
+
+]
+]
+
+
+---
+## Describing the Data: Graphically
+
+
+.panelset[
+.panel[.panel-name[R Code]
+
+``` r
+gf_dotplot(~gain | group~., data = anorexia)
+gf_boxplot(gain ~ group, data = anorexia)
+```
+]
+.panel[.panel-name[Dotplot]
+&lt;img src="Ch0Lect_pt1_w26.qmd_files/figure-html/anorex_plots2-1.png" width="90%" /&gt;
+]
+.panel[.panel-name[Boxplot]
+&lt;img src="Ch0Lect_pt1_w26.qmd_files/figure-html/anorex_plots3-1.png" width="90%" /&gt;
+]
+]
+
+&lt;!-----&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+  "highlightStyle": "github",
+  "highlightLines": true,
+  "ratio": "16:9",
+  "countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

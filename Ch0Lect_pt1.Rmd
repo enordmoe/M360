@@ -289,7 +289,7 @@ tally(~group, data = anorexia)
 .panel[.panel-name[R Code]
 ```{r anorex_plots, eval = FALSE}
 gf_dotplot(~gain | group~., data = anorexia)
-gf_boxploth(group ~ gain, data = anorexia)
+gf_boxplot(gain ~ group, data = anorexia)
 ```
 ]
 .panel[.panel-name[Dotplot]
@@ -299,7 +299,7 @@ gf_dotplot(~gain | group~., data = anorexia)
 ]
 .panel[.panel-name[Boxplot]
 ```{r anorex_plots3, echo = FALSE}
-gf_boxploth(group ~ gain, data = anorexia)
+gf_boxplot(gain ~ group, data = anorexia)
 ```
 ]
 ]

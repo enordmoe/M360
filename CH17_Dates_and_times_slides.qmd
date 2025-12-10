@@ -1,0 +1,257 @@
+---
+title: "Chapter 17: Dates and Times"
+author: Introduction to Data Science
+format:
+  revealjs:
+    theme: [default, custom.scss]
+    slide-number: true
+    chalkboard: 
+      theme: whiteboard
+      buttons: false
+    preview-links: auto
+    execute:
+      eval: false
+      warning: false
+      echo: true
+#      cache: true
+    callouts:
+      quote:
+        title: Quote
+        icon: quote
+title-slide-attributes:
+  data-background-color: "#EA6820"
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+
+
+```{r}
+#| label: setup
+#| include: false
+#| eval: true
+library(tidyverse)
+library(nycflights13)
+```
+
+## Outline
+
+-   Factors review
+
+-   Problems with dates and times
+
+-   Parsing functions
+
+-   Intervals, periods, and durations
+
+## Factors Review {.smaller}
+
+::: incremental
+-   Be careful about piping with factors. Why?
+
+-   What is the difference between `fct_count()` and `fct_unique()`?
+
+-   Compare and contrast `fct_infreq()` and `fct_reorder()`?
+
+-   Income is recorded in 20 narrow categories but I want to regroup to
+    have just 4 categories. What `fct_xxx()` function should I use?
+
+-   How do you tell R to drop empty factor levels that do not occur in
+    the data?
+
+    -   How could this happen?
+:::
+
+## Dates and Time?
+
+::: columns
+::: {.column width="50%"}
+![](figures/dates.jpeg){alt="Dates Image"}
+:::
+
+::: {.column width="50%"}
+![](figures/thyme.jpeg){alt="Thyme Image"}
+:::
+:::
+
+# Dates and Times are Challenging!
+
+::: incremental
+-   Many formats for writing times
+
+-   Leap years (and leap seconds!)
+
+-   Irregular months
+
+-   Time zones
+
+-   Daylight savings time (when is a day not a day?)
+:::
+
+## Those tricky dates...
+
+```{r}
+parse_date("March 21st, 1992")
+parse_date("12th of Jan, 2016")
+```
+
+## Those tricky dates...
+
+```{r}
+parse_date("1942Jan03")
+parse_date("July041776 0930")
+```
+
+------------------------------------------------------------------------
+
+## **lubridate** to the rescue
+
+![](figures/data_sci_superhero.png)
+
+## Parsing functions
+
+**lubridate** has a series of smart functions for parsing dates that do
+better than `parse_date()`:
+
+-   Dates only:
+    -   `ymd()`, `dmy()`, ...
+-   Dates and times:
+    -   `ymd_hms()`, `dmy_hms()`, `dmy_h()`, `ydm_h()`
+-   See the Cheat Sheet and help files for more functions and details
+
+## **lubridate** parsing functions
+
+```{r}
+mdy("March 21st, 1992")
+```
+
+. . .
+
+```{r}
+dmy("12th of Jan, 2016")
+```
+
+. . .
+
+```{r}
+ymd("1942Jan03")
+```
+
+. . .
+
+```{r}
+mdy_hm("July041776 0930")
+```
+
+## Difficult Questions about Dates and Times
+
+
+-   What day is one year after January 1, 2024?
+
+-   What day is one month after February 15, 2024 (or 2025?)?
+
+-   What time is 60 minutes after 1:30 am on March 9, 2025?
+
+-   What is the last day of February?
+
+. . . 
+
+::: {.callout-note}
+### ❓ Question to Consider
+Why are these questions difficult?
+:::
+
+
+
+## Timespans in **lubridate**
+
+Three different timespans:
+
+* Periods  
+
+* Durations  
+
+* Intervals  
+
+
+## Timespans in **lubridate**: Periods {.smaller}
+
+- **Periods**: Represent human-friendly time units that align with the calendar (e.g., months, years), but they **ignore irregularities** like leap years and daylight savings.
+
+  - Examples: `seconds(30)`, `minutes(5)`, `hours(1)`, `days(10)`, `months(3)`, `years(2)`
+  - Used for **arithmetic operations** that adjust dates/times while preserving real-world meaning.
+  - *Example:*
+```{r}
+ymd("2023-03-01") + years(1)  
+ymd("2024-03-01") + years(1)  
+ymd("2024-02-01") + months(1) 
+ymd("2024-03-01") + months(1) 
+```
+
+## Timespans in **lubridate**: Durations {.smaller}
+
+- **Durations**: Represent **exact** lengths of time in **fixed seconds** (ignoring calendars).
+
+  - Examples: `dseconds(30)`, `dminutes(5)`, `dhours(1)`, `dweeks(2)`
+  - Always based on **constant** seconds:
+    - 1 day = **86400 seconds**
+    - 1 year = **31,536,000 seconds** (not accounting for leap years!)
+  - *Example:*
+```{r}
+ymd("2023-03-01") + dyears(1)   # Moves exactly 365.25 days ahead
+ymd("2024-03-01") + dyears(1)  
+dyears(1)/60 # Can't quite sing this
+```
+
+## Timespans in **lubridate**: Intervals {.smaller}
+
+- **Intervals**: Represent a **time span between two date-time points**, keeping both **start and end**.
+
+- Created with `interval()` or  `%--%`:  
+
+```{r}
+interval(ymd("2024-01-01"), ymd("2025-01-01"))
+ymd("2024-01-01") %--% ymd("2025-01-01")
+```
+
+- Used to check if a date-time falls within a range:  
+
+```{r}
+ymd("2024-06-15") %within% interval(ymd("2024-01-01"), ymd("2025-01-01"))
+```
+
+**See the [lubridate Cheat Sheet](https://rstudio.github.io/cheatsheets/lubridate.pdf) for more details.**
+
+
+
+
+## Use time zones to see what's going on 
+
+```{r}
+dmy_hm("09-Mar-2025 01:30", tz = "America/Detroit") 
+dmy_hm("09-Mar-2025 01:30", tz = "America/Detroit") + minutes(60)
+dmy_hm("09-Mar-2025 01:30", tz = "America/Detroit") + dminutes(60)
+```
+
+
+
+## Other useful functions: Rounding date-times
+
+![](figures/rounding_dates.png)
+
+# [Your turn: Complete the tutorial in inclass265]{style="color: white;"} {background-color="#FE961C"}
+
+## Summary: Dates and Times in R {.smaller}
+
+- **Parsing Dates & Times**: Use `ymd()`, `mdy()`, `dmy()`, and their time variants (`ymd_hms()`, etc.) instead of `parse_date()`.
+- **Handling Date Challenges**:
+  - Leap years, daylight savings time, and irregular months make date calculations tricky.
+- **Time Spans in `lubridate`**:
+  - **Periods** (`years(1)`, `months(1)`) respect the calendar.
+  - **Durations** (`dyears(1)`, `dweeks(2)`) are fixed in seconds.
+  - **Intervals** (`interval(start, end)`) define a range of time.
+- **Time Zones Matter!**  
+  - Adding one hour in Detroit during daylight savings behaves differently than in UTC.
+
+**More Resources**: [lubridate Cheat Sheet](https://rstudio.github.io/cheatsheets/lubridate.pdf)

@@ -1,0 +1,300 @@
+---
+title: "Chapter 0: What is a Statistical Model<br><span style='font-size:70%'>Part 1</span>"
+subtitle: "Statistical Modeling"
+author: "MATH 360"
+format:
+  revealjs:
+    chalkboard: true
+    theme: [default, custom.scss]
+    toc: false
+    toc-depth: 1
+    reveal-options:
+      slideNumber: true
+    html-math-method: mathjax
+    incremental: false
+    transition: fade
+    preview-links: auto
+    notes: true
+title-slide-attributes:
+  data-background-color: "#EA6820"
+from: markdown+emoji
+execute:
+  echo: true
+  cache: false
+editor:
+  markdown:
+    wrap: 72
+---
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(rvest)
+library(mosaic)
+library(Stat2Data)
+data("Day1Survey")
+
+```
+
+## Topics :pushpin:
+
+::: incremental
+-   Review of Stats I
+
+-   Statistical modeling
+
+-   Fundamentals
+
+-   Design and Inference
+
+-   Examples
+:::
+
+------------------------------------------------------------------------
+
+![](figures/Inference_Roadmap_Review.png){fig-align="center"}
+
+## Data
+
+::: incremental
+-   Data are numbers with a context.
+
+-   Modeling mindset $$
+    \mbox{Data} = \mbox{Pattern} + \mbox{Departures from a pattern}
+    $$
+
+-   How to identify the pattern?
+:::
+
+## General form of a model
+
+-   The intuitive statistical modeling idea: $$
+    \mbox{Data} = \mbox{Model} + \mbox{Error}
+    $$
+
+-   More formally, we have: $$
+    Y= f(X) + \epsilon
+    $$
+
+## Purposes of Statistical Modeling
+
+![](figures/chris-leipelt-IYOJOCQOtBg-unsplash.jpg){.absolute bottom="0"
+right="0" width="400"}
+
+::::::: columns
+:::: {.column width="45%"}
+::: nonincremental
+1.  Making predictions
+
+2.  Understanding relationships
+
+3.  Assessing differences
+:::
+::::
+
+:::: {.column .fragment .zoom-in width="50%"}
+::: nonincremental
+-   Obtaining confidence intervals
+
+-   Testing hypotheses
+:::
+::::
+:::::::
+
+## Fundamentals
+
+![](figures/alan-king-KZv7w34tluA-unsplash.jpg){.absolute top="-50"
+right="0" width="200"}
+
+::: fragment
+### Building blocks
+
+-   **Observational units.** in a study are the people, <br> objects, or
+    cases on which data are recorded.
+:::
+
+::: fragment
+### Variables in a modeling framework
+
+-   **Response variable:** the variable that measures the outcome of
+    interest; typically the variable whose value we would like to
+    predict.
+
+-   **Explanatory variable(s):** the variable(s) whose relationship to
+    the response is being studied.
+:::
+
+## Types of Variables
+
+::: incremental
+-   **Quantitative**: expressible as numbers for which arithmetic makes
+    sense
+
+-   **Categorical**: divides sample observations into groups
+
+-   **Binary**: categorical with just two groups
+:::
+
+## Types of Studies
+
+-   **Observational study**: Data are recorded without "manipulating"
+    any of the variables.
+
+-   **Statistical experiment**: One or more explanatory variables are
+    assigned/controlled for all experimental units.
+
+<br>
+
+::: fragment
+:question: How is the type of study related to the kinds of inference
+that can be made?
+:::
+
+## Design and Inference
+
+![](figures/statistics1e_fig_01_03.jpg){fig-align="center"}
+
+::: aside
+Source: *Statistics: Unlocking the Power of Data*
+:::
+
+## Overview of Statistical Modeling
+
+![](figures/Model_decision_tree.png){fig-align="center" width="70%"}
+
+::: aside
+Adapted from: Wang & Cai (2023), *Online Repository for Facilitating
+Teaching and Learning of Undergraduate Statistical Modeling Tools*.
+:::
+
+## Sample Data Set
+
+::: panel-tabset
+## Code
+
+```{r, eval = FALSE}
+# Show the first ten rows of Day1Survey 
+head(Day1Survey, n = 6)
+```
+
+## Output
+
+```{r, echo = FALSE}
+# Show the first ten rows of Day1Survey 
+head(Day1Survey, n = 6)
+```
+:::
+
+## Modeling Matrix
+
+### A Brief Summary of the Course
+
++--------------+----------------------+
+| Explanatory\ | Response Variable    |
+| Variable(s)  |                      |
++==============+:====================:+
+| Quantitative | Binary               |
++--------------+----------------------+
+| Quantitative | Regression           |
++--------------+----------------------+
+| Categorical  | Analysis of Variance |
++--------------+----------------------+
+
+#  {background-color="#FAD9C7"}
+
+::: {#title-slide .center}
+[Case Study]{style="font-size: 2.5em; font-weight: bold;"}
+:::
+
+## Study of Treatments of Anorexia {.smaller}
+
+-   A study of the effect of therapies for anorexia patients
+
+    ::: nonincremental
+    -   Family Therapy
+
+    -   Cognitive Behavioral Therapy
+
+    -   A Control Therapy
+    :::
+
+:::: fragment
+::: nonincremental
+-   Variables of interest
+
+    -   *gain*: weight gain over the course of the study
+
+    -   *grp*: treatment group
+:::
+::::
+
+:::: fragment
+::: nonincremental
+-   Research question of interest
+
+    :question: Does Family Therapy increase weight gain compared to the
+    control therapy?
+:::
+::::
+
+## Describing the Data: Numerically
+
+::: panel-tabset
+## Code
+
+```{r, eval = FALSE}
+# Import the data from the web
+anorexia <- read.csv("http://people.kzoo.edu/enordmoe/math360/anorexia_3samp.csv")
+# View the first few rows of the data
+head(anorexia, n=10)
+tally(~grp, data = anorexia)
+```
+
+## Output
+
+```{r, echo = FALSE}
+# Import the data from the web
+anorexia <- read.csv("http://people.kzoo.edu/enordmoe/math360/anorexia_3samp.csv")
+# View the first few rows of the data
+head(anorexia, n=10)
+tally(~grp, data = anorexia)
+```
+:::
+
+## Describing the Data: Graphically
+
+::: panel-tabset
+## Dotplot
+
+```{r, echo = TRUE}
+gf_dotplot(~gain | grp ~ ., data = anorexia)
+```
+
+## Boxplot
+
+```{r, echo = TRUE}
+gf_boxplot(grp ~ gain, data = anorexia)
+```
+:::
+
+## Questions About the Anorexia Data?
+
+::: {.center .large}
+:speech_balloon: What patterns do you see in the graphs?
+
+:thought_balloon: What questions would you ask about this study?
+
+:mag: What kinds of inferences are appropriate?
+:::
+
+------------------------------------------------------------------------
+
+## Summary
+
+::: incremental
+-   We can view data as **pattern + departures from the pattern**
+-   Statistical models help us **describe**, **explain**, and
+    **predict**
+-   The modeling framework: $Y = f(X) + \epsilon$
+-   Types of variables and study design shape the analysis
+-   Case studies like the anorexia data illustrate modeling in practice
+:::
