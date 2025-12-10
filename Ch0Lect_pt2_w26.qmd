@@ -73,14 +73,12 @@ $$
 4.  **Use**: Answer the question of interest
 :::
 
-## Study: Financial incentives for weight loss {.smaller}
+## {.smaller}
+### Study: Financial incentives for weight loss
 
 ::::: columns
 ::: {.column width="50%"}
-```{r echo = FALSE}
-# local
-knitr::include_graphics("figures/wt_loss_title.png")
-```
+![](figures/wt_loss_title.png){fig-align="left"}
 
 -   **Research question**: Do financial incentives help people lose
     weight more successfully?

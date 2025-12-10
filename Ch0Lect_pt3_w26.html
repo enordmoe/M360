@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-<script src="Ch0Lect_pt2_w26_files/libs/clipboard/clipboard.min.js"></script>
-<script src="Ch0Lect_pt2_w26_files/libs/quarto-html/tabby.min.js"></script>
-<script src="Ch0Lect_pt2_w26_files/libs/quarto-html/popper.min.js"></script>
-<script src="Ch0Lect_pt2_w26_files/libs/quarto-html/tippy.umd.min.js"></script>
-<link href="Ch0Lect_pt2_w26_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="Ch0Lect_pt2_w26_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="Ch0Lect_pt2_w26_files/libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<script src="Ch0Lect_pt3_w26_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Ch0Lect_pt3_w26_files/libs/quarto-html/tabby.min.js"></script>
+<script src="Ch0Lect_pt3_w26_files/libs/quarto-html/popper.min.js"></script>
+<script src="Ch0Lect_pt3_w26_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="Ch0Lect_pt3_w26_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Ch0Lect_pt3_w26_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="Ch0Lect_pt3_w26_files/libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.6.42">
 
   <meta name="author" content="MATH 360">
-  <title>Chapter 0: What is a Statistical Model Part 2</title>
+  <title>Chapter 0: What is a Statistical Model Part 3</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
-  <link rel="stylesheet" href="Ch0Lect_pt2_w26_files/libs/revealjs/dist/reset.css">
-  <link rel="stylesheet" href="Ch0Lect_pt2_w26_files/libs/revealjs/dist/reveal.css">
+  <link rel="stylesheet" href="Ch0Lect_pt3_w26_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="Ch0Lect_pt3_w26_files/libs/revealjs/dist/reveal.css">
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
@@ -94,13 +94,13 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="Ch0Lect_pt2_w26_files/libs/revealjs/dist/theme/quarto-1246092c7357598352506a630e966e2e.css">
-  <link href="Ch0Lect_pt2_w26_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
-  <link href="Ch0Lect_pt2_w26_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
-  <link href="Ch0Lect_pt2_w26_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
-  <link href="Ch0Lect_pt2_w26_files/libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
-  <link href="Ch0Lect_pt2_w26_files/libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
-  <link href="Ch0Lect_pt2_w26_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <link rel="stylesheet" href="Ch0Lect_pt3_w26_files/libs/revealjs/dist/theme/quarto-1246092c7357598352506a630e966e2e.css">
+  <link href="Ch0Lect_pt3_w26_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="Ch0Lect_pt3_w26_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="Ch0Lect_pt3_w26_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="Ch0Lect_pt3_w26_files/libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
+  <link href="Ch0Lect_pt3_w26_files/libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
+  <link href="Ch0Lect_pt3_w26_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
   <style type="text/css">
     .reveal div.sourceCode {
       margin: 0;
@@ -194,7 +194,7 @@
     <div class="slides">
 
 <section id="title-slide" data-background-color="#EA6820" class="quarto-title-block center">
-  <h1 class="title">Chapter 0: What is a Statistical Model<br><span style="font-size:70%">Part 2</span></h1>
+  <h1 class="title">Chapter 0: What is a Statistical Model<br><span style="font-size:70%">Part 3</span></h1>
   <p class="subtitle">Statistical Modeling</p>
 
 <div class="quarto-title-authors">
@@ -210,31 +210,15 @@ MATH 360
 <h2>Topics <span class="emoji" data-emoji="pushpin">📌</span></h2>
 <div>
 <ul>
-<li class="fragment"><p>Statistical model</p></li>
-<li class="fragment"><p>4-step process</p></li>
-<li class="fragment"><p>Case study</p></li>
-<li class="fragment"><p>R Code</p></li>
+<li class="fragment"><p>Review 4-step process</p></li>
+<li class="fragment"><p>The Use Step</p></li>
+<li class="fragment"><p>Effect Size</p></li>
 </ul>
 </div>
 </section>
-<section id="statistical-modeling" class="slide level2">
-<h2>Statistical modeling</h2>
-<ul>
-<li>A general statistical model:</li>
-</ul>
-<p><span class="math display">\[
-Y = f(X) + \epsilon
-\]</span></p>
-<ul>
-<li>Goal: Find a model for a relationship between a <strong>response variable</strong> (<span class="math inline">\(Y\)</span>) and one or more <strong>explanatory/predictor</strong> variables <span class="math inline">\((X_1, X_2, \ldots, X_k)\)</span>.</li>
-</ul>
-</section>
-<section id="section" class="slide level2" data-background-image="figures/nyt_model.png" data-background-size="contain" data-background-position="center">
-<h2></h2>
-</section>
-<section id="four-step-modeling-process" class="slide level2">
-<h2>Four-step Modeling Process</h2>
-<div class="highlight-last">
+<section id="four-step-modeling-process-c-f-a-u" class="slide level2">
+<h2>Four-step Modeling Process (C-F-A-U)</h2>
+<div>
 <ol type="1">
 <li class="fragment"><p><strong>Choose</strong>: Pick a form for the model.</p></li>
 <li class="fragment"><p><strong>Fit</strong>: Estimate any parameters.</p></li>
@@ -243,314 +227,24 @@ Y = f(X) + \epsilon
 </ol>
 </div>
 </section>
-<section id="section-1" class="slide level2 smaller">
+<section id="section" class="slide level2">
 <h2></h2>
 <h3 id="study-financial-incentives-for-weight-loss">Study: Financial incentives for weight loss</h3>
 <div class="columns">
 <div class="column" style="width:50%;">
-<div class="quarto-figure quarto-figure-left">
-<figure>
-<p><img data-src="figures/wt_loss_title.png" class="quarto-figure quarto-figure-left"></p>
-</figure>
-</div>
 <ul>
 <li><strong>Research question</strong>: Do financial incentives help people lose weight more successfully?</li>
 </ul>
-</div><div class="column fragment" style="width:50%;">
-<ul>
-<li><p><strong>Participants</strong>: healthy adults 30-70 with BMI of 30-40</p></li>
-<li><p><strong>Treatment groups</strong>: Randomly assigned to treatment groups (<em>Group</em>):</p>
-<ul>
-<li><p>Financial incentives vs</p></li>
-<li><p>Control (monthly weigh-ins, no financial incentive)</p></li>
-</ul></li>
-<li><p><strong>Response</strong>: <em>WeightLoss</em> = Before - After</p>
-<ul>
-<li>Positive <span class="math inline">\(\Rightarrow\)</span> weight loss</li>
-</ul></li>
-<li><p>R Dataset: <strong>WeightLossIncentive4</strong></p></li>
-</ul>
+</div><div class="column" style="width:50%;">
+<p><img data-src="figures/wt_loss_title.png"></p>
 </div></div>
 </section>
-<section class="slide level2">
-
-<h3 id="study-financial-incentives-for-weight-loss-1">Study: Financial incentives for weight loss</h3>
-<h4 id="the-data">The data</h4>
-<div class="panel-tabset">
-<ul id="tabset-1" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-1-1">Access and Group Size</a></li><li><a href="#tabset-1-2">Control</a></li><li><a href="#tabset-1-3">Incentive</a></li></ul>
-<div class="tab-content">
-<div id="tabset-1-1">
-<div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a><span class="co"># Load data set</span></span>
-<span id="cb1-2"><a href=""></a><span class="fu">data</span>(<span class="st">"WeightLossIncentive4"</span>)</span>
-<span id="cb1-3"><a href=""></a><span class="fu">tally</span>(<span class="sc">~</span>Group, <span class="at">data =</span> WeightLossIncentive4)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Group
-  Control Incentive 
-       19        17 </code></pre>
-</div>
-</div>
-</div>
-<div id="tabset-1-2">
-<div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href=""></a><span class="fu">filter</span>(WeightLossIncentive4, Group <span class="sc">==</span> <span class="st">"Control"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>   WeightLoss   Group
-1        12.5 Control
-2        12.0 Control
-3         1.0 Control
-4        -5.0 Control
-5         3.0 Control
-6        -5.0 Control
-7         7.5 Control
-8        -2.5 Control
-9        20.0 Control
-10       -1.0 Control
-11        2.0 Control
-12        4.5 Control
-13       -2.0 Control
-14      -17.0 Control
-15       19.0 Control
-16       -2.0 Control
-17       12.0 Control
-18       10.5 Control
-19        5.0 Control</code></pre>
-</div>
-</div>
-</div>
-<div id="tabset-1-3">
-<div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href=""></a><span class="fu">filter</span>(WeightLossIncentive4, Group <span class="sc">==</span> <span class="st">"Incentive"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>   WeightLoss     Group
-1        25.5 Incentive
-2        24.0 Incentive
-3         8.0 Incentive
-4        15.5 Incentive
-5        21.0 Incentive
-6         4.5 Incentive
-7        30.0 Incentive
-8         7.5 Incentive
-9        10.0 Incentive
-10       18.0 Incentive
-11        5.0 Incentive
-12       -0.5 Incentive
-13       27.0 Incentive
-14        6.0 Incentive
-15       25.5 Incentive
-16       21.0 Incentive
-17       18.5 Incentive</code></pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section class="slide level2">
-
-<h3 id="describing-the-data-graphically-and-nummerically">Describing the Data Graphically and Nummerically</h3>
-<div class="panel-tabset">
-<ul id="tabset-2" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-2-1">R Code</a></li><li><a href="#tabset-2-2">Dotplot</a></li><li><a href="#tabset-2-3">Boxplot</a></li><li><a href="#tabset-2-4">Summary Statistics</a></li></ul>
-<div class="tab-content">
-<div id="tabset-2-1">
-<div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href=""></a><span class="co"># coord_flip makes dotplot vertical</span></span>
-<span id="cb7-2"><a href=""></a><span class="fu">gf_dotplot</span>(<span class="sc">~</span>WeightLoss <span class="sc">|</span> Group, <span class="at">data =</span> WeightLossIncentive4) <span class="sc">+</span> </span>
-<span id="cb7-3"><a href=""></a>  <span class="fu">coord_flip</span>()</span>
-<span id="cb7-4"><a href=""></a><span class="fu">gf_boxplot</span>(Group <span class="sc">~</span> WeightLoss, <span class="at">data =</span> WeightLossIncentive4)</span>
-<span id="cb7-5"><a href=""></a><span class="co"># summary statistics by group</span></span>
-<span id="cb7-6"><a href=""></a><span class="fu">favstats</span>(WeightLoss <span class="sc">~</span> Group, <span class="at">data =</span> WeightLossIncentive4)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
-<div id="tabset-2-2">
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure>
-<p><img data-src="Ch0Lect_pt2_w26_files/figure-revealjs/figraph2-1.png" width="960"></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-<div id="tabset-2-3">
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure>
-<p><img data-src="Ch0Lect_pt2_w26_files/figure-revealjs/figraph3-1.png" width="960"></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-<div id="tabset-2-4">
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>      Group   min   Q1 median    Q3 max      mean       sd  n missing
-1   Control -17.0 -2.0      3 11.25  20  3.921053 9.107785 19       0
-2 Incentive  -0.5  7.5     18 24.00  30 15.676471 9.413988 17       0</code></pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="step-1-choose-a-model" class="slide level2">
-<h2>Step 1: Choose a Model</h2>
-<div class="columns">
-<div class="column" style="width:50%;">
-<h3 id="characteristics">Characteristics</h3>
-<p>Consider a model suggested by the data:</p>
-<ul>
-<li><p>Different means for each treatment group ( <span class="math inline">\(\mu_i\)</span> )</p></li>
-<li><p>Common variability ( <span class="math inline">\(\sigma\)</span> )</p></li>
-<li><p>Normally distributed (symmetric) errors ( <span class="math inline">\(\epsilon\)</span> )</p></li>
-</ul>
-</div><div class="column fragment" style="width:50%;">
-<h3 id="formally-stated">Formally stated:</h3>
-<p><span class="math display">\[
-Y = \mu_i + \epsilon \mbox{ where } \epsilon \sim N(0, \sigma_i)
-\]</span></p>
-<h3 id="by-group">By group:</h3>
-<ul>
-<li>Control Group:<br>
-<span class="math inline">\(\displaystyle Y = \mu_1 + \epsilon \mbox{ so } Y \sim N(\mu_1, \sigma_1)\)</span></li>
-<li>Incentives Group:<br>
-<span class="math inline">\(\displaystyle Y = \mu_2 + \epsilon \mbox{ so } Y \sim N(\mu_2, \sigma_2)\)</span></li>
-</ul>
-</div></div>
-</section>
-<section id="step-2-fit-the-model" class="slide level2 smaller">
-<h2>Step 2: Fit the Model</h2>
-<h3 id="process">Process</h3>
-<ul>
-<li>Depends on study design, types of variables, and proposed model.</li>
-</ul>
-<div class="fragment">
-<h3 id="financial-incentives-model">Financial incentives model</h3>
-<ul>
-<li><p>Compute sample estimates of means <span class="math inline">\(\bar y_i\)</span> and standard deviations <span class="math inline">\(s_i\)</span></p></li>
-<li><p>Fitted values differ by treatment group:</p></li>
-</ul>
-<p><span class="math inline">\(\qquad \hat y = \bar y_i\)</span></p>
-<ul>
-<li><p><strong>Note</strong>: No error term in the <em>fitted model</em></p></li>
-<li><p><strong>Interpretation</strong>: Predicted weight loss for a member of group <span class="math inline">\(i\)</span>.</p></li>
-</ul>
-</div>
-</section>
-<section id="step-3-assess-the-model" class="slide level2">
-<h2>Step 3: Assess the Model</h2>
-<ul>
-<li><p>Determine whether the conditions of the model hold</p>
-<ul>
-<li>Look at residual <span class="math inline">\(y-\hat y_i\)</span></li>
-</ul></li>
-<li><p>Consider whether a different (simpler) model might fit.</p></li>
-</ul>
-</section>
-<section id="check-conditions-on-residuals" class="slide level2">
-<h2>Check conditions on residuals</h2>
-<ul>
-<li><p>Use R function <code>lm()</code> to fit the two-mean model (see code example)</p></li>
-<li><p>Verify fitted values</p></li>
-<li><p>Plot residuals to check conditions</p></li>
-</ul>
-</section>
-<section id="r-code-and-output-for-checking-conditions-on-residuals" class="slide level2 smaller">
-<h2>R code and output for checking conditions on residuals</h2>
-<div class="panel-tabset">
-<ul id="tabset-3" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-3-1">R Code</a></li><li><a href="#tabset-3-2">Fitted values and residuals</a></li><li><a href="#tabset-3-3">Dotplot</a></li><li><a href="#tabset-3-4">Normal quantile plots</a></li></ul>
-<div class="tab-content">
-<div id="tabset-3-1">
-<div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href=""></a><span class="co"># fits two-means model</span></span>
-<span id="cb9-2"><a href=""></a>wl_mod <span class="ot">&lt;-</span> <span class="fu">lm</span>(WeightLoss <span class="sc">~</span> Group, <span class="at">data =</span> WeightLossIncentive4)</span>
-<span id="cb9-3"><a href=""></a></span>
-<span id="cb9-4"><a href=""></a><span class="co"># adds fitted and residual values to the dataset</span></span>
-<span id="cb9-5"><a href=""></a>WeightLossIncentive4 <span class="ot">&lt;-</span> WeightLossIncentive4 <span class="sc">|&gt;</span>  </span>
-<span id="cb9-6"><a href=""></a>  <span class="fu">mutate</span>(<span class="at">yhat =</span> <span class="fu">fitted</span>(wl_mod), <span class="at">resid =</span> <span class="fu">resid</span>(wl_mod))</span>
-<span id="cb9-7"><a href=""></a></span>
-<span id="cb9-8"><a href=""></a><span class="co"># check the values</span></span>
-<span id="cb9-9"><a href=""></a><span class="fu">head</span>(<span class="fu">filter</span>(WeightLossIncentive4, Group <span class="sc">==</span> <span class="st">"Control"</span>))</span>
-<span id="cb9-10"><a href=""></a><span class="fu">head</span>(<span class="fu">filter</span>(WeightLossIncentive4, Group <span class="sc">==</span> <span class="st">"Incentive"</span>))</span>
-<span id="cb9-11"><a href=""></a></span>
-<span id="cb9-12"><a href=""></a><span class="co"># residual dotplots </span></span>
-<span id="cb9-13"><a href=""></a><span class="fu">gf_dotplot</span>(<span class="sc">~</span>resid <span class="sc">|</span> Group, <span class="at">data =</span> WeightLossIncentive4) <span class="sc">+</span> </span>
-<span id="cb9-14"><a href=""></a>  <span class="fu">coord_flip</span>()</span>
-<span id="cb9-15"><a href=""></a></span>
-<span id="cb9-16"><a href=""></a><span class="co"># residual quantile plots</span></span>
-<span id="cb9-17"><a href=""></a><span class="fu">gf_qq</span>(<span class="sc">~</span> resid <span class="sc">|</span> Group, <span class="at">data =</span> WeightLossIncentive4) <span class="sc">|&gt;</span> </span>
-<span id="cb9-18"><a href=""></a>  <span class="fu">gf_qqline</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
-<div id="tabset-3-2">
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>  WeightLoss   Group     yhat      resid
-1       12.5 Control 3.921053  8.5789474
-2       12.0 Control 3.921053  8.0789474
-3        1.0 Control 3.921053 -2.9210526
-4       -5.0 Control 3.921053 -8.9210526
-5        3.0 Control 3.921053 -0.9210526
-6       -5.0 Control 3.921053 -8.9210526</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>  WeightLoss     Group     yhat       resid
-1       25.5 Incentive 15.67647   9.8235294
-2       24.0 Incentive 15.67647   8.3235294
-3        8.0 Incentive 15.67647  -7.6764706
-4       15.5 Incentive 15.67647  -0.1764706
-5       21.0 Incentive 15.67647   5.3235294
-6        4.5 Incentive 15.67647 -11.1764706</code></pre>
-</div>
-</div>
-</div>
-<div id="tabset-3-3">
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure>
-<p><img data-src="Ch0Lect_pt2_w26_files/figure-revealjs/fimod3-1.png" width="960"></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-<div id="tabset-3-4">
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure>
-<p><img data-src="Ch0Lect_pt2_w26_files/figure-revealjs/fimod4-1.png" width="960"></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="test-versus-a-simpler-model" class="slide level2">
-<h2>Test versus a simpler model</h2>
-<p>Carry out a two-sample <span class="math inline">\(t\)</span>-test for financial incentives data</p>
-<p><span class="math display">\[
-H_0: \mu_1 = \mu_2  \quad\Rightarrow \quad Y = \mu + \epsilon \quad \mbox{ (one mean model)}
-\]</span></p>
-<p>versus</p>
-<p><span class="math display">\[
-H_a: \mu_1 \neq \mu_2 \quad \Rightarrow \quad Y = \mu_i + \epsilon \quad \mbox{ (two means model)}
-\]</span></p>
-</section>
-<section class="slide level2">
-
+<section id="section-1" class="slide level2">
+<h2></h2>
 <h3 id="two-sample-t-test-for-financial-incentives-data">Two-sample t-test for financial incentives data</h3>
 <p><strong>Which model is preferred?</strong></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href=""></a><span class="fu">t.test</span>(WeightLoss <span class="sc">~</span> Group, <span class="at">data =</span> WeightLossIncentive4)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell fragment">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a><span class="fu">t.test</span>(WeightLoss <span class="sc">~</span> Group, <span class="at">data =</span> WeightLossIncentive4)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
     Welch Two Sample t-test
@@ -566,32 +260,122 @@ sample estimates:
 </div>
 </div>
 </section>
-<section id="step-4-use-the-model" class="slide level2">
-<h2>Step 4: Use the Model</h2>
-<ul>
-<li><p>The data point to the <strong>two means model</strong> (<span class="math inline">\(H_a\)</span>)</p></li>
-<li><p>Estimate treatment effect</p></li>
-<li><p>Fund more studies</p></li>
-<li><p>Health care policy implications</p></li>
-</ul>
+<section id="the-p-value-controversy" class="slide level2" data-background-image="figures/pvalue_controversy.png" data-background-size="contain" data-background-position="center">
+<h2>The p-value controversy</h2>
 </section>
-<section id="summary" class="slide level2">
-<h2>Summary</h2>
+<section id="the-trouble-with-the-p-value" class="slide level2">
+<h2>The Trouble with the p-value</h2>
+<div>
 <ul>
-<li><p><strong>Statistical models</strong> express relationships as <span class="math inline">\(Y = f(X) + \epsilon\)</span>, with a focus on prediction, explanation, and uncertainty.</p></li>
-<li><p>We applied the <strong>Four-Step Modeling Process</strong></p></li>
+<li class="fragment"><p>The <span class="math inline">\(p\)</span>-value tells the <strong>strength of evidence</strong> of an “effect”</p></li>
+<li class="fragment"><p>The <span class="math inline">\(p\)</span>-value tells nothing about the <strong>size</strong> or <strong>practical importance</strong> of an “effect”</p></li>
 </ul>
-<ol type="1">
-<li><strong>Choose</strong> an appropriate model form</li>
-<li><strong>Fit</strong> model parameters using data</li>
-<li><strong>Assess</strong> adequacy via diagnostics and residuals</li>
-<li><strong>Use</strong> the model to answer scientific questions</li>
-</ol>
+</div>
+</section>
+<section id="step-4-use-answer-the-question-of-interest" class="slide level2">
+<h2>Step 4: Use: Answer the question of interest</h2>
+<div>
 <ul>
-<li>The Financial incentives for weight loss case study illustrates the process</li>
+<li class="fragment"><p>Confidence interval: estimates the <strong>size</strong> of the effect</p></li>
+<li class="fragment"><p>Scope of inference</p>
+<ul>
+<li class="fragment">Can causal inference be concluded?</li>
+<li class="fragment">To what population(s) can we generalize?</li>
+<li class="fragment">Is the <strong>effect size</strong> large enough to be <em>important</em>?</li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="effect-size" class="slide level2 smaller">
+<h2>Effect size</h2>
+<div>
+<ul>
+<li class="fragment"><p><strong>Effect size</strong>: “an often standardized measure of the magnitude of a certain phenomenon of scientific interest.”<sup>1</sup></p></li>
+<li class="fragment"><p><strong>Two quantitative variables</strong></p>
+<ul>
+<li class="fragment"><p>Correlation coefficient <span class="math inline">\(r\)</span></p></li>
+<li class="fragment"><p>Regression slope (or Beta coefficients or Cohen’s <span class="math inline">\(f^2\)</span>)</p></li>
+</ul></li>
+<li class="fragment"><p><strong>Comparing populations</strong></p>
+<ul>
+<li class="fragment">Standardized mean difference <span class="math inline">\(\theta\)</span> <span class="math display">\[
+\theta = \frac{\mu_1-\mu_2}{\sigma}
+\]</span> where <span class="math inline">\(\sigma\)</span> is the standard deviation of one (or both) of the populations being compared.</li>
+</ul></li>
+</ul>
+</div>
+<aside><ol class="aside-footnotes"><li id="fn1"><p>Schafer T and Schwarz MA (2019) The Meaningfulness of Effect Sizes in Psychological Research: Differences Between Sub-Disciplines and the Impact of Potential Biases. Front. Psychol. 10:813. doi: 10.3389/fpsyg.2019.00813</p></li></ol></aside></section>
+<section id="section-2" class="slide level2">
+<h2></h2>
+<h3 class="smaller" id="estimated-effect-size-for-difference-in-means">Estimated Effect Size for Difference in Means</h3>
+<p><span class="math display">\[
+\mbox{effect size} = \frac{\mbox{Difference in sample means}}{\mbox{Estimated Standard Deviation}} = \frac{\bar y_1-\bar y_2}{s_p}
+\]</span></p>
+<div class="fragment">
+<p>Where <span class="math inline">\(s_p\)</span> is “pooled” standard deviation defined as: <span class="math display">\[
+s_p=\sqrt{\frac{(n_1-1)s_1^2 + (n_2-1)s_2^2}{n_1+n_2-2}}
+\]</span></p>
+</div>
+<div class="fragment">
+<ul>
+<li>Alternatively, for financial incentives data, we might estimate <span class="math inline">\(\sigma\)</span> by <span class="math inline">\(s\)</span>, the standard deviation of weight losses for control (“untreated”) individuals</li>
+</ul>
+</div>
+</section>
+<section id="section-3" class="slide level2">
+<h2></h2>
+<h3 class="smaller" id="example-effect-size-from-study-of-financial-incentives-for-weight-loss">Example: Effect Size from Study of Financial Incentives for Weight Loss</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href=""></a><span class="fu">favstats</span>(WeightLoss <span class="sc">~</span> Group, <span class="at">data =</span> WeightLossIncentive4)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      Group   min   Q1 median    Q3 max      mean       sd  n missing
+1   Control -17.0 -2.0      3 11.25  20  3.921053 9.107785 19       0
+2 Incentive  -0.5  7.5     18 24.00  30 15.676471 9.413988 17       0</code></pre>
+</div>
+</div>
+<div class="fragment">
+<ul>
+<li>Using <span class="math inline">\(s_p\)</span> in the denominator: <span class="math inline">\(\mbox{effect size} = \frac{|\bar y_1 - \bar y_2|}{s_p} =  \frac{|15.68 - 3.92|}{9.25} = 1.27\)</span></li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>Using <span class="math inline">\(s_C\)</span> (control sd) in the denominator: <span class="math inline">\(\mbox{effect size} = \frac{|\bar y_1 - \bar y_2|}{s_p} =  \frac{|15.68 - 3.92|}{9.11} = 1.29\)</span></li>
+</ul>
+</div>
+</section>
+<section id="how-to-assess-effect-sizes" class="slide level2">
+<h2>How to Assess Effect Sizes?</h2>
+<ul>
+<li><p>General guidelines for effect sizes</p>
+<ul>
+<li>Small: 0.2</li>
+<li>Medium: 0.5</li>
+<li>Large: 1.0</li>
+</ul></li>
+</ul>
+<div class="fragment">
+<ul>
+<li><p>But these are no substitute for judgement in context.</p>
+<ul>
+<li><p>How does difference in average weight loss of 11.76 pounds compare with starting weights?</p></li>
+<li><p>Was weight loss sustained?</p></li>
+</ul></li>
+</ul>
+</div>
+<p>Here is a more concise summary slide with <strong>3–4 focused bullets</strong>:</p>
+</section>
+<section id="summary" class="slide level2 smaller">
+<h2>Summary <span class="emoji" data-emoji="memo">📝</span></h2>
+<ul>
+<li><p>The <strong>C–F–A–U process</strong> guides modeling: choose a model, fit it, assess assumptions, and use it to answer the research question.</p></li>
+<li><p>A <strong>p-value</strong> provides evidence of a difference but does not tell us the <strong>magnitude</strong> or <strong>practical importance</strong> of the effect.</p></li>
+<li><p><strong>Effect size</strong> quantifies how large the difference is; in the weight-loss study, the standardized mean difference was <strong>very large</strong>.</p></li>
+<li><p>Interpretation always requires <strong>context</strong>: consider generalizability, causality, and whether the effect is meaningful in real-world terms.</p></li>
 </ul>
 
 </section>
+
     </div>
   <div class="quarto-auto-generated-content" style="display: none;">
 <div class="footer footer-default">
@@ -600,20 +384,20 @@ sample estimates:
 </div></div>
 
   <script>window.backupDefine = window.define; window.define = undefined;</script>
-  <script src="Ch0Lect_pt2_w26_files/libs/revealjs/dist/reveal.js"></script>
+  <script src="Ch0Lect_pt3_w26_files/libs/revealjs/dist/reveal.js"></script>
   <!-- reveal.js plugins -->
-  <script src="Ch0Lect_pt2_w26_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
-  <script src="Ch0Lect_pt2_w26_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
-  <script src="Ch0Lect_pt2_w26_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
-  <script src="Ch0Lect_pt2_w26_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
-  <script src="Ch0Lect_pt2_w26_files/libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
-  <script src="Ch0Lect_pt2_w26_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  <script src="Ch0Lect_pt3_w26_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="Ch0Lect_pt3_w26_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="Ch0Lect_pt3_w26_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="Ch0Lect_pt3_w26_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="Ch0Lect_pt3_w26_files/libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
+  <script src="Ch0Lect_pt3_w26_files/libs/revealjs/plugin/quarto-support/support.js"></script>
   
 
-  <script src="Ch0Lect_pt2_w26_files/libs/revealjs/plugin/notes/notes.js"></script>
-  <script src="Ch0Lect_pt2_w26_files/libs/revealjs/plugin/search/search.js"></script>
-  <script src="Ch0Lect_pt2_w26_files/libs/revealjs/plugin/zoom/zoom.js"></script>
-  <script src="Ch0Lect_pt2_w26_files/libs/revealjs/plugin/math/math.js"></script>
+  <script src="Ch0Lect_pt3_w26_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="Ch0Lect_pt3_w26_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="Ch0Lect_pt3_w26_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="Ch0Lect_pt3_w26_files/libs/revealjs/plugin/math/math.js"></script>
   <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
 
   <script>
