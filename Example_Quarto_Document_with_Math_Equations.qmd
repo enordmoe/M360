@@ -1,0 +1,308 @@
+---
+title: "An Example Quarto Document with Math Equations"
+format: 
+    html: 
+      toc: true
+      html-math-method: katex
+      number-depth: 3
+      theme: flatly
+      embed-resources: true
+execute:
+  warning: false
+editor: visual
+---
+
+```{r}
+#| label: setup
+#| include: false
+#| warning: false
+knitr::opts_chunk$set(echo = TRUE)
+options(digits=6)
+library(mosaic)
+library(Lock5Data)
+```
+
+# Introduction
+
+This is a Quarto document. By studying the document source code file, compiling it, and observing the result, side-by-side with the source, you'll learn a lot about Quarto and the LaTeX mathematical typesetting language, and you'll be able to produce nice-looking documents with R input and output neatly formatted.
+
+Quarto is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using Quarto, see <https://quarto.org/docs/guide/>.
+
+When you click the **Render** button in RStudio, a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+summary(cars)
+```
+
+You can also embed plots, for example:
+
+```{r}
+#| echo: false
+plot(cars)
+```
+
+Note that the `#| echo: false` line was added to the code chunk to suppress printing of the R input code that generated the plot.
+
+# Key Formatting Constructs
+
+The key formatting constructs are discussed at <https://quarto.org/docs/authoring/markdown-basics.html>. You can see above how I constructed main section headings. Now I'm going to create a series of sections using secondary headings.
+
+## Emphasis
+
+This is *italic*. This is **bold**.
+
+## Superscripts and Subscripts
+
+If you are not writing an equation but just need a quick subscript or superscript, you can use y^2^ or y~n~.
+
+## Lists
+
+### Unordered
+
+-   Item 1
+-   Item 2
+    -   Item 2a
+    -   Item 2b
+
+### Ordered
+
+1.  Item 1
+2.  Item 2
+3.  Item 3
+    -   Item 3a
+    -   Item 3b
+
+## Block Quotes
+
+A friend once said:
+
+> It's always better to give than to receive.
+
+## Displaying Blocks of Code Without Evaluating
+
+In some situations, you want to display R code but not evaluate it. Here is an example of how you format.
+
+```         
+This text is displayed verbatim / preformatted
+```
+
+## Displaying R Code Inline in a Sentence
+
+Sometimes, you need to include an R name or command inline in a sentence. Here is how your format it.
+
+The `sqrt` function computes the square root of a number.
+
+## Evaluating and Inserting R Code in a Sentence
+
+Sometimes, you want a result without showing the user that you used R to get it. Here is an example.
+
+The mean of the numbers 2, 3 and 4 is `r mean(c(2, 3, 4))`.
+
+There are lots of ways you can exploit this capability. You can do more advanced calculations in a hidden code block, assign the results to variables, and then simply use the variable names to insert the results in a sentence.
+
+In the following example, I compute the sum of the integers from 2 to 19 in a hidden code block. Then I display the result inline.
+
+```{r}
+#| echo: false
+x <- 2:19
+answer <- sum(x)
+```
+
+The sum of the integers from 2 to 19 is `r answer`.
+
+# Typesetting Equations
+
+## Inline vs. Display Material
+
+Equations can be formatted using LaTeX commands *inline* or as *displayed formulas*. In the latter case, they are centered and set off from the main text. In the former case, the mathematical material appears smoothly in the line of text.
+
+In order to fit neatly in a line, summation expressions (and similar constructs) are formatted slightly differently in their inline and display versions.
+
+Inline mathematical material is set off by the use of single dollar-sign characters. Consequently, if you wish to use a dollar sign (for example, to indicate currency), you need to preface it with a backslash, `\`. The following examples, followed by their typeset versions, should make this clear. Study the input file to see how this is done.
+
+```         
+This summation expression $\sum_{i=1}^n X_i$ appears inline.
+```
+
+This summation expression $\sum_{i=1}^n X_i$ appears inline.
+
+```         
+This summation expression is in display form.
+
+$$\sum_{i=1}^n X_i$$
+```
+
+This summation expression is in display form.
+
+$$\sum_{i=1}^n X_i$$
+
+## Some LaTeX Basics
+
+In this section, we show you some rudiments of the LaTeX typesetting language.
+
+### Subscripts and Superscripts
+
+To indicate a subscript, use the underscore `_` character. To indicate a superscript, use a single caret character `^`. In LaTeX equations, a single caret indicates the superscript.
+
+If the subscript or superscript has just one character, there is no need to delimit with braces. However, if there is more than one character, braces must be used.
+
+The following examples illustrate:
+
+```         
+$$X_i$$
+$$X_{i}$$
+```
+
+$$X_i$$ $$X_{i}$$
+
+Notice that in the above case, braces were not actually needed.
+
+In this next example, however, failure to use braces creates an error, as LaTeX sets only the first character as a subscript
+
+```         
+$$X_{i,j}$$
+$$X_i,j$$
+```
+
+$$X_{i,j}$$ $$X_i,j$$
+
+Here is an expression that uses both subscripts and superscripts
+
+```         
+$$X^2_{i,j}$$
+```
+
+$$X^2_{i,j}$$
+
+### Square Roots
+
+We indicate a square root using the `\sqrt` operator.
+
+```         
+$$\sqrt{b^2 - 4ac}$$
+```
+
+$$\sqrt{b^2 - 4ac}$$
+
+### Fractions
+
+Displayed fractions are typeset using the `\frac` operator.
+
+```         
+$$\frac{4z^3}{16}$$
+```
+
+$$\frac{4z^3}{16}$$
+
+### Summation Expressions
+
+These are indicated with the \`\sum' operator, followed by a subscript for the material appearing below the summation sign, and a superscript for any material appearing above the summation sign.
+
+Here is an example.
+
+```         
+$$\sum_{i=1}^{n} X^3_i$$
+```
+
+$$\sum_{i=1}^{n} X^3_i$$
+
+### Self-Sizing Parentheses
+
+In LaTeX, you can create parentheses, brackets, and braces which size themselves automatically to contain large expressions. You do this using the `\left` and `\right` operators. Here is an example
+
+```         
+$$\sum_{i=1}^{n}\left( \frac{X_i}{Y_i} \right)$$
+```
+
+$$\sum_{i=1}^{n}\left( \frac{X_i}{Y_i} \right)$$
+
+### Greek Letters
+
+Many statistical expressions use Greek letters. Much of the Greek alphabet is implemented in LaTeX, as indicated in the LaTeX cheat sheet available at the course website. There are both upper and lower case versions available for some letters.
+
+```         
+$$\alpha, \beta,  \gamma, \Gamma$$
+```
+
+$$\alpha, \beta,  \gamma, \Gamma$$
+
+### Special Symbols
+
+All common mathematical symbols are implemented, and you can find a listing on the LaTeX cheat sheet.
+
+Some examples. (Notice that, in the third example, I use the tilde character for a forced space. Generally LaTeX does spacing for you automatically, and unless you use the tilde character, R will ignore your attempts to add spaces.)
+
+```         
+$$a \pm b$$
+$$x \ge 15$$
+$$a_i \ge 0~~~\forall i$$
+```
+
+$$a \pm b$$ $$x \ge 15$$ $$a_i \ge 0~~~\forall i$$
+
+### Special Functions
+
+LaTeX typesets special functions in a different font from mathematical variables. These functions, such as $\sin$, $\cos$, and $\log$ etc. are indicated in LaTeX with a backslash. Here is an example that also illustrates how to typeset an integral.
+
+```         
+$$\int_0^{2\pi} \sin x~dx$$
+```
+
+$$\int_0^{2\pi} \sin x~dx$$
+
+Here is an example of an especially important function from Probability:
+
+```         
+$$\binom{n}{r} = \frac{n!}{r!(n-r)!} $$
+```
+
+$$\binom{n}{r} = \frac{n!}{r!(n-r)!} $$
+
+This is a *very* brief introduction but should be enough to get you started.
+
+## Stacked Expressions
+
+Occasionally it is helpful to be able to stack a series of expressions to show work, say, in deriving a confidence interval. The following shows how to accomplish this with LaTeX in Quarto. Note that the keywork `gather` is used and each line except the last ends with double-slash `\\`. The asterisk at the end prevents numbering each line of the equation.
+
+```         
+$$
+\begin{gather*}
+A&=B\\
+ &=C \\
+ &=D
+\end{gather*}
+$$
+```
+
+$$
+\begin{gather*}
+\hat p \pm z^* \sqrt{\hat p(1-\hat p)/n} \\
+.42 \pm 1.96 \sqrt{.42(1- .42)/200} \\
+.42 \pm .068 \\
+ (.352, .488)
+\end{gather*}
+$$
+
+## Aligned Equations
+
+In other cases, especially working through a derviation or proof, we want a string of aligned equations. The following shows how to accomplish this with LaTeX in Quarto. First, note that the ampersand symbol `&` show where to align the equations and the double-slash `\\` shows the end of each equation. The double-slash is not needed at the end of the last equation.
+
+```         
+$$
+\begin{align*}
+A&=B\\
+ &=C \\
+ &=D
+\end{align*}
+$$
+```
+
+$$
+\begin{align*}
+A&=B\\
+ &=C \\
+ &=D
+\end{align*}
+$$
+
+<!-- Adapated from a document by James Steiger -->

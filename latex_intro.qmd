@@ -1,0 +1,63 @@
+---
+title: "Basic Equation Commands in Quarto"
+format: 
+    html: 
+      toc: true
+      html-math-method: katex
+      number-depth: 3
+      theme: flatly
+      embed-resources: true
+execute:
+  warning: false
+editor: visual
+---
+
+```{r}
+#| label: setup
+#| include: false
+#| warning: false
+knitr::opts_chunk$set(echo = TRUE)
+options(digits=6)
+library(mosaic)
+library(Lock5Data)
+```
+
+In Quarto text, you may use LaTeX mathematical notation in sections delimited by `$ ... $` to show up inline, or by `$$ ... $$` to show up as a separate paragraph. Here are basics:
+
+|           LaTeX            |           Result           |
+|:--------------------------:|:--------------------------:|
+|           `x^y`            |           $x^y$            |
+|           `x_y`            |           $x_y$            |
+|   `\alpha, \mu, \sigma`    |   $\alpha, \mu, \sigma$    |
+|          `\bar x`          |          $\bar x$          |
+|          `\hat x`          |          $\hat x$          |
+|         `\sqrt{x}`         |         $\sqrt{x}$         |
+|       `\frac{x}{y}`        |       $\frac{x}{y}$        |
+|       `(\frac{x}{y}`       |      $(\frac{x}{y})$       |
+| `\left(\frac{x}{y}\right)` | $\left(\frac{x}{y}\right)$ |
+
+e.g.
+
+```         
+$$
+\bar{x} \pm z^* \frac{\sigma}{\sqrt{n}}
+$$ 
+```
+
+gives $$
+\bar{x} \pm z^* \frac{\sigma}{\sqrt{n}}
+$$
+
+and
+
+```         
+$$
+z = \frac{\bar{x} - \mu_0}{\sigma / \sqrt{n}}
+$$ 
+```
+
+gives $$
+z = \frac{\bar{x} - \mu_0}{\sigma / \sqrt{n}}
+$$
+
+To learn more about Latex, see http://en.wikibooks.org/wiki/LaTeX.
