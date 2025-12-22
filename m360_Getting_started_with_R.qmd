@@ -1,0 +1,60 @@
+---
+title: "Getting (Re-)Started with R"
+format: 
+    html: 
+      toc: true
+      html-math-method: katex
+      number-depth: 3
+      theme: flatly
+      self-contained: true
+execute:
+  warning: false
+editor: visual
+---
+
+```{r}
+#| label: setup
+#| include: false
+#| warning: false
+knitr::opts_chunk$set(echo = TRUE)
+options(digits=6)
+library(mosaic)
+library(Lock5Data)
+library(tidyverse)
+library(tree)
+library(vembedr)
+```
+
+# 1. Welcome
+
+This tutorial takes you through the steps to get R and RStudio up and running on your Windows PC or Mac.
+
+![R logo](figures/R_logo.svg.png){alt="R logo" width="75"} is the statistical programming language.
+
+![RStudio logo](figures/stickers/RStudio.png){alt="RStudio logo" width="10%"} is the IDE (Integrated Development Environment).
+
+The figure below provides a visual representation of the relationship between R and RStudio. R is the engine that drives our calculations while RStudio is the interactive environment we use to interact with R.
+
+```{r fig.align="center", echo=FALSE}
+knitr::include_graphics("figures/engine-dashboard.png")
+```
+
+Source: <http://moderndive.com>
+
+The remainder of this tutorial will lead you through the steps to install R and the RStudio IDE. These steps apply if you have either a Mac or Windows PC. If you have a Chromebook or Linux computer, please contact me for help getting setup with R.
+
+# 2. Installing R and RStudio
+
+To install R and RStudio on your own computer, go to the site <https://posit.co/download/rstudio-desktop/> and follow the instructions [in the video](https://kzoo-my.sharepoint.com/:v:/g/personal/eric_nordmoe_kzoo_edu/EfpeXTMptt9Iv9wkW3DZtE0Bw4EDu4I9yy4ntXyn4zoKrQ?e=lDVdBi).[^1] Installation instructions focus on procedures for a Mac (if you have a Windows computer, here is the URL of a recent YouTube video that demonstrates the installation of R and RStudio on a Windows computer: <https://youtu.be/YrEe2TLr3MI>). Install the **most recent version of the software that is compatible with your computer** which may be newer than what you see in the video. Please note that as of December 4, 2025, the latest version of R was 4.5.2 and the latest version of RStudio is 2025.09.2+418. If you have any questions at this stage, feel free to reach out to me.
+
+[^1]: This video was made for my Math 260 class but also applies for us.
+
+# 3. Installing R Packages
+
+Once you will need to install a couple R *packages*. R packages are collections of functions and data sets developed by R users that increase the power of R by improving existing base R functions, add new functions, or bundle multiple datasets into a convenient "package."
+
+The next video ([click here to access](https://kzoo-my.sharepoint.com/:v:/g/personal/eric_nordmoe_kzoo_edu/IQCa4aNsmfa3SrVw81z3s27WASkoap_PFPyuW5X7j4m2Hk4?e=B3Hooj)) takes you through the steps to install the two R packages we will use most: **mosaic** and **Stat2Data**. Package installation is a one-time operation. Once a package is installed, you do not need to re-install it each time you use R. But you do need to "load" packages at the beginning of your session and the templates I will provide for homework assignments will include lines that do that.
+
+# 4. Next Steps
+
+Now that you have completed these installations, you are ready to go. If you have run into problems or have questions, please contact me in Teams or by email at Eric.Nordmoe\@kzoo.edu.
