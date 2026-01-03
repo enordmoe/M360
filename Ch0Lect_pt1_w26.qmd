@@ -156,14 +156,11 @@ that can be made?
 ::: aside
 Source: *Statistics: Unlocking the Power of Data*
 :::
+## Modeling Matrix
+### Our Course Summary
 
-## Overview of Statistical Modeling
-
-![](figures/Model_decision_tree.png){fig-align="center" width="70%"}
-
-::: aside
-Adapted from: Wang & Cai (2023), *Online Repository for Facilitating
-Teaching and Learning of Undergraduate Statistical Modeling Tools*.
+::: {.center}
+![](figures/mod_matrix.png){width=92% fig-alt="Modeling matrix summarizing the choice of statistical model."}
 :::
 
 ## Sample Data Set
@@ -184,21 +181,19 @@ head(Day1Survey, n = 6)
 ```
 :::
 
-## Modeling Matrix
 
-### A Brief Summary of the Course
+## Overview of Statistical Modeling
 
-+---------------+--------------------+
-| Explanatory\  | Response Variable  |
-| Variable(s)   |                    |
-+===============+:==================:+
-| Quantitative  | Binary             |
-+---------------+--------------------+
-| Quantitative  | Regression         |
-+---------------+--------------------+
-| Categorical   | Analysis of        |
-|               | Variance           |
-+---------------+--------------------+
+![](figures/Model_decision_tree.png){fig-align="center" width="70%"}
+
+::: aside
+Adapted from: Wang & Cai (2023), *Online Repository for Facilitating
+Teaching and Learning of Undergraduate Statistical Modeling Tools*.
+:::
+
+
+
+
 
 #  {background-color="#FAD9C7"}
 
