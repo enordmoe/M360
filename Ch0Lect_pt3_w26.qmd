@@ -187,8 +187,6 @@ $\mbox{effect size} = \frac{|\bar y_1 - \bar y_2|}{s_p} =  \frac{|15.68 - 3.92|}
 :::
 
 
-Here is a more concise summary slide with **3–4 focused bullets**:
-
 
 ## Summary :memo: {.smaller}
 
