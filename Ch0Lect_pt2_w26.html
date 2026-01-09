@@ -444,7 +444,7 @@ Y = \mu_i + \epsilon \mbox{ where } \epsilon \sim N(0, \sigma)
 <ul>
 <li><p>Determine whether the conditions of the model hold</p>
 <ul>
-<li>Look at residual <span class="math inline">\(y-\hat y_i\)</span></li>
+<li>Look at residual <span class="math inline">\(y-\hat y_i\)</span> which is just <span class="math inline">\(y-\bar y_i\)</span> for the 2-means model.</li>
 </ul></li>
 <li><p>Consider whether a different (simpler) model might fit.</p></li>
 </ul>
@@ -467,7 +467,7 @@ Y = \mu_i + \epsilon \mbox{ where } \epsilon \sim N(0, \sigma)
 <div class="tab-content">
 <div id="tabset-3-1">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href=""></a><span class="co"># fits two-means model</span></span>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href=""></a><span class="co"># fits two-means model with equal standard deviations</span></span>
 <span id="cb9-2"><a href=""></a>wl_mod <span class="ot">&lt;-</span> <span class="fu">lm</span>(WeightLoss <span class="sc">~</span> Group, <span class="at">data =</span> WeightLossIncentive4)</span>
 <span id="cb9-3"><a href=""></a></span>
 <span id="cb9-4"><a href=""></a><span class="co"># adds fitted and residual values to the dataset</span></span>

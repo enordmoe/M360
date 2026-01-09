@@ -222,7 +222,7 @@ $\qquad \hat y = \bar y_i$
 
 -   Determine whether the conditions of the model hold
 
-    -   Look at residual $y-\hat y_i$
+    -   Look at residual $y-\hat y_i$ which is just $y-\bar y_i$ for the 2-means model.
 
 -   Consider whether a different (simpler) model might fit.
 
@@ -242,7 +242,7 @@ $\qquad \hat y = \bar y_i$
 ## R Code
 
 ```{r fimod1, eval = FALSE}
-# fits two-means model
+# fits two-means model with equal standard deviations
 wl_mod <- lm(WeightLoss ~ Group, data = WeightLossIncentive4)
 
 # adds fitted and residual values to the dataset
@@ -266,7 +266,7 @@ gf_qq(~ resid, data = WeightLossIncentive4) |>
 ## Fitted values and residuals
 
 ```{r fimod2, echo = FALSE}
-# fits two-means model
+# fits two-means model with equal standard deviations
 wl_mod <- lm(WeightLoss ~ Group, data = WeightLossIncentive4)
 
 # adds fitted and residual values to the dataset
