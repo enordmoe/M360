@@ -191,7 +191,7 @@ $$
 ### By group:
 
 -   Control Group:\
-    $\displaystyle Y = \mu_1 + \epsilon \text{ so } Y \sim N(\mu_1, \sigma)$
+    $\displaystyle Y = \mu_1 + \epsilon \text{ so } Y \sim N(\mu_1, \sigma_1)$
 -   Incentives Group:\
     $\displaystyle Y = \mu_2 + \epsilon \text{ so } Y \sim N(\mu_2, \sigma)$
 :::
