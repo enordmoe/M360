@@ -6,8 +6,8 @@
 <script src="Ch0Lect_pt2_w26_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="Ch0Lect_pt2_w26_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="Ch0Lect_pt2_w26_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="Ch0Lect_pt2_w26_files/libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.6.42">
+<link href="Ch0Lect_pt2_w26_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.7.32">
 
   <meta name="author" content="MATH 360">
   <title>Chapter 0: What is a Statistical Model Part 2</title>
@@ -29,8 +29,9 @@
       vertical-align: middle;
     }
     /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -41,7 +42,7 @@
     }
     @media print {
     pre > code.sourceCode { white-space: pre-wrap; }
-    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
     }
     pre.numberSource code
       { counter-reset: source-line 0; }
@@ -94,7 +95,7 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="Ch0Lect_pt2_w26_files/libs/revealjs/dist/theme/quarto-1246092c7357598352506a630e966e2e.css">
+  <link rel="stylesheet" href="Ch0Lect_pt2_w26_files/libs/revealjs/dist/theme/quarto-10df59a5396271df04a2ae28b52f1741.css">
   <link href="Ch0Lect_pt2_w26_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="Ch0Lect_pt2_w26_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="Ch0Lect_pt2_w26_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -208,14 +209,12 @@ MATH 360
 </section>
 <section id="topics" class="slide level2">
 <h2>Topics <span class="emoji" data-emoji="pushpin">📌</span></h2>
-<div>
 <ul>
 <li class="fragment"><p>Statistical model</p></li>
 <li class="fragment"><p>4-step process</p></li>
 <li class="fragment"><p>Case study</p></li>
 <li class="fragment"><p>R Code</p></li>
 </ul>
-</div>
 </section>
 <section id="statistical-modeling" class="slide level2">
 <h2>Statistical modeling</h2>
@@ -357,7 +356,7 @@ Y = f(X) + \epsilon
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href=""></a><span class="co"># coord_flip makes dotplot vertical</span></span>
 <span id="cb7-2"><a href=""></a><span class="fu">gf_dotplot</span>(<span class="sc">~</span>WeightLoss <span class="sc">|</span> Group, <span class="at">data =</span> WeightLossIncentive4) <span class="sc">+</span> </span>
 <span id="cb7-3"><a href=""></a>  <span class="fu">coord_flip</span>()</span>
-<span id="cb7-4"><a href=""></a><span class="fu">gf_boxplot</span>(Group <span class="sc">~</span> WeightLoss, <span class="at">data =</span> WeightLossIncentive4)</span>
+<span id="cb7-4"><a href=""></a><span class="fu">gf_boxplot</span>(WeightLoss <span class="sc">~</span> Group, <span class="at">data =</span> WeightLossIncentive4)</span>
 <span id="cb7-5"><a href=""></a><span class="co"># summary statistics by group</span></span>
 <span id="cb7-6"><a href=""></a><span class="fu">favstats</span>(WeightLoss <span class="sc">~</span> Group, <span class="at">data =</span> WeightLossIncentive4)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -410,14 +409,14 @@ Y = f(X) + \epsilon
 </div><div class="column fragment" style="width:50%;">
 <h3 id="formally-stated">Formally stated:</h3>
 <p><span class="math display">\[
-Y = \mu_i + \epsilon \mbox{ where } \epsilon \sim N(0, \sigma_i)
+Y = \mu_i + \epsilon \mbox{ where } \epsilon \sim N(0, \sigma)
 \]</span></p>
 <h3 id="by-group">By group:</h3>
 <ul>
 <li>Control Group:<br>
-<span class="math inline">\(\displaystyle Y = \mu_1 + \epsilon \mbox{ so } Y \sim N(\mu_1, \sigma_1)\)</span></li>
+<span class="math inline">\(\displaystyle Y = \mu_1 + \epsilon \text{ so } Y \sim N(\mu_1, \sigma)\)</span></li>
 <li>Incentives Group:<br>
-<span class="math inline">\(\displaystyle Y = \mu_2 + \epsilon \mbox{ so } Y \sim N(\mu_2, \sigma_2)\)</span></li>
+<span class="math inline">\(\displaystyle Y = \mu_2 + \epsilon \text{ so } Y \sim N(\mu_2, \sigma)\)</span></li>
 </ul>
 </div></div>
 </section>
@@ -453,7 +452,10 @@ Y = \mu_i + \epsilon \mbox{ where } \epsilon \sim N(0, \sigma_i)
 <section id="check-conditions-on-residuals" class="slide level2">
 <h2>Check conditions on residuals</h2>
 <ul>
-<li><p>Use R function <code>lm()</code> to fit the two-mean model (see code example)</p></li>
+<li><p>Use R function <code>lm()</code> (for linear model) to fit the two-mean model (see code example)</p>
+<ul>
+<li><span class="math inline">\(\Rightarrow\)</span> The <code>lm()</code> function fits a model assuming constant standard deviations.</li>
+</ul></li>
 <li><p>Verify fitted values</p></li>
 <li><p>Plot residuals to check conditions</p></li>
 </ul>
@@ -461,7 +463,7 @@ Y = \mu_i + \epsilon \mbox{ where } \epsilon \sim N(0, \sigma_i)
 <section id="r-code-and-output-for-checking-conditions-on-residuals" class="slide level2 smaller">
 <h2>R code and output for checking conditions on residuals</h2>
 <div class="panel-tabset">
-<ul id="tabset-3" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-3-1">R Code</a></li><li><a href="#tabset-3-2">Fitted values and residuals</a></li><li><a href="#tabset-3-3">Dotplot</a></li><li><a href="#tabset-3-4">Normal quantile plots</a></li></ul>
+<ul id="tabset-3" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-3-1">R Code</a></li><li><a href="#tabset-3-2">Fitted values and residuals</a></li><li><a href="#tabset-3-3">Dotplot</a></li><li><a href="#tabset-3-4">Normal quantile plot</a></li></ul>
 <div class="tab-content">
 <div id="tabset-3-1">
 <div class="cell">
@@ -480,8 +482,8 @@ Y = \mu_i + \epsilon \mbox{ where } \epsilon \sim N(0, \sigma_i)
 <span id="cb9-13"><a href=""></a><span class="fu">gf_dotplot</span>(<span class="sc">~</span>resid <span class="sc">|</span> Group, <span class="at">data =</span> WeightLossIncentive4) <span class="sc">+</span> </span>
 <span id="cb9-14"><a href=""></a>  <span class="fu">coord_flip</span>()</span>
 <span id="cb9-15"><a href=""></a></span>
-<span id="cb9-16"><a href=""></a><span class="co"># residual quantile plots</span></span>
-<span id="cb9-17"><a href=""></a><span class="fu">gf_qq</span>(<span class="sc">~</span> resid <span class="sc">|</span> Group, <span class="at">data =</span> WeightLossIncentive4) <span class="sc">|&gt;</span> </span>
+<span id="cb9-16"><a href=""></a><span class="co"># residual normal quantile plot</span></span>
+<span id="cb9-17"><a href=""></a><span class="fu">gf_qq</span>(<span class="sc">~</span> resid, <span class="at">data =</span> WeightLossIncentive4) <span class="sc">|&gt;</span> </span>
 <span id="cb9-18"><a href=""></a>  <span class="fu">gf_qqline</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
@@ -532,9 +534,16 @@ Y = \mu_i + \epsilon \mbox{ where } \epsilon \sim N(0, \sigma_i)
 </div>
 </div>
 </section>
+<section id="comments-on-residual-checks" class="slide level2">
+<h2>Comments on Residual checks</h2>
+<ul>
+<li>Residuals have simiiar standard deviations</li>
+<li>Residuals appear reasonably normally distributed</li>
+</ul>
+</section>
 <section id="test-versus-a-simpler-model" class="slide level2">
 <h2>Test versus a simpler model</h2>
-<p>Carry out a two-sample <span class="math inline">\(t\)</span>-test for financial incentives data</p>
+<p>Carry out a two-sample <span class="math inline">\(t\)</span>-test for financial incentives data to see if there is sufficient evidence to use a two means rather than one mean model:</p>
 <p><span class="math display">\[
 H_0: \mu_1 = \mu_2  \quad\Rightarrow \quad Y = \mu + \epsilon \quad \mbox{ (one mean model)}
 \]</span></p>
@@ -548,50 +557,145 @@ H_a: \mu_1 \neq \mu_2 \quad \Rightarrow \quad Y = \mu_i + \epsilon \quad \mbox{ 
 <h3 id="two-sample-t-test-for-financial-incentives-data">Two-sample t-test for financial incentives data</h3>
 <p><strong>Which model is preferred?</strong></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href=""></a><span class="fu">t.test</span>(WeightLoss <span class="sc">~</span> Group, <span class="at">data =</span> WeightLossIncentive4)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href=""></a><span class="fu">t.test</span>(WeightLoss <span class="sc">~</span> Group, <span class="at">data =</span> WeightLossIncentive4, <span class="at">var.equal =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
 <pre><code>
-    Welch Two Sample t-test
+    Two Sample t-test
 
 data:  WeightLoss by Group
-t = -3.7982, df = 33.276, p-value = 0.0005889
+t = -3.8054, df = 34, p-value = 0.0005635
 alternative hypothesis: true difference in means between group Control and group Incentive is not equal to 0
 95 percent confidence interval:
- -18.05026  -5.46058
+ -18.033330  -5.477506
 sample estimates:
   mean in group Control mean in group Incentive 
                3.921053               15.676471 </code></pre>
 </div>
 </div>
-</section>
+
+<aside><div>
+<p>Note use of <code>var.equal</code> here to specify equal standard deviations.</p>
+</div></aside></section>
 <section id="step-4-use-the-model" class="slide level2">
 <h2>Step 4: Use the Model</h2>
 <ul>
-<li><p>The data point to the <strong>two means model</strong> (<span class="math inline">\(H_a\)</span>)</p></li>
+<li><p>The low <span class="math inline">\(p\)</span>-value from the test points us to prefer <strong>two means model</strong> (<span class="math inline">\(H_a\)</span>)</p></li>
 <li><p>Estimate treatment effect</p></li>
 <li><p>Fund more studies</p></li>
 <li><p>Health care policy implications</p></li>
 </ul>
 </section>
-<section id="summary" class="slide level2">
-<h2>Summary</h2>
+<section id="the-p-value-controversy" class="slide level2" data-background-image="figures/pvalue_controversy.png" data-background-size="contain" data-background-position="center">
+<h2>The p-value controversy</h2>
+</section>
+<section id="the-trouble-with-the-p-value" class="slide level2">
+<h2>The Trouble with the p-value</h2>
 <ul>
-<li><p><strong>Statistical models</strong> express relationships as <span class="math inline">\(Y = f(X) + \epsilon\)</span>, with a focus on prediction, explanation, and uncertainty.</p></li>
-<li><p>We applied the <strong>Four-Step Modeling Process</strong></p></li>
+<li class="fragment"><p>The <span class="math inline">\(p\)</span>-value tells the <strong>strength of evidence</strong> of an “effect”</p></li>
+<li class="fragment"><p>The <span class="math inline">\(p\)</span>-value tells nothing about the <strong>size</strong> or <strong>practical importance</strong> of an “effect”</p></li>
 </ul>
-<ol type="1">
-<li><strong>Choose</strong> an appropriate model form</li>
-<li><strong>Fit</strong> model parameters using data</li>
-<li><strong>Assess</strong> adequacy via diagnostics and residuals</li>
-<li><strong>Use</strong> the model to answer scientific questions</li>
-</ol>
+</section>
+<section id="step-4-use-answer-the-question-of-interest" class="slide level2">
+<h2>Step 4: Use: Answer the question of interest</h2>
 <ul>
-<li>The Financial incentives for weight loss case study illustrates the process</li>
+<li class="fragment"><p>Confidence interval: estimates the <strong>size</strong> of the effect</p></li>
+<li class="fragment"><p>Scope of inference</p>
+<ul>
+<li class="fragment">Can causal inference be concluded?</li>
+<li class="fragment">To what population(s) can we generalize?</li>
+<li class="fragment">Is the <strong>effect size</strong> large enough to be <em>important</em>?</li>
+</ul></li>
+</ul>
+</section>
+<section id="effect-size" class="slide level2 smaller">
+<h2>Effect size</h2>
+<ul>
+<li class="fragment"><p><strong>Effect size</strong>: “an often standardized measure of the magnitude of a certain phenomenon of scientific interest.”<sup>1</sup></p></li>
+<li class="fragment"><p><strong>Two quantitative variables</strong></p>
+<ul>
+<li class="fragment"><p>Correlation coefficient <span class="math inline">\(r\)</span></p></li>
+<li class="fragment"><p>Regression slope (or Beta coefficients or Cohen’s <span class="math inline">\(f^2\)</span>)</p></li>
+</ul></li>
+<li class="fragment"><p><strong>Comparing populations</strong></p>
+<ul>
+<li class="fragment">Standardized mean difference <span class="math inline">\(\theta\)</span> <span class="math display">\[
+\theta = \frac{\mu_1-\mu_2}{\sigma}
+\]</span> where <span class="math inline">\(\sigma\)</span> is the standard deviation of one (or both) of the populations being compared.</li>
+</ul></li>
+</ul>
+<aside><ol class="aside-footnotes"><li id="fn1"><p>Schafer T and Schwarz MA (2019) The Meaningfulness of Effect Sizes in Psychological Research: Differences Between Sub-Disciplines and the Impact of Potential Biases. Front. Psychol. 10:813. doi: 10.3389/fpsyg.2019.00813</p></li></ol></aside></section>
+<section id="section-2" class="slide level2">
+<h2></h2>
+<h3 class="smaller" id="estimated-effect-size-for-difference-in-means">Estimated Effect Size for Difference in Means</h3>
+<p><span class="math display">\[
+\mbox{effect size} = \frac{\mbox{Difference in sample means}}{\mbox{Estimated Standard Deviation}} = \frac{\bar y_1-\bar y_2}{s_p}
+\]</span></p>
+<div class="fragment">
+<p>Where <span class="math inline">\(s_p\)</span> is “pooled” standard deviation defined as: <span class="math display">\[
+s_p=\sqrt{\frac{(n_1-1)s_1^2 + (n_2-1)s_2^2}{n_1+n_2-2}}
+\]</span></p>
+</div>
+<div class="fragment">
+<ul>
+<li>Alternatively, for financial incentives data, we might estimate <span class="math inline">\(\sigma\)</span> by <span class="math inline">\(s\)</span>, the standard deviation of weight losses for control (“untreated”) individuals</li>
+</ul>
+</div>
+</section>
+<section id="section-3" class="slide level2">
+<h2></h2>
+<h3 class="smaller" id="example-effect-size-from-study-of-financial-incentives-for-weight-loss">Example: Effect Size from Study of Financial Incentives for Weight Loss</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href=""></a><span class="fu">favstats</span>(WeightLoss <span class="sc">~</span> Group, <span class="at">data =</span> WeightLossIncentive4)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      Group   min   Q1 median    Q3 max      mean       sd  n missing
+1   Control -17.0 -2.0      3 11.25  20  3.921053 9.107785 19       0
+2 Incentive  -0.5  7.5     18 24.00  30 15.676471 9.413988 17       0</code></pre>
+</div>
+</div>
+<div class="fragment">
+<ul>
+<li>Using <span class="math inline">\(s_p\)</span> in the denominator: <span class="math inline">\(\mbox{effect size} = \frac{|\bar y_1 - \bar y_2|}{s_p} =  \frac{|15.68 - 3.92|}{9.25} = 1.27\)</span></li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>Using <span class="math inline">\(s_C\)</span> (control sd) in the denominator: <span class="math inline">\(\mbox{effect size} = \frac{|\bar y_1 - \bar y_2|}{s_c} =  \frac{|15.68 - 3.92|}{9.11} = 1.29\)</span></li>
+</ul>
+</div>
+</section>
+<section id="how-to-assess-effect-sizes" class="slide level2">
+<h2>How to Assess Effect Sizes?</h2>
+<ul>
+<li><p>General guidelines for effect sizes</p>
+<ul>
+<li>Small: 0.2</li>
+<li>Medium: 0.5</li>
+<li>Large: 1.0</li>
+</ul></li>
+</ul>
+<div class="fragment">
+<ul>
+<li><p>But these are no substitute for judgement in context.</p>
+<ul>
+<li><p>How does difference in average weight loss of 11.76 pounds compare with starting weights?</p></li>
+<li><p>Was weight loss sustained?</p></li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="summary" class="slide level2 smaller">
+<h2>Summary <span class="emoji" data-emoji="memo">📝</span></h2>
+<ul>
+<li><p>The <strong>C–F–A–U process</strong> guides modeling: choose a model, fit it, assess assumptions, and use the model to answer the research question.</p></li>
+<li><p>A <strong>p-value</strong> provides evidence of a difference but does not tell us the <strong>magnitude</strong> or <strong>practical importance</strong> of the effect.</p></li>
+<li><p><strong>Effect size</strong> quantifies how large the difference is; in the weight-loss study, the standardized mean difference was <strong>very large</strong>.</p></li>
+<li><p>Interpretation always requires <strong>context</strong>: consider generalizability, causality, and whether the effect is meaningful in real-world terms.</p></li>
 </ul>
 
 </section>
+
     </div>
   <div class="quarto-auto-generated-content" style="display: none;">
 <div class="footer footer-default">
@@ -848,190 +952,172 @@ sample estimates:
     </script>
 
     <script id="quarto-html-after-body" type="application/javascript">
-    window.document.addEventListener("DOMContentLoaded", function (event) {
-      const toggleBodyColorMode = (bsSheetEl) => {
-        const mode = bsSheetEl.getAttribute("data-mode");
-        const bodyEl = window.document.querySelector("body");
-        if (mode === "dark") {
-          bodyEl.classList.add("quarto-dark");
-          bodyEl.classList.remove("quarto-light");
-        } else {
-          bodyEl.classList.add("quarto-light");
-          bodyEl.classList.remove("quarto-dark");
-        }
-      }
-      const toggleBodyColorPrimary = () => {
-        const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
-        if (bsSheetEl) {
-          toggleBodyColorMode(bsSheetEl);
-        }
-      }
-      toggleBodyColorPrimary();  
-      const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
-      tabsets.forEach(function(tabset) {
-        const tabby = new Tabby('#' + tabset.id);
-      });
-      const isCodeAnnotation = (el) => {
-        for (const clz of el.classList) {
-          if (clz.startsWith('code-annotation-')) {                     
-            return true;
-          }
-        }
-        return false;
-      }
-      const onCopySuccess = function(e) {
-        // button target
-        const button = e.trigger;
-        // don't keep focus
-        button.blur();
-        // flash "checked"
-        button.classList.add('code-copy-button-checked');
-        var currentTitle = button.getAttribute("title");
-        button.setAttribute("title", "Copied!");
-        let tooltip;
-        if (window.bootstrap) {
-          button.setAttribute("data-bs-toggle", "tooltip");
-          button.setAttribute("data-bs-placement", "left");
-          button.setAttribute("data-bs-title", "Copied!");
-          tooltip = new bootstrap.Tooltip(button, 
-            { trigger: "manual", 
-              customClass: "code-copy-button-tooltip",
-              offset: [0, -8]});
-          tooltip.show();    
-        }
-        setTimeout(function() {
-          if (tooltip) {
-            tooltip.hide();
-            button.removeAttribute("data-bs-title");
-            button.removeAttribute("data-bs-toggle");
-            button.removeAttribute("data-bs-placement");
-          }
-          button.setAttribute("title", currentTitle);
-          button.classList.remove('code-copy-button-checked');
-        }, 1000);
-        // clear code selection
-        e.clearSelection();
-      }
-      const getTextToCopy = function(trigger) {
-          const codeEl = trigger.previousElementSibling.cloneNode(true);
-          for (const childEl of codeEl.children) {
-            if (isCodeAnnotation(childEl)) {
-              childEl.remove();
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
             }
           }
-          return codeEl.innerText;
-      }
-      const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
-        text: getTextToCopy
-      });
-      clipboard.on('success', onCopySuccess);
-      if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-        const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
-          text: getTextToCopy,
-          container: window.document.getElementById('quarto-embedded-source-code-modal')
-        });
-        clipboardModal.on('success', onCopySuccess);
-      }
-        var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-        var mailtoRegex = new RegExp(/^mailto:/);
-          var filterRegex = new RegExp('/' + window.location.host + '/');
-        var isInternal = (href) => {
-            return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          return false;
         }
-        // Inspect non-navigation links and adorn them if external
-     	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
-        for (var i=0; i<links.length; i++) {
-          const link = links[i];
-          if (!isInternal(link.href)) {
-            // undo the damage that might have been done by quarto-nav.js in the case of
-            // links that we want to consider external
-            if (link.dataset.originalHref !== undefined) {
-              link.href = link.dataset.originalHref;
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
             }
-          }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
         }
-      function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
-        const config = {
-          allowHTML: true,
-          maxWidth: 500,
-          delay: 100,
-          arrow: false,
-          appendTo: function(el) {
-              return el.closest('section.slide') || el.parentElement;
-          },
-          interactive: true,
-          interactiveBorder: 10,
-          theme: 'light-border',
-          placement: 'bottom-start',
-        };
-        if (contentFn) {
-          config.content = contentFn;
-        }
-        if (onTriggerFn) {
-          config.onTrigger = onTriggerFn;
-        }
-        if (onUntriggerFn) {
-          config.onUntrigger = onUntriggerFn;
-        }
-          config['offset'] = [0,0];
-          config['maxWidth'] = 700;
-        window.tippy(el, config); 
-      }
-      const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
-      for (var i=0; i<noterefs.length; i++) {
-        const ref = noterefs[i];
-        tippyHover(ref, function() {
-          // use id or data attribute instead here
-          let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
-          try { href = new URL(href).hash; } catch {}
-          const id = href.replace(/^#\/?/, "");
-          const note = window.document.getElementById(id);
-          if (note) {
-            return note.innerHTML;
-          } else {
-            return "";
-          }
-        });
-      }
-      const findCites = (el) => {
-        const parentEl = el.parentElement;
-        if (parentEl) {
-          const cites = parentEl.dataset.cites;
-          if (cites) {
-            return {
-              el,
-              cites: cites.split(' ')
-            };
-          } else {
-            return findCites(el.parentElement)
-          }
-        } else {
-          return undefined;
-        }
-      };
-      var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
-      for (var i=0; i<bibliorefs.length; i++) {
-        const ref = bibliorefs[i];
-        const citeInfo = findCites(ref);
-        if (citeInfo) {
-          tippyHover(citeInfo.el, function() {
-            var popup = window.document.createElement('div');
-            citeInfo.cites.forEach(function(cite) {
-              var citeDiv = window.document.createElement('div');
-              citeDiv.classList.add('hanging-indent');
-              citeDiv.classList.add('csl-entry');
-              var biblioDiv = window.document.getElementById('ref-' + cite);
-              if (biblioDiv) {
-                citeDiv.innerHTML = biblioDiv.innerHTML;
+        const getTextToCopy = function(trigger) {
+            const codeEl = trigger.previousElementSibling.cloneNode(true);
+            for (const childEl of codeEl.children) {
+              if (isCodeAnnotation(childEl)) {
+                childEl.remove();
               }
-              popup.appendChild(citeDiv);
-            });
-            return popup.innerHTML;
+            }
+            return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
           });
         }
-      }
-    });
-    </script>
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
     
 
 </body></html>

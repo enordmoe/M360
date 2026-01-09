@@ -141,7 +141,7 @@ filter(WeightLossIncentive4, Group == "Incentive")
 # coord_flip makes dotplot vertical
 gf_dotplot(~WeightLoss | Group, data = WeightLossIncentive4) + 
   coord_flip()
-gf_boxplot(Group ~ WeightLoss, data = WeightLossIncentive4)
+gf_boxplot(WeightLoss ~ Group, data = WeightLossIncentive4)
 # summary statistics by group
 favstats(WeightLoss ~ Group, data = WeightLossIncentive4)
 ```
@@ -156,7 +156,7 @@ gf_dotplot(~WeightLoss | Group, data = WeightLossIncentive4) +
 ## Boxplot
 
 ```{r figraph3, echo = FALSE}
-gf_boxplot(Group ~ WeightLoss, data = WeightLossIncentive4) 
+gf_boxplot(WeightLoss ~ Group, data = WeightLossIncentive4)
 ```
 
 ## Summary Statistics
@@ -185,15 +185,15 @@ Consider a model suggested by the data:
 ### Formally stated:
 
 $$
-Y = \mu_i + \epsilon \mbox{ where } \epsilon \sim N(0, \sigma_i)
+Y = \mu_i + \epsilon \mbox{ where } \epsilon \sim N(0, \sigma)
 $$
 
 ### By group:
 
 -   Control Group:\
-    $\displaystyle Y = \mu_1 + \epsilon \mbox{ so } Y \sim N(\mu_1, \sigma_1)$
+    $\displaystyle Y = \mu_1 + \epsilon \text{ so } Y \sim N(\mu_1, \sigma)$
 -   Incentives Group:\
-    $\displaystyle Y = \mu_2 + \epsilon \mbox{ so } Y \sim N(\mu_2, \sigma_2)$
+    $\displaystyle Y = \mu_2 + \epsilon \text{ so } Y \sim N(\mu_2, \sigma)$
 :::
 :::::
 
@@ -228,7 +228,9 @@ $\qquad \hat y = \bar y_i$
 
 ## Check conditions on residuals
 
--   Use R function `lm()` to fit the two-mean model (see code example)
+-   Use R function `lm()` (for linear model) to fit the two-mean model (see code example)
+
+    + $\Rightarrow$ The `lm()` function fits a model assuming constant standard deviations.
 
 -   Verify fitted values
 
@@ -255,10 +257,11 @@ head(filter(WeightLossIncentive4, Group == "Incentive"))
 gf_dotplot(~resid | Group, data = WeightLossIncentive4) + 
   coord_flip()
 
-# residual quantile plots
-gf_qq(~ resid | Group, data = WeightLossIncentive4) |> 
+# residual normal quantile plot
+gf_qq(~ resid, data = WeightLossIncentive4) |> 
   gf_qqline()
 ```
+
 
 ## Fitted values and residuals
 
@@ -282,16 +285,23 @@ gf_dotplot(~resid | Group, data = WeightLossIncentive4) +
   coord_flip()
 ```
 
-## Normal quantile plots
+## Normal quantile plot
 
 ```{r fimod4, echo = FALSE}
-gf_qq(~ resid | Group, data = WeightLossIncentive4) %>% gf_qqline()
+gf_qq(~ resid, data = WeightLossIncentive4) |>  gf_qqline()
 ```
 :::
 
+
+## Comments on Residual checks
+
+* Residuals have simiiar standard deviations
+* Residuals appear reasonably normally distributed
+
+
 ## Test versus a simpler model
 
-Carry out a two-sample $t$-test for financial incentives data
+Carry out a two-sample $t$-test for financial incentives data to see if there is sufficient evidence to use a two means rather than one mean model:
 
 $$
 H_0: \mu_1 = \mu_2  \quad\Rightarrow \quad Y = \mu + \epsilon \quad \mbox{ (one mean model)} 
@@ -311,12 +321,18 @@ $$
 
 ```{r}
 #| output-location: fragment
-t.test(WeightLoss ~ Group, data = WeightLossIncentive4)
+t.test(WeightLoss ~ Group, data = WeightLossIncentive4, var.equal = TRUE)
 ```
+
+::: aside
+Note use of `var.equal` here to specify equal standard deviations.
+:::
+
+
 
 ## Step 4: Use the Model
 
--   The data point to the **two means model** ($H_a$)
+-   The low $p$-value from the test points us to prefer **two means model** ($H_a$)
 
 -   Estimate treatment effect
 
@@ -324,18 +340,122 @@ t.test(WeightLoss ~ Group, data = WeightLossIncentive4)
 
 -   Health care policy implications
 
-## Summary
 
--   **Statistical models** express relationships as
-    $Y = f(X) + \epsilon$, with a focus on prediction, explanation, and
-    uncertainty.
+## The p-value controversy {background-image="figures/pvalue_controversy.png" background-size="contain" background-position="center"}
 
--   We applied the **Four-Step Modeling Process**
+## The Trouble with the p-value
 
-1.  **Choose** an appropriate model form
-2.  **Fit** model parameters using data
-3.  **Assess** adequacy via diagnostics and residuals
-4.  **Use** the model to answer scientific questions
+::: incremental
+-   The $p$-value tells the **strength of evidence** of an "effect"
 
--   The Financial incentives for weight loss case study illustrates the
-    process
+-   The $p$-value tells nothing about the **size** or **practical
+    importance** of an "effect"
+:::
+
+## Step 4: Use: Answer the question of interest
+
+::: incremental
+-   Confidence interval: estimates the **size** of the effect
+
+-   Scope of inference
+
+    -   Can causal inference be concluded?
+    -   To what population(s) can we generalize?
+    -   Is the **effect size** large enough to be *important*?
+:::
+
+## Effect size {.smaller}
+
+::: incremental
+-   **Effect size**: "an often standardized measure of the magnitude of
+    a certain phenomenon of scientific interest."[^1]
+
+-   **Two quantitative variables**
+
+    -   Correlation coefficient $r$
+
+    -   Regression slope (or Beta coefficients or Cohen's $f^2$)
+
+-   **Comparing populations**
+
+    -   Standardized mean difference $\theta$ $$
+        \theta = \frac{\mu_1-\mu_2}{\sigma}
+        $$ where $\sigma$ is the standard deviation of one (or both) of
+        the populations being compared.
+
+:::
+
+##
+### Estimated Effect Size for Difference in Means {.smaller}
+
+$$
+\mbox{effect size} = \frac{\mbox{Difference in sample means}}{\mbox{Estimated Standard Deviation}} = \frac{\bar y_1-\bar y_2}{s_p}
+$$
+
+::: {.fragment}
+Where $s_p$ is "pooled" standard deviation defined as: 
+$$
+s_p=\sqrt{\frac{(n_1-1)s_1^2 + (n_2-1)s_2^2}{n_1+n_2-2}}
+$$
+:::
+:::{.fragment}
+-   Alternatively, for financial incentives data, we might estimate
+    $\sigma$ by $s$, the standard deviation of weight losses for control
+    ("untreated") individuals
+
+:::
+
+[^1]: Schafer T and Schwarz MA (2019) The Meaningfulness of Effect Sizes
+    in Psychological Research: Differences Between Sub-Disciplines and
+    the Impact of Potential Biases. Front. Psychol. 10:813. doi:
+    10.3389/fpsyg.2019.00813
+
+
+##
+### Example: Effect Size from Study of Financial Incentives for Weight Loss {.smaller}
+
+
+```{r}
+favstats(WeightLoss ~ Group, data = WeightLossIncentive4)
+```
+
+:::{.fragment}
+* Using $s_p$ in the denominator:
+$\mbox{effect size} = \frac{|\bar y_1 - \bar y_2|}{s_p} =  \frac{|15.68 - 3.92|}{9.25} = 1.27$
+:::
+
+:::{.fragment}
+* Using $s_C$ (control sd) in the denominator:
+$\mbox{effect size} = \frac{|\bar y_1 - \bar y_2|}{s_c} =  \frac{|15.68 - 3.92|}{9.11} = 1.29$
+:::
+
+## How to Assess Effect Sizes?
+
+- General guidelines for effect sizes
+
+  - Small: 0.2
+  - Medium: 0.5
+  - Large: 1.0
+  
+:::{.fragment}
+- But these are no substitute for judgement in context.
+
+  - How does difference in average weight loss of 11.76 pounds compare with starting weights?
+  
+  - Was weight loss sustained?
+:::
+
+
+
+## Summary :memo: {.smaller}
+
+
+* The **C–F–A–U process** guides modeling: choose a model, fit it, assess assumptions, and use the model to answer the research question.
+
+* A **p-value** provides evidence of a difference but does not tell us the **magnitude** or **practical importance** of the effect.
+
+* **Effect size** quantifies how large the difference is; in the weight-loss study, the standardized mean difference was **very large**.
+
+* Interpretation always requires **context**: consider generalizability, causality, and whether the effect is meaningful in real-world terms.
+
+
