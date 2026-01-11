@@ -1,0 +1,179 @@
+---
+title: "Chapter 1: <br>Simple Linear Regression"
+subtitle: "Part 1"
+author: "MATH 360"
+toc: true
+format:
+  html:
+    self-contained: true
+    number-sections: true
+execute:
+  warning: false
+---
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(rvest)
+library(mosaic)
+library(Stat2Data)
+data("WeightLossIncentive4")
+```
+
+Consider the kinds of questions that can be answered when using a quantitative variable to predict another quantitative variable.
+
+# Research Questions
+
+-   Can cricket chirps be used to predict the temperature?
+
+-   Does electrical stimulation of the brain help with problem solving?
+
+-   To what extent does economic growth depend on the inflation rate?
+
+-   Can we predict Rotten Tomatoes scores using movie budgets?
+
+-   How strong is the dependence of college GPA on high school GPA?
+
+# Single Quantitative Predictor Model
+
+-   Notation:
+    -   $Y$ = response variable
+    -   $X$ = explanatory variable
+-   Assume $X$ and $Y$ are both quantitative (for now) $$
+    \begin{align}
+    \mbox{Data} &= \mbox{Model} + \mbox{Error}\\
+    Y &= f(X) + \epsilon \\
+    Y &= \mu_Y + \epsilon \\
+    \end{align}
+    $$
+
+where $Y$ is assumed to be a linear function of $X$:
+
+$$
+\mu_Y = \beta_0+\beta_1 X
+$$
+
+## Example: Predicting Final Score from Midterm Score
+
+```{r}
+MidtermFinal <- read.csv("http://people.kzoo.edu/enordmoe/math360/MidtermFinal.csv")
+dim(MidtermFinal)
+```
+
+-   First 6 cases
+
+```{r}
+head(MidtermFinal)
+```
+
+## Graphing the Data
+
+-   Scatterplot with a smoother helps determine whether a linear model is appropriate.
+
+```{r}
+gf_point(Final ~ Midterm, data = MidtermFinal) |>
+  gf_smooth()
+```
+
+# Fitting a Simple Least Squares Regression Model
+
+-   The fitted (or estimated) model is represented by
+$$
+    \widehat Y = \hat\beta_0 + \hat\beta_1 X
+$$ where
+
+    -   $\hat\beta_0$ is the intercept of the fitted line and\
+    -   $\hat\beta_1$ is the slope of the fitted line
+
+**Question:** How is the best line determined?
+
+**Answer:** Minimize the sum of squared prediction errors
+
+$$\mbox{SSE}=\sum(Y-\widehat Y)^2$$
+
+That is, we minimized the errors in the **vertical** direction.
+
+The fitted line is called the **least squares regression line** or just the **linear regression line**. 
+
+
+## Least Squares Estimation
+
+- Choose line that minimizes **sum of squares** of vertical distances
+  - Residual = $Y-\hat Y$
+
+```{r, echo = FALSE}
+library(latex2exp)
+d <- MidtermFinal
+fit <- lm(Final ~ Midterm, data = d)
+d$predicted <- predict(fit)   # Save the predicted values
+d$residuals <- residuals(fit) # Save the residual values
+ggplot(d, aes(x = Midterm, y = Final)) +
+  geom_smooth(method = "lm", se = FALSE, color = "lightgrey") +  # Plot regression slope
+  geom_segment(aes(xend = Midterm, yend = predicted), alpha = .25) +  # alpha to fade lines
+  geom_point() +
+  geom_point(aes(y = predicted), shape = 1) +
+  theme_bw() +  # Add theme for cleaner look
+#  annotate(geom="text", x=25, y=80, label=TeX("$\\hat{Y} = \\beta_0 + \\beta_1X_1", output='character'), parse=TRUE)
+  annotate(
+    geom = "curve", x = 29, y = 89, xend = 34, yend = 82, color = "red",
+    curvature = -.2, arrow = arrow(length = unit(2, "mm"))
+    ) +
+  annotate(geom = "text", x = 27, y = 90, label = TeX("$Y-\\hat{Y}$", output='character'), parse=TRUE,
+           hjust = "left", size = 8)
+```
+
+## Example: Using R to Find and Plot the Regression Line
+
+First, fit and save the regression model
+
+```{r lsmod1}
+model1 <- lm(Final ~ Midterm, data = MidtermFinal)
+#Obtain regression output including slope and intercept
+model1
+```
+
+Use R to plot the regression line on the scatterplot.
+
+```{r}
+# Graph regression line on scatterplot
+gf_point(Final ~ Midterm, data = MidtermFinal, 
+         xlab = "Midterm Score", ylab = "Final Score") |>
+  gf_smooth(method = "lm")
+```
+
+
+## The Fitted Regression Equation
+
+$$
+\begin{align*}
+\hat Y &= 18.67 + 1.49X \\
+\widehat{\mbox{Final}}  &= 18.67 + 1.49\mbox{(Midterm)} \\
+\end{align*}
+$$
+
+# Computing Predictions and Residuals
+
+- Compute the predicted Final Exam score and find the residual for Katelin with a score of 35 on the midterm
+
+- Prediction:
+
+$$
+\widehat{\mbox{Final}}  = 18.67 + 1.49\mbox{(35)} = 70.82
+$$
+
+- Residual:
+
+$$
+\mbox{Final}-\widehat{\mbox{Final}}  = 53-70.82 = -17.82
+$$
+
+
+
+# Looking Ahead to the Rest of Chapter 1
+
+- Regression model conditions
+
+- Residual analysis
+
+- Transforming and re-expressing data
+
+- More of R
