@@ -95,7 +95,7 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="Ch1Lect_pt3_files/libs/revealjs/dist/theme/quarto-10df59a5396271df04a2ae28b52f1741.css">
+  <link rel="stylesheet" href="Ch1Lect_pt3_files/libs/revealjs/dist/theme/quarto-1e8aac183fbd48eb13f508ef56dc9f7d.css">
   <link href="Ch1Lect_pt3_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="Ch1Lect_pt3_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="Ch1Lect_pt3_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -189,6 +189,15 @@
       margin-right: 0; 
     }
   </style>
+  <link href="Ch1Lect_pt3_files/libs/htmltools-fill-0.5.9/fill.css" rel="stylesheet">
+  <script src="Ch1Lect_pt3_files/libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+  <script src="Ch1Lect_pt3_files/libs/plotly-binding-4.11.0/plotly.js"></script>
+  <script src="Ch1Lect_pt3_files/libs/typedarray-0.1/typedarray.min.js"></script>
+  <script src="Ch1Lect_pt3_files/libs/jquery-3.5.1/jquery.min.js"></script>
+  <link href="Ch1Lect_pt3_files/libs/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet">
+  <script src="Ch1Lect_pt3_files/libs/crosstalk-1.2.2/js/crosstalk.min.js"></script>
+  <link href="Ch1Lect_pt3_files/libs/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet">
+  <script src="Ch1Lect_pt3_files/libs/plotly-main-2.11.1/plotly-latest.min.js"></script>
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -529,6 +538,9 @@ Coefficients:
 \widehat{\sqrt{\mbox{MDs}}} = -2.753  + 6.876 \mbox{ Hospitals}
 \]</span></p></li>
 </ul>
+</section>
+<section id="questions" class="slide level2">
+<h2>Questions <span class="emoji" data-emoji="clipboard">📋</span></h2>
 <ol type="1">
 <li><p>Predict the number of MDs in a county with 10 hospitals.</p></li>
 <li><p>Interpret the slope coefficient.</p></li>
@@ -573,6 +585,478 @@ Coefficients:
 </div>
 </div>
 </div>
+</section>
+<section id="section-5" class="slide level2 smaller">
+<h2></h2>
+<h3 id="transformation-consideration">Transformation Consideration</h3>
+<ul>
+<li>Address the strong curvature and extreme values using a natural log transformation. Consider the following candidates:</li>
+</ul>
+<div class="panel-tabset">
+<ul id="tabset-6" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-6-1">Code</a></li><li><a href="#tabset-6-2">Output</a></li></ul>
+<div class="tab-content">
+<div id="tabset-6-1">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href=""></a>p1 <span class="ot">&lt;-</span> <span class="fu">gf_point</span>(Species <span class="sc">~</span> Area, <span class="at">data =</span> SpeciesArea)</span>
+<span id="cb9-2"><a href=""></a>p2 <span class="ot">&lt;-</span> <span class="fu">gf_point</span>(logSpecies <span class="sc">~</span> Area, <span class="at">data =</span> SpeciesArea)</span>
+<span id="cb9-3"><a href=""></a>p3 <span class="ot">&lt;-</span> <span class="fu">gf_point</span>(Species <span class="sc">~</span> logArea, <span class="at">data =</span> SpeciesArea)</span>
+<span id="cb9-4"><a href=""></a>p4 <span class="ot">&lt;-</span> <span class="fu">gf_point</span>(logSpecies <span class="sc">~</span> logArea, <span class="at">data =</span> SpeciesArea)</span>
+<span id="cb9-5"><a href=""></a><span class="fu">grid.arrange</span>(p1,p2,p3,p4,<span class="at">ncol=</span><span class="dv">2</span>,<span class="at">nrow=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-6-2">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="Ch1Lect_pt3_files/figure-revealjs/unnamed-chunk-18-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="fit-the-best-model" class="slide level2">
+<h2>Fit the Best Model</h2>
+<ul>
+<li><p>Logging both response and predictor variables appears to give the best results.</p></li>
+<li><p>Proceed by fitting a simple regression using the <em>log-transformed</em> variables.</p></li>
+</ul>
+</section>
+<section id="fitting-the-log-log-model" class="slide level2 smaller">
+<h2>Fitting the Log-Log Model</h2>
+<div class="panel-tabset">
+<ul id="tabset-7" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-7-1">Code</a></li><li><a href="#tabset-7-2">Regression Output</a></li><li><a href="#tabset-7-3">Scatterplot with Line</a></li></ul>
+<div class="tab-content">
+<div id="tabset-7-1">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href=""></a><span class="co"># Fit the log-log model and get output</span></span>
+<span id="cb10-2"><a href=""></a>mod3 <span class="ot">&lt;-</span> <span class="fu">lm</span>(logSpecies <span class="sc">~</span> logArea, <span class="at">data =</span> SpeciesArea)</span>
+<span id="cb10-3"><a href=""></a>mod3</span>
+<span id="cb10-4"><a href=""></a><span class="co"># Scatterplot and regression line with transformed variables</span></span>
+<span id="cb10-5"><a href=""></a><span class="fu">gf_point</span>(logSpecies <span class="sc">~</span> logArea, <span class="at">data =</span> SpeciesArea) <span class="sc">|&gt;</span></span>
+<span id="cb10-6"><a href=""></a>        <span class="fu">gf_smooth</span>(<span class="at">method=</span><span class="st">"lm"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-7-2">
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = logSpecies ~ logArea, data = SpeciesArea)
+
+Coefficients:
+(Intercept)      logArea  
+     1.6249       0.2355  </code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-7-3">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="Ch1Lect_pt3_files/figure-revealjs/unnamed-chunk-21-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="section-6" class="slide level2 smaller">
+<h2></h2>
+<h3 id="the-fitted-log-log-model-for-predicting-number-of-species">The fitted log-log model for predicting number of species</h3>
+<p><span class="math display">\[
+  \widehat{\log(\mbox{Species}}) = 1.625 + 0.2355 \cdot \log(\mbox{Area})
+\]</span></p>
+<ul>
+<li><p>Use the model to obtain the predicted value and residual for Java.</p></li>
+<li><p>Interpret the slope coefficient in context.</p></li>
+</ul>
+<div class="fragment">
+<ul>
+<li>Back transform to get the prediction on the original scale: <span class="math display">\[
+\widehat{\mbox{Species}} = e^{1.625 + 0.2355 \cdot \log(\mbox{Area})} =
+5.08\cdot \mbox{Area}^{0.235}
+\]</span></li>
+</ul>
+</div>
+</section>
+<section id="section-7" class="slide level2 smaller">
+<h2></h2>
+<h3 id="re-assess-log-log-model">Re-assess log-log model</h3>
+<div class="panel-tabset">
+<ul id="tabset-8" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-8-1">Code</a></li><li><a href="#tabset-8-2">Output</a></li></ul>
+<div class="tab-content">
+<div id="tabset-8-1">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href=""></a>p1 <span class="ot">&lt;-</span> <span class="fu">gf_point</span>(<span class="fu">resid</span>(mod3) <span class="sc">~</span> <span class="fu">fitted</span>(mod3)) <span class="sc">|&gt;</span></span>
+<span id="cb12-2"><a href=""></a>  <span class="fu">gf_hline</span>(<span class="at">yintercept =</span> <span class="sc">~</span><span class="dv">0</span>)</span>
+<span id="cb12-3"><a href=""></a>p2 <span class="ot">&lt;-</span> <span class="fu">gf_qq</span>(<span class="sc">~</span><span class="fu">resid</span>(mod3)) <span class="sc">|&gt;</span></span>
+<span id="cb12-4"><a href=""></a>  <span class="fu">gf_qqline</span>()</span>
+<span id="cb12-5"><a href=""></a><span class="fu">grid.arrange</span>(p1,p2,<span class="at">ncol=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-8-2">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="Ch1Lect_pt3_files/figure-revealjs/unnamed-chunk-23-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="section-8" class="slide level2">
+<h2></h2>
+<h4 id="using-r-to-get-java-predictions-from-the-log-log-model">Using R to get Java predictions from the log-log model <span class="emoji" data-emoji="clipboard">📋</span></h4>
+<ul>
+<li>Sample code:</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href=""></a><span class="co"># Get the actual Java values</span></span>
+<span id="cb13-2"><a href=""></a><span class="fu">filter</span>(SpeciesArea, Name <span class="sc">==</span> <span class="st">"Java"</span>)  <span class="sc">|&gt;</span></span>
+<span id="cb13-3"><a href=""></a>  <span class="fu">select</span>(<span class="fu">c</span>(Name, Area, Species))</span>
+<span id="cb13-4"><a href=""></a><span class="co"># Obtain the predictions</span></span>
+<span id="cb13-5"><a href=""></a><span class="fl">1.625</span> <span class="sc">+</span> <span class="fl">0.2355</span> <span class="sc">*</span> <span class="fu">log</span>(<span class="dv">125628</span>)  <span class="co">#Fitted on the log scale</span></span>
+<span id="cb13-6"><a href=""></a><span class="fu">exp</span>(<span class="fl">1.625</span> <span class="sc">+</span><span class="fl">0.2355</span> <span class="sc">*</span> <span class="fu">log</span>(<span class="dv">125628</span>)) <span class="co">#Fitted on the original scale</span></span>
+<span id="cb13-7"><a href=""></a><span class="co"># or create a function</span></span>
+<span id="cb13-8"><a href=""></a>island_fun <span class="ot">&lt;-</span> <span class="fu">makeFun</span>(mod3)</span>
+<span id="cb13-9"><a href=""></a><span class="fu">exp</span>(<span class="fu">island_fun</span>(<span class="fu">log</span>(<span class="dv">125628</span>)))</span>
+<span id="cb13-10"><a href=""></a><span class="co"># or use the R predict function with "newdata" key</span></span>
+<span id="cb13-11"><a href=""></a><span class="fu">predict</span>(mod3, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">logArea =</span> <span class="fu">log</span>(<span class="dv">125628</span>)))</span>
+<span id="cb13-12"><a href=""></a><span class="fu">exp</span>(<span class="fu">predict</span>(mod3, <span class="at">newdata =</span> <span class="fu">data.frame</span>(<span class="at">logArea =</span> <span class="fu">log</span>(<span class="dv">125628</span>))))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>Try this for a different island <span class="emoji" data-emoji="white_check_mark">✅</span></li>
+</ul>
+</section></section>
+<section>
+<section id="outliers-and-influential-observations" class="title-slide slide level1 center" data-background-color="#FAD9C7">
+<h1>Outliers and Influential Observations</h1>
+
+</section>
+<section id="olympic-long-jump-data" class="slide level2">
+<h2>Olympic Long Jump Data</h2>
+<ul>
+<li>Gold medal distance as a function of time:</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href=""></a><span class="fu">data</span>(LongJumpOlympics)</span>
+<span id="cb14-2"><a href=""></a><span class="fu">gf_point</span>(Gold <span class="sc">~</span> Year, <span class="at">data =</span> LongJumpOlympics) <span class="sc">|&gt;</span></span>
+<span id="cb14-3"><a href=""></a>  <span class="fu">gf_smooth</span>() <span class="sc">|&gt;</span></span>
+<span id="cb14-4"><a href=""></a>  <span class="fu">gf_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">color =</span> <span class="st">"red"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell fragment">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="Ch1Lect_pt3_files/figure-revealjs/unnamed-chunk-25-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="fragment">
+<p><span class="emoji" data-emoji="question">❓</span> What do you think has happened since 2008?</p>
+</div>
+</section>
+<section id="section-9" class="slide level2 smaller">
+<h2></h2>
+<h3 id="fit-model-and-identify-outlier">Fit model and identify outlier:</h3>
+<div class="panel-tabset">
+<ul id="tabset-9" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-9-1">R Code</a></li><li><a href="#tabset-9-2">Regression Output</a></li><li><a href="#tabset-9-3">Scatterplot with Outlier</a></li></ul>
+<div class="tab-content">
+<div id="tabset-9-1">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href=""></a>mod4 <span class="ot">&lt;-</span> <span class="fu">lm</span>(Gold <span class="sc">~</span> Year, <span class="at">data =</span> LongJumpOlympics)</span>
+<span id="cb15-2"><a href=""></a>mod4</span>
+<span id="cb15-3"><a href=""></a><span class="fu">gf_point</span>(Gold <span class="sc">~</span> Year, <span class="at">data =</span> LongJumpOlympics) <span class="sc">|&gt;</span></span>
+<span id="cb15-4"><a href=""></a>  <span class="fu">gf_smooth</span>(<span class="at">method=</span><span class="st">"lm"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb15-5"><a href=""></a>  <span class="fu">gf_refine</span>(<span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">label =</span> <span class="st">"Bob Beamon"</span>, <span class="at">x =</span> <span class="dv">1968</span>, <span class="at">y =</span> <span class="fl">8.9</span>, <span class="at">size =</span> <span class="dv">6</span>, <span class="at">colour =</span> <span class="st">"red"</span>, <span class="at">hjust =</span> <span class="sc">-</span><span class="fl">0.1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-9-2">
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = Gold ~ Year, data = LongJumpOlympics)
+
+Coefficients:
+(Intercept)         Year  
+  -19.48359      0.01407  </code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-9-3">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="Ch1Lect_pt3_files/figure-revealjs/unnamed-chunk-28-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="section-10" class="slide level2 smaller">
+<h2></h2>
+<h3 id="bob-beamons-record-breaking-long-jump">Bob Beamon’s record-breaking long jump</h3>
+<iframe data-external="1" src="https://www.youtube.com/embed/DEt_Xgg8dzc" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
+</section>
+<section id="section-11" class="slide level2 smaller">
+<h2></h2>
+<h3 id="we-can-use-the-package-plotly-to-identify-points-interactively-optional">We can use the package <strong>plotly</strong> to identify points interactively (optional)</h3>
+<div class="panel-tabset">
+<ul id="tabset-10" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-10-1">Code</a></li><li><a href="#tabset-10-2">Output</a></li></ul>
+<div class="tab-content">
+<div id="tabset-10-1">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href=""></a><span class="fu">library</span>(plotly)</span>
+<span id="cb17-2"><a href=""></a>p <span class="ot">&lt;-</span> <span class="fu">gf_point</span>(Gold <span class="sc">~</span> Year, <span class="at">data =</span> LongJumpOlympics)</span>
+<span id="cb17-3"><a href=""></a><span class="fu">ggplotly</span>(p)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-10-2">
+<div class="cell">
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item" id="htmlwidget-bf90c889e8a062a7f612" style="width:960px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-bf90c889e8a062a7f612">{"x":{"data":[{"x":[1900,1904,1906,1908,1912,1920,1924,1928,1932,1936,1948,1952,1956,1960,1964,1968,1972,1976,1980,1984,1988,1992,1996,2000,2004,2008],"y":[7.1849999999999996,7.3399999999999999,7.2000000000000002,7.4800000000000004,7.5999999999999996,7.1500000000000004,7.4450000000000003,7.7300000000000004,7.6399999999999997,8.0600000000000005,7.8250000000000002,7.5700000000000003,7.8300000000000001,8.1199999999999992,8.0700000000000003,8.9000000000000004,8.2400000000000002,8.3499999999999996,8.5399999999999991,8.5399999999999991,8.7200000000000006,8.6699999999999999,8.5,8.5500000000000007,8.5899999999999999,8.3699999999999992],"text":["Year: 1900<br />Gold: 7.185","Year: 1904<br />Gold: 7.340","Year: 1906<br />Gold: 7.200","Year: 1908<br />Gold: 7.480","Year: 1912<br />Gold: 7.600","Year: 1920<br />Gold: 7.150","Year: 1924<br />Gold: 7.445","Year: 1928<br />Gold: 7.730","Year: 1932<br />Gold: 7.640","Year: 1936<br />Gold: 8.060","Year: 1948<br />Gold: 7.825","Year: 1952<br />Gold: 7.570","Year: 1956<br />Gold: 7.830","Year: 1960<br />Gold: 8.120","Year: 1964<br />Gold: 8.070","Year: 1968<br />Gold: 8.900","Year: 1972<br />Gold: 8.240","Year: 1976<br />Gold: 8.350","Year: 1980<br />Gold: 8.540","Year: 1984<br />Gold: 8.540","Year: 1988<br />Gold: 8.720","Year: 1992<br />Gold: 8.670","Year: 1996<br />Gold: 8.500","Year: 2000<br />Gold: 8.550","Year: 2004<br />Gold: 8.590","Year: 2008<br />Gold: 8.370"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,0,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"}},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":23.305936073059364,"r":7.3059360730593621,"b":37.260273972602747,"l":43.105022831050235},"plot_bgcolor":"rgba(235,235,235,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[1894.5999999999999,2013.4000000000001],"tickmode":"array","ticktext":["1920","1950","1980","2010"],"tickvals":[1920,1950,1980,2010],"categoryorder":"array","categoryarray":["1920","1950","1980","2010"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"Year","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[7.0625,8.9875000000000007],"tickmode":"array","ticktext":["7.5","8.0","8.5"],"tickvals":[7.5,8,8.5],"categoryorder":"array","categoryarray":["7.5","8.0","8.5"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"Gold","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","layer":"below","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":false,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"c089219bc687":{"x":{},"y":{},"type":"scatter"}},"cur_data":"c089219bc687","visdat":{"c089219bc687":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="section-12" class="slide level2 smaller">
+<h2></h2>
+<h3 id="obtain-the-plot-of-residual-versus-fitted-values">Obtain the plot of residual versus fitted values</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href=""></a><span class="fu">gf_point</span>(<span class="fu">resid</span>(mod4)<span class="sc">~</span><span class="fu">fitted</span>(mod4)) <span class="sc">|&gt;</span></span>
+<span id="cb18-2"><a href=""></a>  <span class="fu">gf_hline</span>(<span class="at">yintercept =</span> <span class="sc">~</span><span class="dv">0</span>, <span class="at">color =</span> <span class="st">"red"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell fragment">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="Ch1Lect_pt3_files/figure-revealjs/unnamed-chunk-31-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="section-13" class="slide level2 smaller">
+<h2></h2>
+<h3 id="other-types-of-residuals">Other types of residuals</h3>
+<p>Scaled residuals are helpful in identifying outliers:</p>
+<ol type="1">
+<li><strong>Standardized residuals.</strong> Residuals divided by estimated standard deviation of residuals:</li>
+</ol>
+<p><span class="math display">\[
+\frac{y - \hat y}{\hat\sigma_\epsilon}
+\]</span></p>
+<div class="fragment">
+<ol start="2" type="1">
+<li><strong>Studentized residuals.</strong> Residuals divided by standard deviation of residuals from the regression <em>after omitting the point in question</em></li>
+</ol>
+<ul>
+<li><p>Removes effect of extreme observation on standard deviation</p></li>
+<li><p>Implicitly involves fitting <span class="math inline">\(n\)</span> different regression models.</p></li>
+</ul>
+<p><span class="math display">\[
+\frac{y - \hat y}{\hat\sigma_i}
+\]</span></p>
+</div>
+</section>
+<section id="why-studentize" class="slide level2">
+<h2>Why studentize?</h2>
+<ul>
+<li class="fragment"><p><strong>Concern</strong>: An unusual value may exert great <em>influence</em> on the fit.</p>
+<ul>
+<li class="fragment"><p>Its residual might be underestimated because the model “moves” a lot to fit it. or</p></li>
+<li class="fragment"><p>The standard error of regression may be <em>inflated</em> due to the large outlier residual</p></li>
+</ul></li>
+<li class="fragment"><p><strong>Remedy</strong>: We <strong>studentize</strong> by fitting the model <strong>without</strong> the influential case, finding a new estimate <span class="math inline">\(\widehat{\sigma_\epsilon}\)</span>.</p></li>
+</ul>
+</section>
+<section id="section-14" class="slide level2 smaller">
+<h2></h2>
+<h3 id="plots-of-standardized-and-studentized-residuals-versus-fitted">Plots of standardized and studentized residuals versus fitted</h3>
+<div class="panel-tabset">
+<ul id="tabset-11" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-11-1">Code</a></li><li><a href="#tabset-11-2">Output</a></li></ul>
+<div class="tab-content">
+<div id="tabset-11-1">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href=""></a><span class="co">#Standardized resids</span></span>
+<span id="cb19-2"><a href=""></a>p1 <span class="ot">&lt;-</span> <span class="fu">gf_point</span>(<span class="fu">rstandard</span>(mod4) <span class="sc">~</span> Year, <span class="at">data =</span> LongJumpOlympics, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">4</span>,<span class="dv">4</span>),</span>
+<span id="cb19-3"><a href=""></a>               <span class="at">main=</span><span class="st">"Standardized Residuals"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb19-4"><a href=""></a>  <span class="fu">gf_hline</span>(<span class="at">yintercept =</span> <span class="sc">~</span><span class="dv">0</span>) <span class="sc">|&gt;</span></span>
+<span id="cb19-5"><a href=""></a>  <span class="fu">gf_hline</span>(<span class="at">yintercept =</span> <span class="sc">~</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">3</span>,<span class="sc">-</span><span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">3</span>), <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">data =</span> <span class="cn">NA</span>)</span>
+<span id="cb19-6"><a href=""></a><span class="co">#Studentized resids</span></span>
+<span id="cb19-7"><a href=""></a>p2 <span class="ot">&lt;-</span> <span class="fu">gf_point</span>(<span class="fu">rstudent</span>(mod4) <span class="sc">~</span> Year, <span class="at">data =</span> LongJumpOlympics, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">4</span>,<span class="dv">4</span>),</span>
+<span id="cb19-8"><a href=""></a>               <span class="at">main=</span><span class="st">"Studentized Residuals"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb19-9"><a href=""></a>  <span class="fu">gf_hline</span>(<span class="at">yintercept =</span> <span class="sc">~</span><span class="dv">0</span>) <span class="sc">|&gt;</span></span>
+<span id="cb19-10"><a href=""></a>  <span class="fu">gf_hline</span>(<span class="at">yintercept =</span> <span class="sc">~</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">3</span>,<span class="sc">-</span><span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">3</span>), <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">data =</span> <span class="cn">NA</span>)</span>
+<span id="cb19-11"><a href=""></a><span class="fu">grid.arrange</span>(p1 ,p2, <span class="at">ncol=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-11-2">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="Ch1Lect_pt3_files/figure-revealjs/lj4o-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="beamon-is-an-extreme-outlier" class="slide level2">
+<h2><span class="red"> Beamon is an extreme outlier!</span></h2>
+
+<img data-src="https://e0.365dm.com/21/07/768x432/skysports-bob-beamon-olympics_5462311.jpg" class="r-stretch"></section>
+<section id="example-the-butterfly-ballot-in-the-year-2000-election" class="slide level2">
+<h2>Example: The Butterfly Ballot in the Year 2000 Election</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><img data-src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Butterfly_Ballot%2C_Florida_2000_%28large%29.jpg"></p>
+</div><div class="column" style="width:50%;">
+<p><img data-src="https://media.npr.org/assets/img/2018/11/12/gettyimages-1306049_wide-78b1a96ccca5fcaac551979e4a29942620227e3d.jpg?s=1400"></p>
+</div></div>
+</section>
+<section id="plot-the-votes-by-county" class="slide level2">
+<h2>Plot the Votes by County</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href=""></a><span class="fu">data</span>(<span class="st">"PalmBeach"</span>)</span>
+<span id="cb20-2"><a href=""></a>p <span class="ot">&lt;-</span> <span class="fu">gf_point</span>(Buchanan <span class="sc">~</span> Bush, <span class="at">label =</span> <span class="sc">~</span>County, <span class="at">data =</span> PalmBeach)</span>
+<span id="cb20-3"><a href=""></a><span class="fu">ggplotly</span>(p)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell fragment">
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item" id="htmlwidget-72f59e4761cbc92b6991" style="width:960px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-72f59e4761cbc92b6991">{"x":{"data":[{"x":[34062,5610,38637,5413,115185,177279,2873,35419,29744,41745,60426,10964,289456,4256,2698,152082,73029,12608,2448,4750,3300,1840,3546,2153,3764,4743,30646,20196,176967,4985,28627,9138,2481,1669,49963,106141,39053,6860,1316,3038,57948,55135,33864,16059,16404,52043,5058,134476,26216,152846,68581,184312,90101,13439,39497,34705,36248,83100,75293,12126,8014,4051,2326,82214,4511,12176,4983],"y":[262,73,248,65,570,789,90,182,270,186,122,89,561,36,29,650,504,83,33,39,29,9,71,24,30,22,242,99,836,76,105,102,29,10,289,305,282,67,39,29,272,563,108,47,90,267,43,446,145,3407,570,1010,538,147,229,124,311,305,194,114,108,27,26,396,46,120,88],"text":["County: ALACHUA<br />Bush:  34062<br />Buchanan:  262","County: BAKER<br />Bush:   5610<br />Buchanan:   73","County: BAY<br />Bush:  38637<br />Buchanan:  248","County: BRADFORD<br />Bush:   5413<br />Buchanan:   65","County: BREVARD<br />Bush: 115185<br />Buchanan:  570","County: BROWARD<br />Bush: 177279<br />Buchanan:  789","County: CALHOUN<br />Bush:   2873<br />Buchanan:   90","County: CHARLOTTE<br />Bush:  35419<br />Buchanan:  182","County: CITRUS<br />Bush:  29744<br />Buchanan:  270","County: CLAY<br />Bush:  41745<br />Buchanan:  186","County: COLLIER<br />Bush:  60426<br />Buchanan:  122","County: COLUMBIA<br />Bush:  10964<br />Buchanan:   89","County: DADE<br />Bush: 289456<br />Buchanan:  561","County: DE SOTO<br />Bush:   4256<br />Buchanan:   36","County: DIXIE<br />Bush:   2698<br />Buchanan:   29","County: DUVAL<br />Bush: 152082<br />Buchanan:  650","County: ESCAMBIA<br />Bush:  73029<br />Buchanan:  504","County: FLAGLER<br />Bush:  12608<br />Buchanan:   83","County: FRANKLIN<br />Bush:   2448<br />Buchanan:   33","County: GADSDEN<br />Bush:   4750<br />Buchanan:   39","County: GILCHRIST<br />Bush:   3300<br />Buchanan:   29","County: GLADES<br />Bush:   1840<br />Buchanan:    9","County: GULF<br />Bush:   3546<br />Buchanan:   71","County: HAMILTON<br />Bush:   2153<br />Buchanan:   24","County: HARDEE<br />Bush:   3764<br />Buchanan:   30","County: HENDRY<br />Bush:   4743<br />Buchanan:   22","County: HERNANDO<br />Bush:  30646<br />Buchanan:  242","County: HIGHLANDS<br />Bush:  20196<br />Buchanan:   99","County: HILLSBOROUGH<br />Bush: 176967<br />Buchanan:  836","County: HOLMES<br />Bush:   4985<br />Buchanan:   76","County: INDIAN RIVER<br />Bush:  28627<br />Buchanan:  105","County: JACKSON<br />Bush:   9138<br />Buchanan:  102","County: JEFFERSON<br />Bush:   2481<br />Buchanan:   29","County: LAFAYETTE<br />Bush:   1669<br />Buchanan:   10","County: LAKE<br />Bush:  49963<br />Buchanan:  289","County: LEE<br />Bush: 106141<br />Buchanan:  305","County: LEON<br />Bush:  39053<br />Buchanan:  282","County: LEVY<br />Bush:   6860<br />Buchanan:   67","County: LIBERTY<br />Bush:   1316<br />Buchanan:   39","County: MADISON<br />Bush:   3038<br />Buchanan:   29","County: MANATEE<br />Bush:  57948<br />Buchanan:  272","County: MARION<br />Bush:  55135<br />Buchanan:  563","County: MARTIN<br />Bush:  33864<br />Buchanan:  108","County: MONROE<br />Bush:  16059<br />Buchanan:   47","County: NASSAU<br />Bush:  16404<br />Buchanan:   90","County: OKALOOSA<br />Bush:  52043<br />Buchanan:  267","County: OKEECHOBEE<br />Bush:   5058<br />Buchanan:   43","County: ORANGE<br />Bush: 134476<br />Buchanan:  446","County: OSCEOLA<br />Bush:  26216<br />Buchanan:  145","County: PALM BEACH<br />Bush: 152846<br />Buchanan: 3407","County: PASCO<br />Bush:  68581<br />Buchanan:  570","County: PINELLAS<br />Bush: 184312<br />Buchanan: 1010","County: POLK<br />Bush:  90101<br />Buchanan:  538","County: PUTNAM<br />Bush:  13439<br />Buchanan:  147","County: ST. JOHNS<br />Bush:  39497<br />Buchanan:  229","County: ST. LUCIE<br />Bush:  34705<br />Buchanan:  124","County: SANTA ROSA<br />Bush:  36248<br />Buchanan:  311","County: SARASOTA<br />Bush:  83100<br />Buchanan:  305","County: SEMINOLE<br />Bush:  75293<br />Buchanan:  194","County: SUMTER<br />Bush:  12126<br />Buchanan:  114","County: SUWANNEE<br />Bush:   8014<br />Buchanan:  108","County: TAYLOR<br />Bush:   4051<br />Buchanan:   27","County: UNION<br />Bush:   2326<br />Buchanan:   26","County: VOLUSIA<br />Bush:  82214<br />Buchanan:  396","County: WAKULLA<br />Bush:   4511<br />Buchanan:   46","County: WALTON<br />Bush:  12176<br />Buchanan:  120","County: WASHINGTON<br />Bush:   4983<br />Buchanan:   88"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,0,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"}},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":23.305936073059364,"r":7.3059360730593621,"b":37.260273972602747,"l":48.949771689497723},"plot_bgcolor":"rgba(235,235,235,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-13091,303863],"tickmode":"array","ticktext":["0e+00","1e+05","2e+05","3e+05"],"tickvals":[0,100000,200000,300000],"categoryorder":"array","categoryarray":["0e+00","1e+05","2e+05","3e+05"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"Bush","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-160.90000000000001,3576.9000000000001],"tickmode":"array","ticktext":["0","1000","2000","3000"],"tickvals":[0,1000.0000000000001,2000,3000],"categoryorder":"array","categoryarray":["0","1000","2000","3000"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"Buchanan","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","layer":"below","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":false,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"c08919dab5e4":{"label":{},"x":{},"y":{},"type":"scatter"}},"cur_data":"c08919dab5e4","visdat":{"c08919dab5e4":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+<section id="section-15" class="slide level2 smaller">
+<h2></h2>
+<h3 id="linear-model-fit-and-plots">Linear model fit and plots</h3>
+<div class="panel-tabset">
+<ul id="tabset-12" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-12-1">R Code</a></li><li><a href="#tabset-12-2">Plot with Regression Line</a></li><li><a href="#tabset-12-3">Residual vs Fitted Plot</a></li></ul>
+<div class="tab-content">
+<div id="tabset-12-1">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href=""></a><span class="co"># Fit and display model</span></span>
+<span id="cb21-2"><a href=""></a>mod5 <span class="ot">&lt;-</span> <span class="fu">lm</span>(Buchanan <span class="sc">~</span> Bush, <span class="at">data =</span> PalmBeach)</span>
+<span id="cb21-3"><a href=""></a><span class="co"># Regresssion line plot</span></span>
+<span id="cb21-4"><a href=""></a><span class="fu">gf_point</span>(Buchanan <span class="sc">~</span> Bush, <span class="at">data =</span> PalmBeach) <span class="sc">|&gt;</span></span>
+<span id="cb21-5"><a href=""></a>  <span class="fu">gf_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>)</span>
+<span id="cb21-6"><a href=""></a><span class="co"># Residual plot</span></span>
+<span id="cb21-7"><a href=""></a><span class="fu">gf_point</span>(<span class="fu">resid</span>(mod5) <span class="sc">~</span> <span class="fu">fitted</span>(mod5)) <span class="sc">|&gt;</span></span>
+<span id="cb21-8"><a href=""></a>  <span class="fu">gf_hline</span>(<span class="at">yintercept =</span> <span class="sc">~</span><span class="dv">0</span>, <span class="at">color =</span> <span class="st">"blue"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-12-2">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="Ch1Lect_pt3_files/figure-revealjs/unnamed-chunk-32-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-12-3">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="Ch1Lect_pt3_files/figure-revealjs/unnamed-chunk-33-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="is-palm-beach-an-influential-outlier" class="slide level2">
+<h2>Is Palm Beach an Influential Outlier?</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href=""></a><span class="co"># Omit Palm Beach</span></span>
+<span id="cb22-2"><a href=""></a>PalmBeach_noPB <span class="ot">&lt;-</span> <span class="fu">filter</span>(PalmBeach, County <span class="sc">!=</span> <span class="st">"PALM BEACH"</span>)</span>
+<span id="cb22-3"><a href=""></a><span class="co"># Refit the regression without Palm Beach</span></span>
+<span id="cb22-4"><a href=""></a>mod6 <span class="ot">&lt;-</span> <span class="fu">lm</span>(Buchanan <span class="sc">~</span> Bush, <span class="at">data =</span> PalmBeach_noPB)</span>
+<span id="cb22-5"><a href=""></a>mod6</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell fragment">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = Buchanan ~ Bush, data = PalmBeach_noPB)
+
+Coefficients:
+(Intercept)         Bush  
+  65.573496     0.003482  </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href=""></a>mod6_fun <span class="ot">&lt;-</span> <span class="fu">makeFun</span>(mod6)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="is-palm-beach-an-influential-outlier-1" class="slide level2">
+<h2>Is Palm Beach an Influential Outlier?</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href=""></a><span class="fu">gf_point</span>(Buchanan <span class="sc">~</span> Bush, <span class="at">data =</span> PalmBeach) <span class="sc">|&gt;</span></span>
+<span id="cb25-2"><a href=""></a>        <span class="fu">gf_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb25-3"><a href=""></a>  <span class="fu">gf_fun</span>(mod6_fun, <span class="at">col =</span> <span class="st">"red"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb25-4"><a href=""></a>  <span class="fu">gf_refine</span>(<span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">label =</span> <span class="st">"Complete"</span>, <span class="at">x =</span> <span class="fl">2.5e+05</span>, <span class="at">y =</span> <span class="dv">1400</span>, <span class="at">size =</span> <span class="dv">6</span>, <span class="at">hjust =</span> <span class="dv">1</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb25-5"><a href=""></a>  <span class="fu">gf_refine</span>(<span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">label =</span> <span class="st">"Without</span><span class="sc">\n</span><span class="st">Palm Beach"</span>,</span>
+<span id="cb25-6"><a href=""></a>                     <span class="at">x =</span> <span class="fl">2e+05</span>, <span class="at">y =</span> <span class="dv">700</span>, <span class="at">size =</span> <span class="dv">6</span>, <span class="at">hjust =</span> <span class="dv">0</span>, <span class="at">vjust =</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="Ch1Lect_pt3_files/figure-revealjs/pres5-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+
+<aside><div>
+<p>Note: The <code>\n</code> on line 5 of the code is the “new line” character that causes the label to wrap.</p>
+</div></aside></section>
+<section id="influence-and-leverage" class="slide level2">
+<h2>Influence and Leverage</h2>
+<ul>
+<li class="fragment"><p><strong>Influence</strong>: the effect of a single data point on the regression line depends on:</p>
+<ul>
+<li class="fragment"><p>how well it matches the “trend” of the rest of the points</p></li>
+<li class="fragment"><p>how “unusual” is its predictor value</p></li>
+</ul></li>
+<li class="fragment"><p><strong>Leverage</strong>: measures the potential for a case to affect a regression fit, based on an “unusual” predictor value. (Chapter 4)</p></li>
+</ul>
+</section>
+<section id="summary" class="slide level2">
+<h2>Summary</h2>
+<ul>
+<li><p>When regression conditions fail, <strong>transforming variables</strong> can improve model fit.</p></li>
+<li><p><strong>Log and square-root transformations</strong> often help with curvature, unequal spread, and skewness.</p></li>
+<li><p><strong>Outliers and influential points</strong> can distort a regression line and must be checked using diagnostics.</p></li>
+<li><p>After any adjustment, <strong>reassess conditions and interpret results in context</strong>.</p></li>
+</ul>
 
 </section></section>
     </div>

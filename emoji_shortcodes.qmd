@@ -1,0 +1,90 @@
+---
+title: "Quarto Emoji Shortcodes (Printable Reference)"
+format:
+  html:
+    toc: true
+    number-sections: true
+---
+
+## How to Use Emojis in Quarto
+
+Type the shortcode wrapped in colons:
+
+```
+
+:pushpin:
+
+````
+
+Quarto will render it as an emoji when knitting to HTML, revealjs, or PDF (with modern LaTeX engines).
+
+---
+
+## Common Teaching & Slides Emojis
+
+| Emoji | Shortcode |
+|------|-----------|
+| 📌 | `:pushpin:` |
+| ❓ | `:question:` |
+| ✅ | `:white_check_mark:` |
+| ⚠️ | `:warning:` |
+| 💡 | `:bulb:` |
+| 📝 | `:memo:` |
+| 🔍 | `:mag:` |
+| 📊 | `:bar_chart:` |
+| 📈 | `:chart_with_upwards_trend:` |
+| 📉 | `:chart_with_downwards_trend:` |
+
+---
+
+## Arrows & Flow
+
+| Emoji | Shortcode |
+|------|-----------|
+| ➡️ | `:arrow_right:` |
+| ⬅️ | `:arrow_left:` |
+| ⬆️ | `:arrow_up:` |
+| ⬇️ | `:arrow_down:` |
+| 🔁 | `:repeat:` |
+| 🔄 | `:arrows_counterclockwise:` |
+
+---
+
+## Emphasis & Status
+
+| Emoji | Shortcode |
+|------|-----------|
+| ⭐ | `:star:` |
+| 🔴 | `:red_circle:` |
+| 🟢 | `:green_circle:` |
+| 🔵 | `:blue_circle:` |
+| ⏸️ | `:pause_button:` |
+| ▶️ | `:arrow_forward:` |
+
+---
+
+## Data, Math, and Modeling Contexts
+
+| Emoji | Shortcode |
+|------|-----------|
+| 🧮 | `:abacus:` |
+| 📐 | `:triangular_ruler:` |
+| 📏 | `:straight_ruler:` |
+| 🧠 | `:brain:` |
+| 🔢 | `:1234:` |
+| 📋 | `:clipboard:` |
+
+---
+
+## Classroom & People
+
+| Emoji | Shortcode |
+|------|-----------|
+| 👩‍🎓 | `:woman_student:` |
+| 👨‍🎓 | `:man_student:` |
+| 👥 | `:busts_in_silhouette:` |
+| 🗣️ | `:speaking_head:` |
+| 🙋 | `:raising_hand:` |
+
+
+
