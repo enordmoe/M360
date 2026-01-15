@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Chapter 1: Simple Linear Regression</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Applied Statistics II" />
+    <script src="libs/header-attrs-2.30/header-attrs.js"></script>
+    <link href="libs/panelset-0.3.0/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset-0.3.0/panelset.js"></script>
+    <script src="libs/clipboard-2.0.6/clipboard.min.js"></script>
+    <link href="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.js"></script>
+    <script>window.xaringanExtraClipboard(null, {"button":"Copy Code","success":"Copied!","error":"Press Ctrl+C to Copy"})</script>
+    <link href="libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view-0.2.6/tile-view.js"></script>
+    <link href="libs/htmltools-fill-0.5.9/fill.css" rel="stylesheet" />
+    <script src="libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+    <script src="libs/plotly-binding-4.11.0/plotly.js"></script>
+    <script src="libs/typedarray-0.1/typedarray.min.js"></script>
+    <script src="libs/jquery-3.5.1/jquery.min.js"></script>
+    <link href="libs/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet" />
+    <script src="libs/crosstalk-1.2.2/js/crosstalk.min.js"></script>
+    <link href="libs/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet" />
+    <script src="libs/plotly-main-2.11.1/plotly-latest.min.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+    <link rel="stylesheet" href="extra.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Chapter 1: Simple Linear Regression
+]
+.subtitle[
+## Part 3: Sections 1.4-1.5
+]
+.author[
+### Applied Statistics II
+]
+
+---
+
+class: highlight-last-item
+
+
+
+
+
+
+
+
+
+
+&lt;style type="text/css"&gt;
+.highlight-last-item &gt; ul &gt; li,
+.highlight-last-item &gt; ol &gt; li {
+  opacity: 0.5;
+}
+.highlight-last-item &gt; ul &gt; li:last-of-type,
+.highlight-last-item &gt; ol &gt; li:last-of-type {
+  opacity: 1;
+}
+&lt;/style&gt;
+
+# Outline 
+
+- Transformations
+
+--
+
+- Outliers and Influential Points
+  
+---
+class: highlight-last-item
+
+## What to Do When Regression Conditions Are Violated
+
+### Examples
+
+1. Lack of normality in residuals
+
+--
+
+1. Patterns in residuals
+
+--
+
+1. Heteroscedasticity (nonconstant variability of errors)
+
+--
+
+1. Outliers: influential points, large residuals
+
+---
+class: center, inverse, middle
+
+# Data Transformations
+
+---
+## Possible Goals of Data Transformations
+
+1. Address nonlinear patterns
+
+--
+
+1. Stabilize variance
+
+--
+
+1. Remove skewness from residuals
+
+--
+
+1. Minimize effects of outliers
+
+
+---
+### Common Transformations
+
+&lt;br&gt;
+
+|      Name      |     Mathematically     |
+|:--------------:|:----------------------:|
+| Logarithm      |  `\(Y\rightarrow\log(Y)\)` |
+| Square root    | `\(Y\rightarrow\sqrt{Y}\)` |
+| Exponential    |   `\(Y\rightarrow e^Y\)`   |
+| Power function |   `\(Y\rightarrow Y^k\)`   |
+| Reciprocal     |   `\(Y\rightarrow 1/Y\)`   |
+
+&lt;br&gt;
+
+- Transformations can be applied to either response `\((Y)\)` or explanatory `\((X)\)` variables.
+
+--
+
+- Art as much as science
+
+--
+
+- Often requires trial and error
+
+---
+## Examples: Doctors and Hospitals in Counties
+
+.panelset[
+.panel[.panel-name[R Code]
+
+``` r
+# plot with smoothing line
+gf_point(MDs ~ Hospitals, data = CountyHealth) %&gt;%
+        gf_smooth()
+# fit linear regression
+mod1 &lt;- lm(MDs ~ Hospitals, data=CountyHealth) 
+mod1
+# scatterplot with line
+gf_point(MDs ~ Hospitals, data = CountyHealth) %&gt;%
+        gf_smooth(method="lm")
+```
+]
+.panel[.panel-name[Smoothed Scatterplot]
+&lt;img src="Ch1Lect_pt3_w22_files/figure-html/unnamed-chunk-3-1.png" alt="" width="90%" /&gt;
+]
+.panel[.panel-name[Output]
+
+```
+## 
+## Call:
+## lm(formula = MDs ~ Hospitals, data = CountyHealth)
+## 
+## Coefficients:
+## (Intercept)    Hospitals  
+##     -1120.6        557.3
+```
+]
+.panel[.panel-name[Scatterplot with Regresson Line]
+&lt;img src="Ch1Lect_pt3_w22_files/figure-html/unnamed-chunk-5-1.png" alt="" width="90%" /&gt;
+]
+.panel[.panel-name[Linear Model]
+The fitted linear model  is 
+$$
+\widehat{MDs} = -1120.6 + 557.3 \mbox{ Hospitals}
+$$
+- Predict number of MDs in a county with 10 hospitals.
+]
+]
+
+---
+## Residual Diagnostics
+
+.panelset[
+.panel[.panel-name[R Code]
+
+``` r
+# Residual vs fitted plot
+gf_point(resid(mod1) ~ fitted(mod1)) %&gt;% 
+  gf_hline(yintercept = ~0)
+# Normality plots
+# install.packages("gridExtra")
+library(gridExtra)
+plot1 &lt;- gf_histogram(~resid(mod1))
+plot2 &lt;- gf_qq(~resid(mod1)) %&gt;%
+  gf_qqline()
+grid.arrange(plot1, plot2, ncol=2)
+```
+]
+.panel[.panel-name[Residual vs Fitted]
+&lt;img src="Ch1Lect_pt3_w22_files/figure-html/unnamed-chunk-7-1.png" alt="" width="90%" /&gt;
+]
+.panel[.panel-name[Normality plots]
+&lt;img src="Ch1Lect_pt3_w22_files/figure-html/unnamed-chunk-8-1.png" alt="" width="90%" /&gt;
+]
+]
+
+---
+## Transformed model plots
+- Consider whether square root or log transformation of the number of MDs results in a better fit.
+
+.panelset[
+.panel[.panel-name[R Code]
+
+``` r
+# Transform data
+CountyHealth &lt;- mutate(CountyHealth, SqrtMDs = sqrt(MDs), logMDs= log(MDs))
+# Create and save plots
+plot1 &lt;- gf_point(SqrtMDs ~ Hospitals, data = CountyHealth) %&gt;%
+  gf_smooth()
+# Display plots concisely
+plot2&lt;-gf_point(logMDs ~ Hospitals, data = CountyHealth) %&gt;%
+  gf_smooth()
+grid.arrange(plot1,plot2,ncol=2)
+```
+]
+.panel[.panel-name[Scatterplots]
+&lt;img src="Ch1Lect_pt3_w22_files/figure-html/unnamed-chunk-10-1.png" alt="" width="90%" /&gt;
+]
+]
+
+---
+### Square Root Transformation
+
+- Try the `\(\sqrt{Y}\)` transformation and fit the equation. 
+
+- The red line is the least squares regression line.
+
+.panelset[
+.panel[.panel-name[R Code]
+
+``` r
+# Plot smoother and square root model
+gf_point(SqrtMDs ~ Hospitals, data=CountyHealth) %&gt;%
+  gf_smooth(method = "lm", col = "red") %&gt;%
+  gf_smooth()
+# Fit and print square root model
+mod2 &lt;- lm(SqrtMDs ~ Hospitals, data = CountyHealth)
+mod2
+```
+]
+.panel[.panel-name[Scatterplot]
+&lt;img src="Ch1Lect_pt3_w22_files/figure-html/unnamed-chunk-12-1.png" alt="" width="90%" /&gt;
+]
+.panel[.panel-name[Output]
+
+```
+## 
+## Call:
+## lm(formula = SqrtMDs ~ Hospitals, data = CountyHealth)
+## 
+## Coefficients:
+## (Intercept)    Hospitals  
+##      -2.753        6.876
+```
+]
+]
+
+---
+### Re-assess conditions
+
+.panelset[
+.panel[.panel-name[R Code]
+
+``` r
+# Residual vs fitted plot
+gf_point(resid(mod2) ~ fitted(mod2)) %&gt;% 
+  gf_hline(yintercept = ~0)
+# Normality plots
+# install.packages("gridExtra")
+library(gridExtra)
+plot1 &lt;- gf_histogram(~resid(mod2))
+plot2 &lt;- gf_qq(~resid(mod2)) %&gt;%
+  gf_qqline()
+grid.arrange(plot1, plot2, ncol=2)
+```
+]
+.panel[.panel-name[Residual vs Fitted]
+&lt;img src="Ch1Lect_pt3_w22_files/figure-html/unnamed-chunk-15-1.png" alt="" width="90%" /&gt;
+]
+.panel[.panel-name[Normality plots]
+&lt;img src="Ch1Lect_pt3_w22_files/figure-html/unnamed-chunk-16-1.png" alt="" width="90%" /&gt;
+]
+]
+
+
+---
+## Fitted model with square root transformation
+
+- Transformed model is satisfactory.
+
+- The fitted equation is now  
+$$
+  \widehat{\sqrt{\mbox{MDs}}} = -2.753  + 6.876 \mbox{ Hospitals}
+$$
+
+### Questions: 
+
+1. Predict the number of MDs in a county with 10 hospitals.
+
+2. Interpret the slope coefficient.
+
+
+
+---
+class: center, middle, inverse
+
+# Southeast Island Mammal Species
+
+---
+class: inverse
+background-image: url(https://assets.vacationstogo.com/images/maps/SoutheastAsiaIslands.gif)
+background-size: contain
+
+
+
+---
+
+## Example: Indonesian Wildlife
+
+.pull-left[
+Bako Park
+![](figures/Bako_park.jpeg)
+]
+
+--
+
+.pull-right[
+Green turtles
+![](figures/green_turtle.jpeg)]
+
+---
+background-image: url(figures/proboscis_unsplash.jpg)
+background-size: cover
+class: left, bottom, inverse
+
+## Proboscis monkey
+
+---
+## Species vs Area
+
+- Investigate the dependence of number of species on the size of the island.
+
+- Doesn't make sense that species would be a *linear* function of area.
+
+.panelset[
+
+.panel[.panel-name[Code]
+
+``` r
+gf_point(Species ~ Area, data = SpeciesArea)
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+&lt;img src="Ch1Lect_pt3_w22_files/figure-html/unnamed-chunk-17-1.png" alt="" width="90%" /&gt;
+
+]
+]
+
+---
+### Transformation Consideration
+
+- Address the strong curvature and extreme values using a natural log transformation. Consider the following candidates:  
+
+.panelset[
+
+.panel[.panel-name[Code]
+
+``` r
+p1 &lt;- gf_point(Species ~ Area, data = SpeciesArea) 
+p2 &lt;- gf_point(logSpecies ~ Area, data = SpeciesArea)
+p3 &lt;- gf_point(Species ~ logArea, data = SpeciesArea)
+p4 &lt;- gf_point(logSpecies ~ logArea, data = SpeciesArea)
+grid.arrange(p1,p2,p3,p4,ncol=2,nrow=2)
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+&lt;img src="Ch1Lect_pt3_w22_files/figure-html/unnamed-chunk-18-1.png" alt="" width="90%" /&gt;
+
+]
+]
+
+---
+
+## Fit the Best Model
+
+- Logging both response and predictor variables appears to give the best results. 
+
+- Proceed by fitting a simple regression using the *log-transformed* variables. 
+
+---
+## Fitting the Log-Log Model
+
+.panelset[
+.panel[.panel-name[R Code]
+
+``` r
+# Fit the log-log model and get output
+mod3 &lt;- lm(logSpecies ~ logArea, data = SpeciesArea)
+mod3
+# Scatterplot and regression line with transformed variables
+gf_point(logSpecies ~ logArea, data = SpeciesArea) %&gt;%
+        gf_smooth(method="lm")
+```
+]
+.panel[.panel-name[Regression Output]
+
+```
+## 
+## Call:
+## lm(formula = logSpecies ~ logArea, data = SpeciesArea)
+## 
+## Coefficients:
+## (Intercept)      logArea  
+##      1.6249       0.2355
+```
+]
+
+.panel[.panel-name[Scatterplot with Line]
+&lt;img src="Ch1Lect_pt3_w22_files/figure-html/unnamed-chunk-21-1.png" alt="" width="90%" /&gt;
+
+]
+]
+
+&lt;!--End of panelset  --&gt;
+
+---
+### The fitted log-log model for predicting number of species
+
+$$
+  \widehat{\log(\mbox{Species}}) = 1.625 + 0.2355 \cdot \log(\mbox{Area})
+$$
+--
+
+- Use the model to obtain the predicted value and residual for Java.
+
+- Interpret the slope coefficient in context.
+
+--
+
+- On the original scale: 
+$$
+\widehat{\mbox{Species}} = 5.08\cdot \mbox{Area}^{0.235}
+$$
+
+---
+### Re-assess log-log model 
+
+.panelset[
+.panel[.panel-name[Code]
+
+``` r
+p1 &lt;- gf_point(resid(mod3) ~ fitted(mod3)) %&gt;%
+  gf_hline(yintercept = ~0)
+p2 &lt;- gf_qq(~resid(mod3)) %&gt;%
+  gf_qqline()
+grid.arrange(p1,p2,ncol=2)
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+&lt;img src="Ch1Lect_pt3_w22_files/figure-html/unnamed-chunk-22-1.png" alt="" width="90%" /&gt;
+
+]
+]
+
+&lt;!--End of panelset  --&gt;
+
+---
+### Using R to get Java predictions from the log-log model
+
+- Try these on your own:
+
+
+``` r
+1.625 + 0.2355 * log(125628)  #Fitted on the log scale
+exp(1.625 +0.2355 * log(125628)) #Fitted on the original scale
+# or create a function
+island_fun &lt;- makeFun(mod3)
+exp(island_fun(log(125628)))
+# or use the R predict function with "newdata" key
+predict(mod3, newdata = data.frame(logArea = log(125628)))
+exp(predict(mod3, newdata = data.frame(logArea = log(125628))))
+
+# Print the actual values
+filter(SpeciesArea, Name == "Java")  %&gt;%
+  select(c(Name, Area, Species))
+```
+
+---
+class: center, middle, inverse
+
+# Outliers and Influential Observations 
+
+---
+## Olympic Long Jump Data
+
+- Gold medal distance as a function of time:
+
+.panelset[
+
+.panel[.panel-name[Code]
+
+``` r
+data(LongJumpOlympics)
+gf_point(Gold ~ Year, data = LongJumpOlympics) %&gt;%
+  gf_smooth() %&gt;%
+  gf_smooth(method = "lm", color = "red")
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+&lt;img src="Ch1Lect_pt3_w22_files/figure-html/unnamed-chunk-24-1.png" alt="" width="90%" /&gt;
+
+]
+
+]
+
+---
+### Fit model and identify outlier:
+
+.panelset[
+
+.panel[.panel-name[R Code]
+
+
+``` r
+mod4 &lt;- lm(Gold ~ Year, data = LongJumpOlympics)  
+mod4
+gf_point(Gold ~ Year, data = LongJumpOlympics) %&gt;%
+  gf_smooth(method="lm") %&gt;%
+  gf_refine(annotate("text", label = "Bob Beamon", x = 1968, y = 8.9, size = 6, colour = "red", hjust = -0.1))
+```
+
+]
+
+.panel[.panel-name[Regression Output]
+
+
+```
+## 
+## Call:
+## lm(formula = Gold ~ Year, data = LongJumpOlympics)
+## 
+## Coefficients:
+## (Intercept)         Year  
+##   -19.48359      0.01407
+```
+
+]
+
+.panel[.panel-name[Scatterplot with Outlier]
+
+&lt;img src="Ch1Lect_pt3_w22_files/figure-html/unnamed-chunk-27-1.png" alt="" width="90%" /&gt;
+
+]
+]
+---
+## Bob Beamon's record-breaking long jump
+
+.center[
+&lt;iframe width="560" height="315" src="https://www.youtube.com/embed/DEt_Xgg8dzc" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen&gt;&lt;/iframe&gt;
+]
+
+---
+## Can use the package **plotly** to identify points interactively
+.panelset[
+
+.panel[.panel-name[Code]
+
+``` r
+#install.packages("plotly")
+library(plotly)
+p &lt;- gf_point(Gold ~ Year, data = LongJumpOlympics)
+ggplotly(p)
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+<div class="plotly html-widget html-fill-item" id="htmlwidget-2e9129a93964651d4339" style="width:90%;height:288px;"></div>
+<script type="application/json" data-for="htmlwidget-2e9129a93964651d4339">{"x":{"data":[{"x":[1900,1904,1906,1908,1912,1920,1924,1928,1932,1936,1948,1952,1956,1960,1964,1968,1972,1976,1980,1984,1988,1992,1996,2000,2004,2008],"y":[7.1849999999999996,7.3399999999999999,7.2000000000000002,7.4800000000000004,7.5999999999999996,7.1500000000000004,7.4450000000000003,7.7300000000000004,7.6399999999999997,8.0600000000000005,7.8250000000000002,7.5700000000000003,7.8300000000000001,8.1199999999999992,8.0700000000000003,8.9000000000000004,8.2400000000000002,8.3499999999999996,8.5399999999999991,8.5399999999999991,8.7200000000000006,8.6699999999999999,8.5,8.5500000000000007,8.5899999999999999,8.3699999999999992],"text":["Year: 1900<br />Gold: 7.185","Year: 1904<br />Gold: 7.340","Year: 1906<br />Gold: 7.200","Year: 1908<br />Gold: 7.480","Year: 1912<br />Gold: 7.600","Year: 1920<br />Gold: 7.150","Year: 1924<br />Gold: 7.445","Year: 1928<br />Gold: 7.730","Year: 1932<br />Gold: 7.640","Year: 1936<br />Gold: 8.060","Year: 1948<br />Gold: 7.825","Year: 1952<br />Gold: 7.570","Year: 1956<br />Gold: 7.830","Year: 1960<br />Gold: 8.120","Year: 1964<br />Gold: 8.070","Year: 1968<br />Gold: 8.900","Year: 1972<br />Gold: 8.240","Year: 1976<br />Gold: 8.350","Year: 1980<br />Gold: 8.540","Year: 1984<br />Gold: 8.540","Year: 1988<br />Gold: 8.720","Year: 1992<br />Gold: 8.670","Year: 1996<br />Gold: 8.500","Year: 2000<br />Gold: 8.550","Year: 2004<br />Gold: 8.590","Year: 2008<br />Gold: 8.370"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,0,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"}},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":23.305936073059364,"r":7.3059360730593621,"b":37.260273972602747,"l":43.105022831050235},"plot_bgcolor":"rgba(235,235,235,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[1894.5999999999999,2013.4000000000001],"tickmode":"array","ticktext":["1920","1950","1980","2010"],"tickvals":[1920,1950,1980,2010],"categoryorder":"array","categoryarray":["1920","1950","1980","2010"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"Year","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[7.0625,8.9875000000000007],"tickmode":"array","ticktext":["7.5","8.0","8.5"],"tickvals":[7.5,8,8.5],"categoryorder":"array","categoryarray":["7.5","8.0","8.5"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"Gold","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","layer":"below","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":false,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"175312b80fd6d":{"x":{},"y":{},"type":"scatter"}},"cur_data":"175312b80fd6d","visdat":{"175312b80fd6d":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+
+]
+
+]
+
+---
+
+### Obtain the plot of residual versus fitted values:  
+
+.panelset[
+
+.panel[.panel-name[Code]
+
+``` r
+gf_point(resid(mod4)~fitted(mod4)) %&gt;% 
+  gf_hline(yintercept = ~0, color = "red")
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+&lt;img src="Ch1Lect_pt3_w22_files/figure-html/unnamed-chunk-29-1.png" alt="" width="90%" /&gt;
+
+]
+
+]
+
+---
+### Other types of residuals
+
+- Scaled residuals are helpful in identifying outliers.
+
+--
+
+- **Standardized residuals.** Residuals divided by estimated standard  deviation of residuals:
+ 
+$$
+\frac{y - \hat y}{\hat\sigma_\epsilon}
+$$
+
+--
+
+- **Studentized residuals.** Residuals divided by standard deviation of residuals from the regression *after omitting the point in question*
+
+  - Removes effect of extreme observation on standard deviation
+  
+  - Implicitly involves fitting `\(n\)` different regression models.
+    
+$$
+\frac{y - \hat y}{\hat\sigma_i}
+$$
+---
+## Why studentize?
+
+- **Concern**: An unusual value may exert great *influence* on the fit.
+
+  - Its residual might be underestimated because the model "moves" a  lot to fit it.
+or
+
+  - The standard error of regression may be *inflated* due to the large outlier residual
+  
+--
+  
+- **Remedy**: We **studentize** by fitting the model **without** the influential case, finding a new estimate `\(\hat\sigma^\epsilon\)`.
+
+---
+### Plots of standardized  and studentized residuals versus fitted.
+
+.panelset[
+
+.panel[.panel-name[Code]
+
+``` r
+#Standardized resids
+p1 &lt;- gf_point(rstandard(mod4) ~ Year, data = LongJumpOlympics, ylim = c(-4,4),
+               main="Standardized Residuals") %&gt;%
+  gf_hline(yintercept = ~0) %&gt;%
+  gf_hline(yintercept = ~c(-3,-2,2,3), lty = 2, data = NA)
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+```
+## Warning: `aes_string()` was deprecated in ggplot2 3.0.0.
+## ℹ Please use tidy evaluation idioms with `aes()`.
+## ℹ See also `vignette("ggplot2-in-packages")` for more information.
+## ℹ The deprecated feature was likely used in the ggformula package.
+##   Please report the issue at
+##   &lt;https://github.com/ProjectMOSAIC/ggformula/issues&gt;.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+## generated.
+```
+
+.panel[.panel-name[Code]
+
+``` r
+#Studentized resids
+p2 &lt;- gf_point(rstudent(mod4) ~ Year, data = LongJumpOlympics, ylim = c(-4,4), 
+               main="Studentized Residuals") %&gt;%
+  gf_hline(yintercept = ~0) %&gt;%
+  gf_hline(yintercept = ~c(-3,-2,2,3), lty = 2, data = NA)
+grid.arrange(p1 ,p2, ncol=2)
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+&lt;img src="Ch1Lect_pt3_w22_files/figure-html/lj4-1.png" alt="" width="90%" /&gt;
+
+]
+
+]
+
+
+---
+
+class: inverse
+background-image: url(https://e0.365dm.com/21/07/768x432/skysports-bob-beamon-olympics_5462311.jpg)
+background-size: cover
+
+class: center, middle
+
+# .red[Beamon is an extreme outlier!]
+
+
+---
+
+## Example: The Butterfly Ballot in the Year 2000 Election
+
+.pull-left[
+![](https://www.wuft.org/news/files/2020/10/Butterfly_Ballot_Florida_2000_large-660x330.jpg)
+]
+
+--
+
+]
+
+.pull-right[
+![](https://media.npr.org/assets/img/2018/11/12/gettyimages-1306049_wide-78b1a96ccca5fcaac551979e4a29942620227e3d.jpg?s=1400)
+]
+
+---
+
+## Plot the Votes by County
+
+.panelset[
+.panel[.panel-name[Code]
+
+``` r
+data("PalmBeach")
+p &lt;- gf_point(Buchanan ~ Bush, label = ~County, data = PalmBeach)
+ggplotly(p)
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+<div class="plotly html-widget html-fill-item" id="htmlwidget-0b8eeff35b83a77b8d29" style="width:90%;height:288px;"></div>
+<script type="application/json" data-for="htmlwidget-0b8eeff35b83a77b8d29">{"x":{"data":[{"x":[34062,5610,38637,5413,115185,177279,2873,35419,29744,41745,60426,10964,289456,4256,2698,152082,73029,12608,2448,4750,3300,1840,3546,2153,3764,4743,30646,20196,176967,4985,28627,9138,2481,1669,49963,106141,39053,6860,1316,3038,57948,55135,33864,16059,16404,52043,5058,134476,26216,152846,68581,184312,90101,13439,39497,34705,36248,83100,75293,12126,8014,4051,2326,82214,4511,12176,4983],"y":[262,73,248,65,570,789,90,182,270,186,122,89,561,36,29,650,504,83,33,39,29,9,71,24,30,22,242,99,836,76,105,102,29,10,289,305,282,67,39,29,272,563,108,47,90,267,43,446,145,3407,570,1010,538,147,229,124,311,305,194,114,108,27,26,396,46,120,88],"text":["County: ALACHUA<br />Bush:  34062<br />Buchanan:  262","County: BAKER<br />Bush:   5610<br />Buchanan:   73","County: BAY<br />Bush:  38637<br />Buchanan:  248","County: BRADFORD<br />Bush:   5413<br />Buchanan:   65","County: BREVARD<br />Bush: 115185<br />Buchanan:  570","County: BROWARD<br />Bush: 177279<br />Buchanan:  789","County: CALHOUN<br />Bush:   2873<br />Buchanan:   90","County: CHARLOTTE<br />Bush:  35419<br />Buchanan:  182","County: CITRUS<br />Bush:  29744<br />Buchanan:  270","County: CLAY<br />Bush:  41745<br />Buchanan:  186","County: COLLIER<br />Bush:  60426<br />Buchanan:  122","County: COLUMBIA<br />Bush:  10964<br />Buchanan:   89","County: DADE<br />Bush: 289456<br />Buchanan:  561","County: DE SOTO<br />Bush:   4256<br />Buchanan:   36","County: DIXIE<br />Bush:   2698<br />Buchanan:   29","County: DUVAL<br />Bush: 152082<br />Buchanan:  650","County: ESCAMBIA<br />Bush:  73029<br />Buchanan:  504","County: FLAGLER<br />Bush:  12608<br />Buchanan:   83","County: FRANKLIN<br />Bush:   2448<br />Buchanan:   33","County: GADSDEN<br />Bush:   4750<br />Buchanan:   39","County: GILCHRIST<br />Bush:   3300<br />Buchanan:   29","County: GLADES<br />Bush:   1840<br />Buchanan:    9","County: GULF<br />Bush:   3546<br />Buchanan:   71","County: HAMILTON<br />Bush:   2153<br />Buchanan:   24","County: HARDEE<br />Bush:   3764<br />Buchanan:   30","County: HENDRY<br />Bush:   4743<br />Buchanan:   22","County: HERNANDO<br />Bush:  30646<br />Buchanan:  242","County: HIGHLANDS<br />Bush:  20196<br />Buchanan:   99","County: HILLSBOROUGH<br />Bush: 176967<br />Buchanan:  836","County: HOLMES<br />Bush:   4985<br />Buchanan:   76","County: INDIAN RIVER<br />Bush:  28627<br />Buchanan:  105","County: JACKSON<br />Bush:   9138<br />Buchanan:  102","County: JEFFERSON<br />Bush:   2481<br />Buchanan:   29","County: LAFAYETTE<br />Bush:   1669<br />Buchanan:   10","County: LAKE<br />Bush:  49963<br />Buchanan:  289","County: LEE<br />Bush: 106141<br />Buchanan:  305","County: LEON<br />Bush:  39053<br />Buchanan:  282","County: LEVY<br />Bush:   6860<br />Buchanan:   67","County: LIBERTY<br />Bush:   1316<br />Buchanan:   39","County: MADISON<br />Bush:   3038<br />Buchanan:   29","County: MANATEE<br />Bush:  57948<br />Buchanan:  272","County: MARION<br />Bush:  55135<br />Buchanan:  563","County: MARTIN<br />Bush:  33864<br />Buchanan:  108","County: MONROE<br />Bush:  16059<br />Buchanan:   47","County: NASSAU<br />Bush:  16404<br />Buchanan:   90","County: OKALOOSA<br />Bush:  52043<br />Buchanan:  267","County: OKEECHOBEE<br />Bush:   5058<br />Buchanan:   43","County: ORANGE<br />Bush: 134476<br />Buchanan:  446","County: OSCEOLA<br />Bush:  26216<br />Buchanan:  145","County: PALM BEACH<br />Bush: 152846<br />Buchanan: 3407","County: PASCO<br />Bush:  68581<br />Buchanan:  570","County: PINELLAS<br />Bush: 184312<br />Buchanan: 1010","County: POLK<br />Bush:  90101<br />Buchanan:  538","County: PUTNAM<br />Bush:  13439<br />Buchanan:  147","County: ST. JOHNS<br />Bush:  39497<br />Buchanan:  229","County: ST. LUCIE<br />Bush:  34705<br />Buchanan:  124","County: SANTA ROSA<br />Bush:  36248<br />Buchanan:  311","County: SARASOTA<br />Bush:  83100<br />Buchanan:  305","County: SEMINOLE<br />Bush:  75293<br />Buchanan:  194","County: SUMTER<br />Bush:  12126<br />Buchanan:  114","County: SUWANNEE<br />Bush:   8014<br />Buchanan:  108","County: TAYLOR<br />Bush:   4051<br />Buchanan:   27","County: UNION<br />Bush:   2326<br />Buchanan:   26","County: VOLUSIA<br />Bush:  82214<br />Buchanan:  396","County: WAKULLA<br />Bush:   4511<br />Buchanan:   46","County: WALTON<br />Bush:  12176<br />Buchanan:  120","County: WASHINGTON<br />Bush:   4983<br />Buchanan:   88"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,0,1)","opacity":1,"size":5.6692913385826778,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"}},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":23.305936073059364,"r":7.3059360730593621,"b":37.260273972602747,"l":48.949771689497723},"plot_bgcolor":"rgba(235,235,235,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-13091,303863],"tickmode":"array","ticktext":["0e+00","1e+05","2e+05","3e+05"],"tickvals":[0,100000,200000,300000],"categoryorder":"array","categoryarray":["0e+00","1e+05","2e+05","3e+05"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"Bush","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-160.90000000000001,3576.9000000000001],"tickmode":"array","ticktext":["0","1000","2000","3000"],"tickvals":[0,1000.0000000000001,2000,3000],"categoryorder":"array","categoryarray":["0","1000","2000","3000"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"Buchanan","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","layer":"below","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":false,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"175315b4da7bd":{"label":{},"x":{},"y":{},"type":"scatter"}},"cur_data":"175315b4da7bd","visdat":{"175315b4da7bd":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+
+]
+]
+
+---
+## Linear model fit and plots
+
+
+.panelset[
+.panel[.panel-name[R Code]
+
+
+``` r
+# Fit and display model
+mod5 &lt;- lm(Buchanan ~ Bush, data = PalmBeach)
+# Regresssion line plot
+gf_point(Buchanan ~ Bush, data = PalmBeach) %&gt;%
+  gf_smooth(method = "lm")
+# Residual plot
+gf_point(resid(mod5) ~ fitted(mod5)) %&gt;% 
+  gf_hline(yintercept = ~0, color = "blue")
+```
+
+]
+.panel[.panel-name[Plot with Regression Line]
+
+&lt;img src="Ch1Lect_pt3_w22_files/figure-html/unnamed-chunk-30-1.png" alt="" width="90%" /&gt;
+
+]
+.panel[.panel-name[Residual vs Fitted Plot]
+
+&lt;img src="Ch1Lect_pt3_w22_files/figure-html/unnamed-chunk-31-1.png" alt="" width="90%" /&gt;
+
+]
+]
+---
+## Is Palm Beach an Influential Outlier?
+
+
+.panelset[
+.panel[.panel-name[Code]
+
+``` r
+# Omit Palm Beach
+PalmBeach_noPB &lt;- filter(PalmBeach, County != "PALM BEACH")
+# Refit the regression without Palm Beach
+mod6 &lt;- lm(Buchanan ~ Bush, data = PalmBeach_noPB)
+mod6
+mod6_fun &lt;- makeFun(mod6)
+```
+
+
+
+]
+
+.panel[.panel-name[Output]
+
+```
+## 
+## Call:
+## lm(formula = Buchanan ~ Bush, data = PalmBeach_noPB)
+## 
+## Coefficients:
+## (Intercept)         Bush  
+##   65.573496     0.003482
+```
+
+
+
+]
+]
+
+---
+
+## Is Palm Beach an Influential Outlier?
+
+
+``` r
+gf_point(Buchanan ~ Bush, data = PalmBeach) %&gt;%
+        gf_smooth(method = "lm", se = FALSE) %&gt;% 
+  gf_fun(mod6_fun, col = "red") %&gt;%
+  gf_refine(annotate("text", label = "Complete", x = 2.5e+05, y = 1400, size = 6, hjust = 1)) %&gt;%
+  gf_refine(annotate("text", label = "Without\nPalm Beach", 
+                     x = 2e+05, y = 700, size = 6, hjust = 0, vjust = 1))
+```
+
+&lt;img src="Ch1Lect_pt3_w22_files/figure-html/pres5-1.png" alt="" width="90%" /&gt;
+
+``` r
+# Note that the \n on the previous line is the "new line" character that causes the label to wrap
+```
+
+---
+
+## Influence and Leverage
+
+- **Influence**:  the  effect of a single data point on the regression line depends on:
+
+  - how well it matches the "trend" of the rest of the points
+  
+  - how "unusual" is its predictor value
+  
+--
+
+- **Leverage**: measures the potential for a case to affect a regression fit, based on an "unusual" predictor value. (Chapter 4)
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+  "highlightStyle": "github",
+  "highlightLines": true,
+  "ratio": "16:9",
+  "countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

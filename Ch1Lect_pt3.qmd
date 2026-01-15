@@ -1,0 +1,359 @@
+---
+title: "Chapter 1: Simple Linear Regression<br><span style='font-size:70%'>Part 3</span>"
+subtitle: "Statistical Modeling"
+author: "MATH 360"
+format:
+  revealjs:
+    chalkboard: true
+    theme: [default, custom.scss]
+    toc: false
+    toc-depth: 1
+    reveal-options:
+      slideNumber: true
+    html-math-method: mathjax
+    incremental: false
+    transition: fade
+    preview-links: auto
+    notes: true
+title-slide-attributes:
+  data-background-color: "#EA6820"
+from: markdown+emoji
+execute:
+  echo: true
+  cache: false
+editor:
+  markdown:
+    wrap: 72
+---
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(rvest)
+library(mosaic)
+library(Stat2Data)
+library(gridExtra)
+library(plotly)
+data("SpeciesArea")
+data("CountyHealth")
+data("LongJumpOlympics")
+MidtermFinal <- read.csv("http://people.kzoo.edu/enordmoe/math360/MidtermFinal.csv")
+data("WeightLossIncentive4")
+```
+
+## Topics :pushpin:
+
+-   Transformations
+
+-   Outliers and Influential Points
+
+------------------------------------------------------------------------
+
+### What to Do When Regression Conditions Are Violated
+
+Possible issues to address:
+
+::: incremental
+1.  Lack of normality in residuals
+
+2.  Patterns in residuals
+
+3.  Heteroscedasticity (nonconstant variability of errors)
+
+4.  Outliers: influential points, large residuals
+:::
+
+# Data Transformations {background-color="#FAD9C7"}
+
+## Possible Goals of Data Transformations
+
+::: incremental
+1.  Address nonlinear patterns
+
+2.  Stabilize variance
+
+3.  Remove skewness from residuals
+
+4.  Minimize effects of outliers
+:::
+
+##  {.smaller}
+
+### Common Transformations
+
+|     Name       |     Mathematically     |
+|:---------------|:----------------------:|
+| Logarithm      | $Y\rightarrow\log(Y)$  |
+| Square root    | $Y\rightarrow\sqrt{Y}$ |
+| Exponential    |   $Y\rightarrow e^Y$   |
+| Power function |   $Y\rightarrow Y^k$   |
+| Reciprocal     |   $Y\rightarrow 1/Y$   |
+
+::: fragment
+-   Transformations can be applied to either response $(Y)$ or
+    explanatory $(X)$ variables.
+
+-   Both a science and an art
+
+-   Often requires trial and error
+:::
+
+##  {.smaller}
+
+### Examples: Doctors and Hospitals in Counties
+
+::: panel-tabset
+## R Code
+
+```{r}
+#| eval: false
+# plot with smoothing line
+gf_point(MDs ~ Hospitals, data = CountyHealth) |>
+        gf_smooth()
+# fit linear regression
+mod1 <- lm(MDs ~ Hospitals, data=CountyHealth)
+mod1
+# scatterplot with line
+gf_point(MDs ~ Hospitals, data = CountyHealth) |>
+        gf_smooth(method="lm")
+```
+
+## Smoothed Plot
+
+```{r}
+#| echo: false
+gf_point(MDs ~ Hospitals, data = CountyHealth) |>
+        gf_smooth()
+```
+
+## Output
+
+```{r}
+#| echo: false
+# fit linear regression
+mod1 <- lm(MDs ~ Hospitals, data=CountyHealth)
+mod1
+```
+
+## Plot with Reg Line
+
+```{r}
+#| echo: false
+# scatterplot with line
+gf_point(MDs ~ Hospitals, data = CountyHealth) |>
+        gf_smooth(method="lm")
+```
+:::
+
+## Linear Model
+
+The fitted linear model is
+
+$$
+\widehat{MDs} = -1120.6 + 557.3 \mbox{ Hospitals}
+$$
+
+-   Predict number of MDs in a county with 10 hospitals.
+
+## Residual Diagnostics
+
+::: panel-tabset
+## R Code
+
+```{r}
+#| eval: false
+# Residual vs fitted plot
+gf_point(resid(mod1) ~ fitted(mod1)) |>
+  gf_hline(yintercept = ~0, col = "red")
+# Normality plots
+# install.packages("gridExtra")
+# Use the grid.arrange() function to condense and arrange plots
+library(gridExtra)
+plot1 <- gf_histogram(~resid(mod1))
+plot2 <- gf_qq(~resid(mod1)) |>
+  gf_qqline()
+grid.arrange(plot1, plot2, ncol=2)
+```
+
+## Residual vs Fitted
+
+```{r}
+#| echo: false
+gf_point(resid(mod1) ~ fitted(mod1)) |>
+  gf_hline(yintercept = ~0, col = "red")
+```
+
+## Normality plots
+
+```{r}
+#| echo: false
+plot1 <- gf_histogram(~resid(mod1))
+plot2 <- gf_qq(~resid(mod1)) |>
+  gf_qqline()
+grid.arrange(plot1, plot2, ncol=2)
+```
+:::
+
+##  {.smaller}
+
+### Transformed model plots
+
+-   Consider whether square root or log transformation of the number of
+    MDs results in a better fit.
+
+::: panel-tabset
+### R Code
+
+```{r}
+#| eval: false
+# Transform data
+CountyHealth <- mutate(CountyHealth, SqrtMDs = sqrt(MDs), logMDs= log(MDs))
+# Create and save plots
+plot1 <- gf_point(SqrtMDs ~ Hospitals, data = CountyHealth) |>
+  gf_smooth()
+# Display plots concisely
+plot2<-gf_point(logMDs ~ Hospitals, data = CountyHealth) |>
+  gf_smooth()
+grid.arrange(plot1,plot2,ncol=2)
+```
+
+### Scatterplots
+
+```{r}
+#| echo: false
+#| fig-height: 3
+CountyHealth <- mutate(CountyHealth, SqrtMDs = sqrt(MDs), logMDs= log(MDs))
+plot1 <- gf_point(SqrtMDs ~ Hospitals, data = CountyHealth) |>
+  gf_smooth()
+plot2<-gf_point(logMDs ~ Hospitals, data = CountyHealth) |>
+  gf_smooth()
+grid.arrange(plot1,plot2,ncol=2)
+```
+:::
+
+##  {.smaller}
+
+### Square Root Transformation
+
+-   Try the $\sqrt{Y}$ transformation and fit the equation.
+
+-   The red line is the least squares regression line.
+
+::: panel-tabset
+### R Code
+
+```{r}
+#| eval: false
+# Plot smoother and square root model
+gf_point(SqrtMDs ~ Hospitals, data=CountyHealth) |>
+  gf_smooth(method = "lm", col = "red") |>
+  gf_smooth()
+# Fit and print square root model
+mod2 <- lm(SqrtMDs ~ Hospitals, data = CountyHealth)
+mod2
+```
+
+### Scatterplot
+
+```{r}
+#| echo: false
+#| fig-height: 3
+gf_point(SqrtMDs ~ Hospitals, data=CountyHealth) |>
+  gf_smooth(method = "lm", col = "red") |>
+  gf_smooth()
+```
+
+### Output
+
+```{r}
+#| echo: false
+mod2 <- lm(SqrtMDs ~ Hospitals, data = CountyHealth)
+mod2
+```
+:::
+
+##  {.smaller}
+
+### Re-assess conditions
+
+::: panel-tabset
+### R Code
+
+```{r}
+#| eval: false
+# Residual vs fitted plot
+gf_point(resid(mod2) ~ fitted(mod2)) |>
+  gf_hline(yintercept = ~0)
+# Normality plots
+# install.packages("gridExtra")
+library(gridExtra)
+plot1 <- gf_histogram(~resid(mod2))
+plot2 <- gf_qq(~resid(mod2)) |>
+  gf_qqline()
+grid.arrange(plot1, plot2, ncol=2)
+```
+
+### Residual vs Fitted
+
+```{r}
+#| echo: false
+gf_point(resid(mod2) ~ fitted(mod2)) |>
+  gf_hline(yintercept = ~0)
+```
+
+### Normality plots
+
+```{r}
+#| echo: false
+plot1 <- gf_histogram(~resid(mod2))
+plot2 <- gf_qq(~resid(mod2)) |>
+  gf_qqline()
+grid.arrange(plot1, plot2, ncol=2)
+```
+:::
+
+## Fitted model with square root transformation
+
+-   Transformed model is satisfactory.
+
+-   The fitted equation is now $$
+    \widehat{\sqrt{\mbox{MDs}}} = -2.753  + 6.876 \mbox{ Hospitals}
+    $$
+
+1.  Predict the number of MDs in a county with 10 hospitals.
+
+2.  Interpret the slope coefficient.
+
+# Southeast Island Mammal Species {background-color="#FAD9C7"}
+
+------------------------------------------------------------------------
+
+## Southeast Asian Islands
+
+![](https://assets.vacationstogo.com/images/maps/SoutheastAsiaIslands.gif)
+
+## Example: Indonesian Wildlife
+
+::::: columns
+::: {.column width="50%"}
+Bako Park ![](figures/Bako_park.jpeg)
+:::
+
+::: {.column width="50%"}
+Green turtles ![](figures/green_turtle.jpeg)
+:::
+:::::
+
+
+## Proboscis Monkey  {background-image="figures/proboscis_unsplash.jpg"}
+
+## Species vs Area {.smaller}
+
+- Investigate the dependence of number of species on the size of the island.
+
+- Doesn't make sense that species would be a *linear* function of area.
+
+
+```{r}
+#| output-location: fragment
+gf_point(Species ~ Area, data = SpeciesArea)
+```
