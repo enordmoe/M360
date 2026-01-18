@@ -1,0 +1,327 @@
+---
+title: "Chapter 2: Inference for Simple Linear Regression<br><span style='font-size:70%'>Part 1</span>"
+subtitle: "Statistical Modeling"
+author: "MATH 360"
+format:
+  revealjs:
+    chalkboard: true
+    theme: [default, custom.scss]
+    toc: false
+    toc-depth: 1
+    reveal-options:
+      slideNumber: true
+    html-math-method: mathjax
+    incremental: false
+    transition: fade
+    preview-links: auto
+    notes: true
+title-slide-attributes:
+  data-background-color: "#EA6820"
+from: markdown+emoji
+execute:
+  echo: true
+  cache: false
+editor:
+  markdown:
+    wrap: 72
+---
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(rvest)
+library(mosaic)
+library(Stat2Data)
+library(gridExtra)
+library(plotly)
+data("SpeciesArea")
+data("CountyHealth")
+data("LongJumpOlympics")
+MidtermFinal <- read.csv("http://people.kzoo.edu/enordmoe/math360/MidtermFinal.csv")
+data("WeightLossIncentive4")
+```
+
+## Topics :pushpin:
+
+-   Distribution of the slope $(\hat\beta_1)$ and intercept
+    $(\hat\beta_0)$ estimates
+
+-   Standard error of estimates
+
+-   Inference for $\beta_0$ and $\beta_1$ based on the $t$ distribution
+
+    -   Confidence intervals
+
+    -   Hypothesis tests
+
+## Sampling Distribution
+
+### The Central Limit Theorem
+
+-   The sample mean $\bar Y$ varies from sample to sample and has a
+    distribution (for large $n$) that follows:
+
+$$
+\overline Y \sim N(\mu, \sigma/\sqrt{n})
+$$
+
+-   This is the foundation for inference about means and differences in
+    means.
+
+::: fragment
+:question: Is there an equivalent result for sample slope and/or
+intercept?
+:::
+
+## Sampling Distribution {.smaller}
+
+#### The sampling distributions of $\hat\beta_1$ and $\hat\beta_0$
+
+-   Investigate by sampling from a hypothetical true regression model
+
+::: incremental
+1.  Generate many samples from the same population (known linear model).
+
+2.  Record the sample slopes and intercepts.
+
+3.  Compute summary statistics and obtain plots of the sampling
+    distributions.
+:::
+
+::: fragment
+-   Demo: regression_sims.R [R code
+    file](https://www.dropbox.com/s/yopahp37f288lyq/regression_sims.R?dl=0)
+:::
+
+## 
+
+### The sampling distributions of $\hat\beta_1$ and $\hat\beta_0$
+
+Assuming the conditions for a Simple Linear Model hold, the slope and
+interval estimates haves the following distributions:
+
+::: fragment
+|   | $\hat\beta_1$ = slope | $\hat\beta_0$ =intercept |
+|------------------|:-------------------------:|:-------------------------:|
+| Mean | $\beta_1$ | $\beta_0$ |
+| Standard error | $\sigma_{\hat\beta_1}$ | $\sigma_{\hat\beta_0}$ |
+| Shape | Normal | Normal |
+| Summary | $\hat\beta_1\sim N(\beta_1,\sigma_{\hat\beta_1})$ | $\hat\beta_0\sim N(\beta_0,\sigma_{\hat\beta_0})$ |
+:::
+
+## Standard Errors of Slope and Intercept Estimates
+
+-   In practice, we don't know either $\sigma_{\hat\beta_1}$ of
+    $\sigma_{\hat\beta_0}$.
+
+-   Use R to obtain estimates:
+
+    -   $\mbox{SE}_{\hat\beta_1}$ is the **standard error** of the
+        slope.
+
+    -   $\mbox{SE}_{\hat\beta_0}$ is the **standard error** of the
+        intercept.
+
+## Factors affecting the size of the standard error of the slope
+
+The following factors influence the variability of the slope estimate
+
+::: incremental
+-   Larger sample size $\Rightarrow$ lower SE
+
+-   Greater error variability $\sigma_\epsilon$ $\Rightarrow$ greater SE
+
+-   Greater variability in observed $X$ values $\Rightarrow$ lower SE
+:::
+
+##  {.smaller}
+
+### Example: Midterm vs Final Scores
+
+```{r}
+#| output-location: fragment
+MidtermFinal <- read.csv("http://people.kzoo.edu/enordmoe/math360/MidtermFinal.csv")
+model1 <- lm(Final ~ Midterm, data = MidtermFinal)
+summary(model1)
+```
+
+##  {.smaller}
+
+### Inference for Slope and Intercept
+
+-   Key Fact:
+
+$$t=\frac{\hat\beta_i-\beta_i}{\mbox{SE}_{\hat\beta_i}}\sim t_{n-2}\mbox{ distribution}$$
+
+::: fragment
+-   We use this to obtain a $100(1-\alpha)$% confidence interval for
+    $\beta_i$:
+
+$$\hat\beta_i\pm t^*\cdot\mbox{SE}_{\hat\beta_i}$$
+
+where $t^*$ is obtained from a $t$-distribution with $n-2$ degrees of
+freedom.
+:::
+
+##  {.smaller}
+
+### How do we find a $t^*$?
+
+Illustrate using the information from the **MidtermFinal** data:
+
+::::: columns
+::: {.column width="50%"}
+-   Use R to obtain the appropriate multiplier and compute it yourself:
+
+```{r}
+#t-star for 95% confidence 
+# interval with df=31-2
+ct(0.95, df = 29)
+```
+
+<br> or...
+:::
+
+::: {.column .fragment width="50%"}
+-   Fit the model with R and use the R function `confint()` to compute
+    the intervals:
+
+```{r}
+mod1 <- lm(Final ~ Midterm, data = MidtermFinal)
+confint(mod1)
+confint(mod1, level = 0.90)
+```
+:::
+:::::
+
+## $t$-Tests for Slope and Intercept
+
+### General Case
+
+Hypotheses:
+
+$$\begin{gather}
+H_0:\beta_i=c\\
+H_a:\beta_i\neq c
+\end{gather}
+$$
+
+::: fragment
+Test statistic: $$t=\frac{\hat\beta_i-c}{\mbox{SE}_{\hat\beta_i}}$$
+:::
+
+## $t$-Tests for Slope and Intercept
+
+### Most Common Case
+
+Hypotheses:
+
+$$
+\begin{gather}
+H_0:\beta_i=0\\
+H_a:\beta_i\neq 0
+\end{gather}
+$$
+
+::: fragment
+Test statistic:
+
+$$t=\frac{\hat\beta_i}{\mbox{SE}_{\hat\beta_i}}$$
+:::
+
+## Is the $t$ Statistic "Significant"?
+
+-   **Definition:** A **P-value** is the probability, assuming that the
+    null hypothesis $(H_0)$ is true, of getting a statistic at least as
+    extreme as the observed test statistic.
+
+::: fragment
+<br>
+
+:memo: **Golden Rule** :
+$$\mbox{P-value is small }\Longleftrightarrow \mbox{ Reject } H_0$$
+:::
+
+##  {.smaller}
+
+### Is the $t$ Statistic "Significant"?
+
+::: panel-tabset
+## Use R Output
+
+```{r}
+mod1 <- lm(Final ~ Midterm, data = MidtermFinal)
+summary(mod1)
+```
+
+## Use Probability Functions
+
+-   Use R to obtain the appropriate $t$-ratio and compute it yourself:
+
+```{r}
+# Use t=6.19 df=31-2
+# Two-sided p-value
+2 * pt(6.186, df = 29, lower.tail = FALSE)
+# One-sided p-value
+pt(6.186, df = 29, lower.tail = FALSE)
+```
+:::
+
+##  {.smaller}
+
+### Example: Species vs Area
+
+Is $t$-inference valid here?
+
+::::: columns
+::: {.column width="50%"}
+```{r, echo = FALSE}
+summary(lm(Species ~ Area, data = SpeciesArea))
+```
+:::
+
+::: {.column .fragment width="50%"}
+```{r, echo = FALSE}
+gf_point(Species ~ Area, data = SpeciesArea)
+```
+:::
+:::::
+
+::: fragment
+<br>
+
+:warning: A statistically significant $t$ test does not mean the model
+is "correct."
+:::
+
+## Summary
+
+::: incremental
+-   Inference about coefficients uses the same process as inference
+    about.
+
+-   Conditions must hold for inference to be valid.
+
+-   Two approaches
+
+    -   **Significance test**: Is there an effect?
+
+    -   **Confidence interval**: How big is the effect?
+:::
+
+## Your turn
+
+### Inference for the used car data
+
+![](https://media0.giphy.com/media/nQuG0bQUIegIk87p9Y/200w.webp?cid=ecf05e476fwrml7ex84nfhs0z7kzy7md4b1ryvbd6jhnefvj&rid=200w.webp&ct=g){.absolute
+top="0" right="0" height="150"}
+
+Carry out inference for the slope $\beta_1$ measuring the relationship
+between Price and Mileage in thousands.
+
+1.  Test $H_0:\beta_1=0$ versus the two-sided alternative.
+
+2.  Test $H_0:\beta_1=-0.5$ versus the two-sided alternative.
+
+-   Question: What does this hypothesis mean?
+
+3.  Obtain a 90% confidence interval for $\beta_1$.
