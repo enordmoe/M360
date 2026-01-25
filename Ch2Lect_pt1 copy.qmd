@@ -101,7 +101,7 @@ interval estimates haves the following distributions:
 
 ::: fragment
 |   | $\hat\beta_1$ = slope | $\hat\beta_0$ =intercept |
-|----|:--:|:--:|
+|------------------|:-------------------------:|:-------------------------:|
 | Mean | $\beta_1$ | $\beta_0$ |
 | Standard error | $\sigma_{\hat\beta_1}$ | $\sigma_{\hat\beta_0}$ |
 | Shape | Normal | Normal |

@@ -1,0 +1,322 @@
+---
+title: "Chapter 2: Inference for Simple Linear Regression<br><span style='font-size:70%'>Part 2: Sections 2.2-2.3</span>"
+subtitle: "Statistical Modeling"
+author: "MATH 360"
+format:
+  revealjs:
+    chalkboard: true
+    theme: [default, custom.scss]
+    toc: false
+    toc-depth: 1
+    slideNumber: true
+    html-math-method: mathjax
+    incremental: false
+    transition: fade
+    preview-links: auto
+    notes: true
+title-slide-attributes:
+  data-background-color: "#EA6820"
+from: markdown+emoji
+execute:
+  echo: true
+  cache: false
+editor:
+  markdown:
+    wrap: 72
+---
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(rvest)
+library(mosaic)
+library(Stat2Data)
+library(gridExtra)
+library(plotly)
+data("SpeciesArea")
+data("CountyHealth")
+data("LongJumpOlympics")
+MidtermFinal <- read.csv("http://people.kzoo.edu/enordmoe/math360/MidtermFinal.csv")
+data("WeightLossIncentive4")
+```
+
+## Topics :pushpin:
+
+-   ANOVA for Simple Linear Regression
+
+-   Partitioning Variability
+
+    -   $R^2$
+
+-   Correlation
+
+    -   Test for correlation coefficient $r$
+
+-   Practical vs Statistical significance revisited
+
+    -   Effect size considerations
+
+## Analysis of Variance (ANOVA) for Regression {.smaller}
+
+### Our framework
+
+$$
+\mbox{Data} = \mbox{Model }+\mbox{ Error}
+$$
+
+::: fragment
+### Question:
+
+Does the explanatory variable help "explain" the variability in the
+response?
+
+$$
+\mbox{Total variability} = \mbox{Explained variabilty }+ \mbox{Unexplained variability}
+$$
+
+-   **Key Question:** Does the MODEL explain a "significant" amount of
+    the TOTAL variability?
+:::
+
+##  {.smaller}
+
+### Decomposing Regression Variability
+
+![](figures/decomposing_regression_variability_v2.png){fig-align="center"}
+
+## The Amazing Identity
+
+![](figures/thomas-t-OPpCbAAKWv8-unsplash.jpg){.absolute top="-30"
+right="0" height="100"}
+
+-   Decomposition of variabilty around the mean $\bar Y$:
+    $$\mbox{SSTotal }=\mbox{ SSModel }+\mbox{ SSE}$$
+
+-   In formula terms:
+    $$\sum(y-\bar y)^2=\sum(\hat y-\bar y)^2=\sum(y-\hat y)^2$$
+
+::: fragment
+-   **Intuitive Idea:** A good model should do better than just
+    predicting $\hat y=\bar y$ by using $X$ to *explain* some of the
+    uncertainty in $Y$.
+:::
+
+##  {.smaller}
+
+### ANOVA for a Simple Linear Regression Model
+
+-   To test the effectiveness of the simple linear model, the hypotheses
+    are
+
+$$
+\begin{align}
+H_0:\beta_1&=0\\
+H_a:\beta_1&\neq 0
+\end{align}
+$$
+
+::: fragment
+-   The **ANOVA table** is
+
+| Source | Degrees of<br>Freedom | Sum of<br> Squares | Mean<br>Square | $F$-statistic |
+|:-------------:|:-------------:|:-------------:|:-------------:|:-------------:|
+| Model | 1 | SSModel | MSModel | $F=\frac{\mbox{MSModel}}{\mbox{MSE}}$ |
+| Error | n-2 | SSE | MSE |  |
+| Total | n-1 | SSTotal |  |  |
+
+-   Given LINC-R conditions, the $F$-statistic has an $F$ distribution
+    with 1 and $n-2$ degrees of freedom.
+:::
+
+##  {.smaller}
+
+### Example: $P$-value from the $F$ distribution
+
+```{r, fig.height = 3}
+xpf(3.2, df1 = 1, df2 = 29, lower.tail = FALSE)
+```
+
+-   The $P$-value is always the *upper* tail probability.
+
+## 
+
+### Example: MidtermFinal ANOVA Output
+
+```{r, fig.height = 3.5}
+#| output-location: fragment
+mod1 <- lm(Final ~ Midterm, data = MidtermFinal)
+anova(mod1)
+```
+
+## Questions
+
+For the output on the following page...
+
+1.  What connections can you find between these two sets of results?
+
+2.  Is the regression *practically significant*?
+
+3.  What's the deal with the `Multiple R-squared`?
+
+## 
+
+### Example: MidtermFinal `lm()` Output
+
+```{r, fig.height = 3.5}
+#| output-location: fragment
+summary(mod1)
+```
+
+## The Coefficient of Determination: $r^2$
+
+-   $r^2$ is the proportion of total variability in the response $(Y)$
+    that is "explained" by the model.
+
+-   $r^2$ can be calculated from the ANOVA decomposition: $$
+    r^2 = \frac{\mbox{SSModel}}{\mbox{SSTotal}}=1- \frac{\mbox{SSE}}{\mbox{SSTotal}}
+    $$
+
+-   **Your turn:** Check using R output for **MidtermFinal** data.
+
+::: fragment
+-   Check: $r^2=0.569\Rightarrow$ The model explains 56.9% of the
+    variability in Final Exam scores.
+:::
+
+##  {.smaller}
+
+### How is $r^2$ the proporiton of variability explained?
+
+:::: columns
+::: {.column width="50%"}
+![](figures/low_rsquare.png)
+:::
+
+::: {.column .fragment width="50%"}
+![](figures/high_rsquare.png)
+:::
+::::
+
+## Testing the Significance of a Regression {.smaller}
+
+-   Test based on the correlation coefficient
+
+$$
+\begin{align}
+H_0:&\rho=0 \\
+H_a:&\rho\neq 0 \\
+\end{align}
+$$
+
+::: fragment
+-   Test statistic
+
+$$
+t=\frac{r\sqrt{n-2}}{\sqrt{1-r^2}} \sim t_{n-2}
+$$
+
+-   Find the $p$-value using a $t$ distribution with $n-2$ degrees of
+    freedom.
+:::
+
+## Test of Correlation Using R Software
+
+```{r}
+cor.test(Final~Midterm, data = MidtermFinal)
+```
+
+**Question:** What numbers look familiar:question:
+
+## Three Regression Tests
+
+### 1. $t$-test for slope
+
+::::: columns
+::: {.column width="50%"}
+**Hypotheses** $$
+\begin{align}
+H_0:&\beta_1=0 \\
+H_a:&\beta_1\neq 0 \\
+\end{align}
+$$
+:::
+
+::: {.column .fragment width="50%"}
+**Test statistic**
+$$t=\frac{\hat\beta_1}{\mbox{SE}_{\hat\beta_1}}\sim t_{n-2}$$
+:::
+:::::
+
+
+## Three Regression Tests
+
+
+### 2. ANOVA for regression $F$-test
+
+::::: columns
+::: {.column width="50%"}
+**Hypotheses** $$
+\begin{align}
+H_0:&\beta_1=0 \\
+H_a:&\beta_1\neq 0 \\
+\end{align}
+$$
+:::
+
+::: {.column .fragment width="50%"}
+**Test statistic** $$F=\frac{\mbox{MSModel}}{\mbox{MSE}}\sim F_{1,n-2}$$
+:::
+:::::
+
+## Three Regression Tests
+
+### 3. $t$-test for Correlation Coefficient
+
+:::: columns
+::: {.column .fragment width="50%"}
+ **Hypotheses** 
+$$
+\begin{align}
+H_0:&\rho=0 \\
+H_a:&\rho\neq 0 \\
+\end{align}
+$$
+:::
+::: {.column .fragment width="50%" .fragment}
+**Test statistic**
+$$t=\frac{r\sqrt{n-2}}{\sqrt{1-r^2}} \sim t_{n-2}$$
+:::
+::::
+
+
+
+## Three Regressions Tests
+
+::: incremental
+- All three are equivalent
+
+- All test the significance of the linear regression relationship
+:::
+
+
+## Effect sizes
+
+- Why is the following a meaningful measure of **effect size**
+
+$$
+f^2 = \frac{R^2}{1-R^2}
+$$
+
+  - This is known as **Cohen's $f^2$**.
+  
+## Summary {.smaller}
+
+- Regression ANOVA asks: does $X$ explain meaningful variability in $Y$?
+
+- Variability decomposes as  
+  $$\text{SSTotal} = \text{SSModel} + \text{SSE}$$
+
+- $R^2$ measures the proportion of variability explained by the model.
+
+- Three equivalent tests assess significance: slope $t$, ANOVA $F$, and correlation $t$.
+
+- Statistical significance ≠ practical significance $\Longrightarrow$ consider effect size (e.g., <br> Cohen’s $f^2$).

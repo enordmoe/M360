@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-<script src="Ch2Lect_pt1_files/libs/clipboard/clipboard.min.js"></script>
-<script src="Ch2Lect_pt1_files/libs/quarto-html/tabby.min.js"></script>
-<script src="Ch2Lect_pt1_files/libs/quarto-html/popper.min.js"></script>
-<script src="Ch2Lect_pt1_files/libs/quarto-html/tippy.umd.min.js"></script>
-<link href="Ch2Lect_pt1_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="Ch2Lect_pt1_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="Ch2Lect_pt1_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<script src="Ch2Lect_pt2_w26_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Ch2Lect_pt2_w26_files/libs/quarto-html/tabby.min.js"></script>
+<script src="Ch2Lect_pt2_w26_files/libs/quarto-html/popper.min.js"></script>
+<script src="Ch2Lect_pt2_w26_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="Ch2Lect_pt2_w26_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Ch2Lect_pt2_w26_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="Ch2Lect_pt2_w26_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.7.32">
 
   <meta name="author" content="MATH 360">
-  <title>Chapter 2: Inference for Simple Linear Regression Part 1</title>
+  <title>Chapter 2: Inference for Simple Linear Regression Part 2: Sections 2.2-2.3</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
-  <link rel="stylesheet" href="Ch2Lect_pt1_files/libs/revealjs/dist/reset.css">
-  <link rel="stylesheet" href="Ch2Lect_pt1_files/libs/revealjs/dist/reveal.css">
+  <link rel="stylesheet" href="Ch2Lect_pt2_w26_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="Ch2Lect_pt2_w26_files/libs/revealjs/dist/reveal.css">
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
@@ -95,13 +95,13 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="Ch2Lect_pt1_files/libs/revealjs/dist/theme/quarto-1e8aac183fbd48eb13f508ef56dc9f7d.css">
-  <link href="Ch2Lect_pt1_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
-  <link href="Ch2Lect_pt1_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
-  <link href="Ch2Lect_pt1_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
-  <link href="Ch2Lect_pt1_files/libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
-  <link href="Ch2Lect_pt1_files/libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
-  <link href="Ch2Lect_pt1_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <link rel="stylesheet" href="Ch2Lect_pt2_w26_files/libs/revealjs/dist/theme/quarto-1e8aac183fbd48eb13f508ef56dc9f7d.css">
+  <link href="Ch2Lect_pt2_w26_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="Ch2Lect_pt2_w26_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="Ch2Lect_pt2_w26_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="Ch2Lect_pt2_w26_files/libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
+  <link href="Ch2Lect_pt2_w26_files/libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
+  <link href="Ch2Lect_pt2_w26_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
   <style type="text/css">
     .reveal div.sourceCode {
       margin: 0;
@@ -195,7 +195,7 @@
     <div class="slides">
 
 <section id="title-slide" data-background-color="#EA6820" class="quarto-title-block center">
-  <h1 class="title">Chapter 2: Inference for Simple Linear Regression<br><span style="font-size:70%">Part 1</span></h1>
+  <h1 class="title">Chapter 2: Inference for Simple Linear Regression<br><span style="font-size:70%">Part 2: Sections 2.2-2.3</span></h1>
   <p class="subtitle">Statistical Modeling</p>
 
 <div class="quarto-title-authors">
@@ -210,118 +210,166 @@ MATH 360
 <section id="topics" class="slide level2">
 <h2>Topics <span class="emoji" data-emoji="pushpin">📌</span></h2>
 <ul>
-<li><p>Distribution of the slope <span class="math inline">\((\hat\beta_1)\)</span> and intercept <span class="math inline">\((\hat\beta_0)\)</span> estimates</p></li>
-<li><p>Standard error of estimates</p></li>
-<li><p>Inference for <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> based on the <span class="math inline">\(t\)</span> distribution</p>
+<li><p>ANOVA for Simple Linear Regression</p></li>
+<li><p>Partitioning Variability</p>
 <ul>
-<li><p>Confidence intervals</p></li>
-<li><p>Hypothesis tests</p></li>
+<li><span class="math inline">\(R^2\)</span></li>
+</ul></li>
+<li><p>Correlation</p>
+<ul>
+<li>Test for correlation coefficient <span class="math inline">\(r\)</span></li>
+</ul></li>
+<li><p>Practical vs Statistical significance revisited</p>
+<ul>
+<li>Effect size considerations</li>
 </ul></li>
 </ul>
 </section>
-<section id="sampling-distribution" class="slide level2">
-<h2>Sampling Distribution</h2>
-<h3 id="the-central-limit-theorem">The Central Limit Theorem</h3>
-<ul>
-<li>The sample mean <span class="math inline">\(\bar Y\)</span> varies from sample to sample and has a distribution (for large <span class="math inline">\(n\)</span>) that follows:</li>
-</ul>
+<section id="analysis-of-variance-anova-for-regression" class="slide level2 smaller">
+<h2>Analysis of Variance (ANOVA) for Regression</h2>
+<h3 id="our-framework">Our framework</h3>
 <p><span class="math display">\[
-\overline Y \sim N(\mu, \sigma/\sqrt{n})
+\mbox{Data} = \mbox{Model }+\mbox{ Error}
+\]</span></p>
+<div class="fragment">
+<h3 id="question">Question:</h3>
+<p>Does the explanatory variable help “explain” the variability in the response?</p>
+<p><span class="math display">\[
+\mbox{Total variability} = \mbox{Explained variabilty }+ \mbox{Unexplained variability}
 \]</span></p>
 <ul>
-<li>This is the foundation for inference about means and differences in means.</li>
-</ul>
-<div class="fragment">
-<p><span class="emoji" data-emoji="question">❓</span> Is there an equivalent result for sample slope and/or intercept?</p>
-</div>
-</section>
-<section id="sampling-distribution-1" class="slide level2 smaller">
-<h2>Sampling Distribution</h2>
-<h4 id="the-sampling-distributions-of-hatbeta_1-and-hatbeta_0">The sampling distributions of <span class="math inline">\(\hat\beta_1\)</span> and <span class="math inline">\(\hat\beta_0\)</span></h4>
-<ul>
-<li>Investigate by sampling from a hypothetical true regression model</li>
-</ul>
-<ol type="1">
-<li class="fragment"><p>Generate many samples from the same population (known linear model).</p></li>
-<li class="fragment"><p>Record the sample slopes and intercepts.</p></li>
-<li class="fragment"><p>Compute summary statistics and obtain plots of the sampling distributions.</p></li>
-</ol>
-<div class="fragment">
-<ul>
-<li>Demo: regression_sims.R <a href="https://www.dropbox.com/s/yopahp37f288lyq/regression_sims.R?dl=0">R code file</a></li>
+<li><strong>Key Question:</strong> Does the MODEL explain a “significant” amount of the TOTAL variability?</li>
 </ul>
 </div>
 </section>
-<section id="section" class="slide level2">
+<section id="section" class="slide level2 smaller">
 <h2></h2>
-<h3 id="the-sampling-distributions-of-hatbeta_1-and-hatbeta_0-1">The sampling distributions of <span class="math inline">\(\hat\beta_1\)</span> and <span class="math inline">\(\hat\beta_0\)</span></h3>
-<p>Assuming the conditions for a Simple Linear Model hold, the slope and interval estimates haves the following distributions:</p>
+<h3 id="decomposing-regression-variability">Decomposing Regression Variability</h3>
+
+<img data-src="figures/decomposing_regression_variability_v2.png" class="quarto-figure quarto-figure-center r-stretch"></section>
+<section id="the-amazing-identity" class="slide level2">
+<h2>The Amazing Identity</h2>
+<p><img data-src="figures/thomas-t-OPpCbAAKWv8-unsplash.jpg" class="absolute" style="top: -30px; right: 0px; height: 100px; "></p>
+<ul>
+<li><p>Decomposition of variabilty around the mean <span class="math inline">\(\bar Y\)</span>: <span class="math display">\[\mbox{SSTotal }=\mbox{ SSModel }+\mbox{ SSE}\]</span></p></li>
+<li><p>In formula terms: <span class="math display">\[\sum(y-\bar y)^2=\sum(\hat y-\bar y)^2=\sum(y-\hat y)^2\]</span></p></li>
+</ul>
 <div class="fragment">
+<ul>
+<li><strong>Intuitive Idea:</strong> A good model should do better than just predicting <span class="math inline">\(\hat y=\bar y\)</span> by using <span class="math inline">\(X\)</span> to <em>explain</em> some of the uncertainty in <span class="math inline">\(Y\)</span>.</li>
+</ul>
+</div>
+</section>
+<section id="section-1" class="slide level2 smaller">
+<h2></h2>
+<h3 id="anova-for-a-simple-linear-regression-model">ANOVA for a Simple Linear Regression Model</h3>
+<ul>
+<li>To test the effectiveness of the simple linear model, the hypotheses are</li>
+</ul>
+<p><span class="math display">\[
+\begin{align}
+H_0:\beta_1&amp;=0\\
+H_a:\beta_1&amp;\neq 0
+\end{align}
+\]</span></p>
+<div class="fragment">
+<ul>
+<li>The <strong>ANOVA table</strong> is</li>
+</ul>
 <table class="caption-top">
 <colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
 </colgroup>
 <thead>
 <tr class="header">
-<th></th>
-<th style="text-align: center;"><span class="math inline">\(\hat\beta_1\)</span> = slope</th>
-<th style="text-align: center;"><span class="math inline">\(\hat\beta_0\)</span> =intercept</th>
+<th style="text-align: center;">Source</th>
+<th style="text-align: center;">Degrees of<br>Freedom</th>
+<th style="text-align: center;">Sum of<br> Squares</th>
+<th style="text-align: center;">Mean<br>Square</th>
+<th style="text-align: center;"><span class="math inline">\(F\)</span>-statistic</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>Mean</td>
-<td style="text-align: center;"><span class="math inline">\(\beta_1\)</span></td>
-<td style="text-align: center;"><span class="math inline">\(\beta_0\)</span></td>
+<td style="text-align: center;">Model</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">SSModel</td>
+<td style="text-align: center;">MSModel</td>
+<td style="text-align: center;"><span class="math inline">\(F=\frac{\mbox{MSModel}}{\mbox{MSE}}\)</span></td>
 </tr>
 <tr class="even">
-<td>Standard error</td>
-<td style="text-align: center;"><span class="math inline">\(\sigma_{\hat\beta_1}\)</span></td>
-<td style="text-align: center;"><span class="math inline">\(\sigma_{\hat\beta_0}\)</span></td>
+<td style="text-align: center;">Error</td>
+<td style="text-align: center;">n-2</td>
+<td style="text-align: center;">SSE</td>
+<td style="text-align: center;">MSE</td>
+<td style="text-align: center;"></td>
 </tr>
 <tr class="odd">
-<td>Shape</td>
-<td style="text-align: center;">Normal</td>
-<td style="text-align: center;">Normal</td>
-</tr>
-<tr class="even">
-<td>Summary</td>
-<td style="text-align: center;"><span class="math inline">\(\hat\beta_1\sim N(\beta_1,\sigma_{\hat\beta_1})\)</span></td>
-<td style="text-align: center;"><span class="math inline">\(\hat\beta_0\sim N(\beta_0,\sigma_{\hat\beta_0})\)</span></td>
+<td style="text-align: center;">Total</td>
+<td style="text-align: center;">n-1</td>
+<td style="text-align: center;">SSTotal</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
 </tr>
 </tbody>
 </table>
+<ul>
+<li>Given LINC-R conditions, the <span class="math inline">\(F\)</span>-statistic has an <span class="math inline">\(F\)</span> distribution with 1 and <span class="math inline">\(n-2\)</span> degrees of freedom.</li>
+</ul>
 </div>
 </section>
-<section id="standard-errors-of-slope-and-intercept-estimates" class="slide level2">
-<h2>Standard Errors of Slope and Intercept Estimates</h2>
-<ul>
-<li><p>In practice, we don’t know either <span class="math inline">\(\sigma_{\hat\beta_1}\)</span> of <span class="math inline">\(\sigma_{\hat\beta_0}\)</span>.</p></li>
-<li><p>Use R to obtain estimates:</p>
-<ul>
-<li><p><span class="math inline">\(\mbox{SE}_{\hat\beta_1}\)</span> is the <strong>standard error</strong> of the slope.</p></li>
-<li><p><span class="math inline">\(\mbox{SE}_{\hat\beta_0}\)</span> is the <strong>standard error</strong> of the intercept.</p></li>
-</ul></li>
-</ul>
-</section>
-<section id="factors-affecting-the-size-of-the-standard-error-of-the-slope" class="slide level2">
-<h2>Factors affecting the size of the standard error of the slope</h2>
-<p>The following factors influence the variability of the slope estimate</p>
-<ul>
-<li class="fragment"><p>Larger sample size <span class="math inline">\(\Rightarrow\)</span> lower SE</p></li>
-<li class="fragment"><p>Greater error variability <span class="math inline">\(\sigma_\epsilon\)</span> <span class="math inline">\(\Rightarrow\)</span> greater SE</p></li>
-<li class="fragment"><p>Greater variability in observed <span class="math inline">\(X\)</span> values <span class="math inline">\(\Rightarrow\)</span> lower SE</p></li>
-</ul>
-</section>
-<section id="section-1" class="slide level2 smaller">
+<section id="section-2" class="slide level2 smaller">
 <h2></h2>
-<h3 id="example-midterm-vs-final-scores">Example: Midterm vs Final Scores</h3>
+<h3 id="example-p-value-from-the-f-distribution">Example: <span class="math inline">\(P\)</span>-value from the <span class="math inline">\(F\)</span> distribution</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a>MidtermFinal <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"http://people.kzoo.edu/enordmoe/math360/MidtermFinal.csv"</span>)</span>
-<span id="cb1-2"><a href=""></a>model1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(Final <span class="sc">~</span> Midterm, <span class="at">data =</span> MidtermFinal)</span>
-<span id="cb1-3"><a href=""></a><span class="fu">summary</span>(model1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a><span class="fu">xpf</span>(<span class="fl">3.2</span>, <span class="at">df1 =</span> <span class="dv">1</span>, <span class="at">df2 =</span> <span class="dv">29</span>, <span class="at">lower.tail =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.08408978</code></pre>
+</div>
+</div>
+<img data-src="Ch2Lect_pt2_w26_files/figure-revealjs/unnamed-chunk-1-1.png" width="960" class="r-stretch"><ul>
+<li>The <span class="math inline">\(P\)</span>-value is always the <em>upper</em> tail probability.</li>
+</ul>
+</section>
+<section id="section-3" class="slide level2">
+<h2></h2>
+<h3 id="example-midtermfinal-anova-output">Example: MidtermFinal ANOVA Output</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href=""></a>mod1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(Final <span class="sc">~</span> Midterm, <span class="at">data =</span> MidtermFinal)</span>
+<span id="cb3-2"><a href=""></a><span class="fu">anova</span>(mod1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell fragment">
+<div class="cell-output cell-output-stdout">
+<pre><code>Analysis of Variance Table
+
+Response: Final
+          Df Sum Sq Mean Sq F value    Pr(&gt;F)    
+Midterm    1 3564.1  3564.1  38.263 9.582e-07 ***
+Residuals 29 2701.3    93.1                      
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+</section>
+<section id="questions" class="slide level2">
+<h2>Questions</h2>
+<p>For the output on the following page…</p>
+<ol type="1">
+<li><p>What connections can you find between these two sets of results?</p></li>
+<li><p>Is the regression <em>practically significant</em>?</p></li>
+<li><p>What’s the deal with the <code>Multiple R-squared</code>?</p></li>
+</ol>
+</section>
+<section id="section-4" class="slide level2">
+<h2></h2>
+<h3 id="example-midtermfinal-lm-output">Example: MidtermFinal <code>lm()</code> Output</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href=""></a><span class="fu">summary</span>(mod1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
@@ -346,222 +394,148 @@ F-statistic: 38.26 on 1 and 29 DF,  p-value: 9.582e-07</code></pre>
 </div>
 </div>
 </section>
-<section id="section-2" class="slide level2 smaller">
-<h2></h2>
-<h3 id="inference-for-slope-and-intercept">Inference for Slope and Intercept</h3>
+<section id="the-coefficient-of-determination-r2" class="slide level2">
+<h2>The Coefficient of Determination: <span class="math inline">\(r^2\)</span></h2>
 <ul>
-<li>Key Fact:</li>
-</ul>
-<p><span class="math display">\[t=\frac{\hat\beta_i-\beta_i}{\mbox{SE}_{\hat\beta_i}}\sim t_{n-2}\mbox{ distribution}\]</span></p>
-<div class="fragment">
-<ul>
-<li>We use this to obtain a <span class="math inline">\(100(1-\alpha)\)</span>% confidence interval for <span class="math inline">\(\beta_i\)</span>:</li>
-</ul>
-<p><span class="math display">\[\hat\beta_i\pm t^*\cdot\mbox{SE}_{\hat\beta_i}\]</span></p>
-<p>where <span class="math inline">\(t^*\)</span> is obtained from a <span class="math inline">\(t\)</span>-distribution with <span class="math inline">\(n-2\)</span> degrees of freedom.</p>
-</div>
-</section>
-<section id="section-3" class="slide level2 smaller">
-<h2></h2>
-<h3 id="how-do-we-find-a-t">How do we find a <span class="math inline">\(t^*\)</span>?</h3>
-<p>Illustrate using the information from the <strong>MidtermFinal</strong> data:</p>
-<div class="columns">
-<div class="column" style="width:50%;">
-<ul>
-<li>Use R to obtain the appropriate multiplier and compute it yourself:</li>
-</ul>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href=""></a><span class="co">#t-star for 95% confidence </span></span>
-<span id="cb3-2"><a href=""></a><span class="co"># interval with df=31-2</span></span>
-<span id="cb3-3"><a href=""></a><span class="fu">ct</span>(<span class="fl">0.95</span>, <span class="at">df =</span> <span class="dv">29</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 2.04523</code></pre>
-</div>
-</div>
-<p><br> or…</p>
-</div><div class="column fragment" style="width:50%;">
-<ul>
-<li>Fit the model with R and use the R function <code>confint()</code> to compute the intervals:</li>
-</ul>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href=""></a>mod1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(Final <span class="sc">~</span> Midterm, <span class="at">data =</span> MidtermFinal)</span>
-<span id="cb5-2"><a href=""></a><span class="fu">confint</span>(mod1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>                 2.5 %    97.5 %
-(Intercept) -0.4122049 37.756398
-Midterm      0.9990233  1.985977</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href=""></a><span class="fu">confint</span>(mod1, <span class="at">level =</span> <span class="fl">0.90</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>                 5 %      95 %
-(Intercept) 2.817323 34.526870
-Midterm     1.082532  1.902468</code></pre>
-</div>
-</div>
-</div></div>
-</section>
-<section id="t-tests-for-slope-and-intercept" class="slide level2">
-<h2><span class="math inline">\(t\)</span>-Tests for Slope and Intercept</h2>
-<h3 id="general-case">General Case</h3>
-<p>Hypotheses:</p>
-<p><span class="math display">\[\begin{gather}
-H_0:\beta_i=c\\
-H_a:\beta_i\neq c
-\end{gather}
-\]</span></p>
-<div class="fragment">
-<p>Test statistic: <span class="math display">\[t=\frac{\hat\beta_i-c}{\mbox{SE}_{\hat\beta_i}}\]</span></p>
-</div>
-</section>
-<section id="t-tests-for-slope-and-intercept-1" class="slide level2">
-<h2><span class="math inline">\(t\)</span>-Tests for Slope and Intercept</h2>
-<h3 id="most-common-case">Most Common Case</h3>
-<p>Hypotheses:</p>
-<p><span class="math display">\[
-\begin{gather}
-H_0:\beta_i=0\\
-H_a:\beta_i\neq 0
-\end{gather}
-\]</span></p>
-<div class="fragment">
-<p>Test statistic:</p>
-<p><span class="math display">\[t=\frac{\hat\beta_i}{\mbox{SE}_{\hat\beta_i}}\]</span></p>
-</div>
-</section>
-<section id="is-the-t-statistic-significant" class="slide level2">
-<h2>Is the <span class="math inline">\(t\)</span> Statistic “Significant”?</h2>
-<ul>
-<li><strong>Definition:</strong> A <strong>P-value</strong> is the probability, assuming that the null hypothesis <span class="math inline">\((H_0)\)</span> is true, of getting a statistic at least as extreme as the observed test statistic.</li>
+<li><p><span class="math inline">\(r^2\)</span> is the proportion of total variability in the response <span class="math inline">\((Y)\)</span> that is “explained” by the model.</p></li>
+<li><p><span class="math inline">\(r^2\)</span> can be calculated from the ANOVA decomposition: <span class="math display">\[
+r^2 = \frac{\mbox{SSModel}}{\mbox{SSTotal}}=1- \frac{\mbox{SSE}}{\mbox{SSTotal}}
+\]</span></p></li>
+<li><p><strong>Your turn:</strong> Check using R output for <strong>MidtermFinal</strong> data.</p></li>
 </ul>
 <div class="fragment">
-<p><br></p>
-<p><span class="emoji" data-emoji="memo">📝</span> <strong>Golden Rule</strong> : <span class="math display">\[\mbox{P-value is small }\Longleftrightarrow \mbox{ Reject } H_0\]</span></p>
-</div>
-</section>
-<section id="section-4" class="slide level2 smaller">
-<h2></h2>
-<h3 id="is-the-t-statistic-significant-1">Is the <span class="math inline">\(t\)</span> Statistic “Significant”?</h3>
-<div class="panel-tabset">
-<ul id="tabset-1" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-1-1">Use R Output</a></li><li><a href="#tabset-1-2">Use Probability Functions</a></li></ul>
-<div class="tab-content">
-<div id="tabset-1-1">
-<div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href=""></a>mod1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(Final <span class="sc">~</span> Midterm, <span class="at">data =</span> MidtermFinal)</span>
-<span id="cb9-2"><a href=""></a><span class="fu">summary</span>(mod1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-Call:
-lm(formula = Final ~ Midterm, data = MidtermFinal)
-
-Residuals:
-     Min       1Q   Median       3Q      Max 
--18.4621  -6.3571   0.1354   5.7992  16.6279 
-
-Coefficients:
-            Estimate Std. Error t value Pr(&gt;|t|)    
-(Intercept)  18.6721     9.3311   2.001   0.0548 .  
-Midterm       1.4925     0.2413   6.186 9.58e-07 ***
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-
-Residual standard error: 9.651 on 29 degrees of freedom
-Multiple R-squared:  0.5689,    Adjusted R-squared:  0.554 
-F-statistic: 38.26 on 1 and 29 DF,  p-value: 9.582e-07</code></pre>
-</div>
-</div>
-</div>
-<div id="tabset-1-2">
 <ul>
-<li>Use R to obtain the appropriate <span class="math inline">\(t\)</span>-ratio and compute it yourself:</li>
+<li>Check: <span class="math inline">\(r^2=0.569\Rightarrow\)</span> The model explains 56.9% of the variability in Final Exam scores.</li>
 </ul>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href=""></a><span class="co"># Use t=6.19 df=31-2</span></span>
-<span id="cb11-2"><a href=""></a><span class="co"># Two-sided p-value</span></span>
-<span id="cb11-3"><a href=""></a><span class="dv">2</span> <span class="sc">*</span> <span class="fu">pt</span>(<span class="fl">6.186</span>, <span class="at">df =</span> <span class="dv">29</span>, <span class="at">lower.tail =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 9.574051e-07</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href=""></a><span class="co"># One-sided p-value</span></span>
-<span id="cb13-2"><a href=""></a><span class="fu">pt</span>(<span class="fl">6.186</span>, <span class="at">df =</span> <span class="dv">29</span>, <span class="at">lower.tail =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 4.787026e-07</code></pre>
-</div>
-</div>
-</div>
-</div>
 </div>
 </section>
 <section id="section-5" class="slide level2 smaller">
 <h2></h2>
-<h3 id="example-species-vs-area">Example: Species vs Area</h3>
-<p>Is <span class="math inline">\(t\)</span>-inference valid here?</p>
+<h3 id="how-is-r2-the-proporiton-of-variability-explained">How is <span class="math inline">\(r^2\)</span> the proporiton of variability explained?</h3>
 <div class="columns">
 <div class="column" style="width:50%;">
+<p><img data-src="figures/low_rsquare.png"></p>
+</div><div class="column fragment" style="width:50%;">
+<p><img data-src="figures/high_rsquare.png"></p>
+</div></div>
+</section>
+<section id="testing-the-significance-of-a-regression" class="slide level2 smaller">
+<h2>Testing the Significance of a Regression</h2>
+<ul>
+<li>Test based on the correlation coefficient</li>
+</ul>
+<p><span class="math display">\[
+\begin{align}
+H_0:&amp;\rho=0 \\
+H_a:&amp;\rho\neq 0 \\
+\end{align}
+\]</span></p>
+<div class="fragment">
+<ul>
+<li>Test statistic</li>
+</ul>
+<p><span class="math display">\[
+t=\frac{r\sqrt{n-2}}{\sqrt{1-r^2}} \sim t_{n-2}
+\]</span></p>
+<ul>
+<li>Find the <span class="math inline">\(p\)</span>-value using a <span class="math inline">\(t\)</span> distribution with <span class="math inline">\(n-2\)</span> degrees of freedom.</li>
+</ul>
+</div>
+</section>
+<section id="test-of-correlation-using-r-software" class="slide level2">
+<h2>Test of Correlation Using R Software</h2>
 <div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href=""></a><span class="fu">cor.test</span>(Final<span class="sc">~</span>Midterm, <span class="at">data =</span> MidtermFinal)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
-Call:
-lm(formula = Species ~ Area, data = SpeciesArea)
+    Pearson's product-moment correlation
 
-Residuals:
-    Min      1Q  Median      3Q     Max 
--20.808  -7.494  -4.027   2.554  35.242 
-
-Coefficients:
-             Estimate Std. Error t value Pr(&gt;|t|)    
-(Intercept) 2.098e+01  4.621e+00   4.541 0.000677 ***
-Area        1.733e-04  1.942e-05   8.925 1.21e-06 ***
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-
-Residual standard error: 15.79 on 12 degrees of freedom
-Multiple R-squared:  0.8691,    Adjusted R-squared:  0.8582 
-F-statistic: 79.66 on 1 and 12 DF,  p-value: 1.206e-06</code></pre>
+data:  Final and Midterm
+t = 6.1857, df = 29, p-value = 9.582e-07
+alternative hypothesis: true correlation is not equal to 0
+95 percent confidence interval:
+ 0.5457349 0.8747792
+sample estimates:
+     cor 
+0.754226 </code></pre>
 </div>
 </div>
-</div><div class="column fragment" style="width:50%;">
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure>
-<p><img data-src="Ch2Lect_pt1_files/figure-revealjs/unnamed-chunk-7-1.png" width="960"></p>
-</figure>
-</div>
-</div>
-</div>
-</div></div>
-<div class="fragment">
-<p><br></p>
-<p><span class="emoji" data-emoji="warning">⚠️</span> A statistically significant <span class="math inline">\(t\)</span> test does not mean the model is “correct.”</p>
-</div>
+<p><strong>Question:</strong> What numbers look familiar<span class="emoji" data-emoji="question">❓</span></p>
 </section>
-<section id="summary" class="slide level2">
+<section id="three-regression-tests" class="slide level2">
+<h2>Three Regression Tests</h2>
+<h3 id="t-test-for-slope">1. <span class="math inline">\(t\)</span>-test for slope</h3>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>Hypotheses</strong> <span class="math display">\[
+\begin{align}
+H_0:&amp;\beta_1=0 \\
+H_a:&amp;\beta_1\neq 0 \\
+\end{align}
+\]</span></p>
+</div><div class="column fragment" style="width:50%;">
+<p><strong>Test statistic</strong> <span class="math display">\[t=\frac{\hat\beta_1}{\mbox{SE}_{\hat\beta_1}}\sim t_{n-2}\]</span></p>
+</div></div>
+</section>
+<section id="three-regression-tests-1" class="slide level2">
+<h2>Three Regression Tests</h2>
+<h3 id="anova-for-regression-f-test">2. ANOVA for regression <span class="math inline">\(F\)</span>-test</h3>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>Hypotheses</strong> <span class="math display">\[
+\begin{align}
+H_0:&amp;\beta_1=0 \\
+H_a:&amp;\beta_1\neq 0 \\
+\end{align}
+\]</span></p>
+</div><div class="column fragment" style="width:50%;">
+<p><strong>Test statistic</strong> <span class="math display">\[F=\frac{\mbox{MSModel}}{\mbox{MSE}}\sim F_{1,n-2}\]</span></p>
+</div></div>
+</section>
+<section id="three-regression-tests-2" class="slide level2">
+<h2>Three Regression Tests</h2>
+<h3 id="t-test-for-correlation-coefficient">3. <span class="math inline">\(t\)</span>-test for Correlation Coefficient</h3>
+<div class="columns">
+<div class="column fragment" style="width:50%;">
+<p><strong>Hypotheses</strong> <span class="math display">\[
+\begin{align}
+H_0:&amp;\rho=0 \\
+H_a:&amp;\rho\neq 0 \\
+\end{align}
+\]</span></p>
+</div><div class="column fragment" style="width:50%;">
+<p><strong>Test statistic</strong> <span class="math display">\[t=\frac{r\sqrt{n-2}}{\sqrt{1-r^2}} \sim t_{n-2}\]</span></p>
+</div></div>
+</section>
+<section id="three-regressions-tests" class="slide level2">
+<h2>Three Regressions Tests</h2>
+<ul>
+<li class="fragment"><p>All three are equivalent</p></li>
+<li class="fragment"><p>All test the significance of the linear regression relationship</p></li>
+</ul>
+</section>
+<section id="effect-sizes" class="slide level2">
+<h2>Effect sizes</h2>
+<ul>
+<li>Why is the following a meaningful measure of <strong>effect size</strong></li>
+</ul>
+<p><span class="math display">\[
+f^2 = \frac{R^2}{1-R^2}
+\]</span></p>
+<ul>
+<li>This is known as <strong>Cohen’s <span class="math inline">\(f^2\)</span></strong>.</li>
+</ul>
+</section>
+<section id="summary" class="slide level2 smaller">
 <h2>Summary</h2>
 <ul>
-<li class="fragment"><p>Inference about coefficients uses the same process as inference about.</p></li>
-<li class="fragment"><p>Conditions must hold for inference to be valid.</p></li>
-<li class="fragment"><p>Two approaches</p>
-<ul>
-<li class="fragment"><p><strong>Significance test</strong>: Is there an effect?</p></li>
-<li class="fragment"><p><strong>Confidence interval</strong>: How big is the effect?</p></li>
-</ul></li>
+<li><p>Regression ANOVA asks: does <span class="math inline">\(X\)</span> explain meaningful variability in <span class="math inline">\(Y\)</span>?</p></li>
+<li><p>Variability decomposes as<br>
+<span class="math display">\[\text{SSTotal} = \text{SSModel} + \text{SSE}\]</span></p></li>
+<li><p><span class="math inline">\(R^2\)</span> measures the proportion of variability explained by the model.</p></li>
+<li><p>Three equivalent tests assess significance: slope <span class="math inline">\(t\)</span>, ANOVA <span class="math inline">\(F\)</span>, and correlation <span class="math inline">\(t\)</span>.</p></li>
+<li><p>Statistical significance ≠ practical significance <span class="math inline">\(\Longrightarrow\)</span> consider effect size (e.g., <br> Cohen’s <span class="math inline">\(f^2\)</span>).</p></li>
 </ul>
-</section>
-<section id="your-turn" class="slide level2">
-<h2>Your turn</h2>
-<h3 id="inference-for-the-used-car-data">Inference for the used car data</h3>
-<p><img data-src="https://media0.giphy.com/media/nQuG0bQUIegIk87p9Y/200w.webp?cid=ecf05e476fwrml7ex84nfhs0z7kzy7md4b1ryvbd6jhnefvj&amp;rid=200w.webp&amp;ct=g" class="absolute" style="top: 0px; right: 0px; height: 150px; "></p>
-<p>Carry out inference for the slope <span class="math inline">\(\beta_1\)</span> measuring the relationship between Price and Mileage in thousands.</p>
-<ol type="1">
-<li><p>Test <span class="math inline">\(H_0:\beta_1=0\)</span> versus the two-sided alternative.</p></li>
-<li><p>Test <span class="math inline">\(H_0:\beta_1=-0.5\)</span> versus the two-sided alternative.</p></li>
-</ol>
-<ul>
-<li>Question: What does this hypothesis mean?</li>
-</ul>
-<ol start="3" type="1">
-<li>Obtain a 90% confidence interval for <span class="math inline">\(\beta_1\)</span>.</li>
-</ol>
 
 </section>
     </div>
@@ -572,20 +546,20 @@ F-statistic: 79.66 on 1 and 12 DF,  p-value: 1.206e-06</code></pre>
 </div></div>
 
   <script>window.backupDefine = window.define; window.define = undefined;</script>
-  <script src="Ch2Lect_pt1_files/libs/revealjs/dist/reveal.js"></script>
+  <script src="Ch2Lect_pt2_w26_files/libs/revealjs/dist/reveal.js"></script>
   <!-- reveal.js plugins -->
-  <script src="Ch2Lect_pt1_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
-  <script src="Ch2Lect_pt1_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
-  <script src="Ch2Lect_pt1_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
-  <script src="Ch2Lect_pt1_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
-  <script src="Ch2Lect_pt1_files/libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
-  <script src="Ch2Lect_pt1_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  <script src="Ch2Lect_pt2_w26_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="Ch2Lect_pt2_w26_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="Ch2Lect_pt2_w26_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="Ch2Lect_pt2_w26_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="Ch2Lect_pt2_w26_files/libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
+  <script src="Ch2Lect_pt2_w26_files/libs/revealjs/plugin/quarto-support/support.js"></script>
   
 
-  <script src="Ch2Lect_pt1_files/libs/revealjs/plugin/notes/notes.js"></script>
-  <script src="Ch2Lect_pt1_files/libs/revealjs/plugin/search/search.js"></script>
-  <script src="Ch2Lect_pt1_files/libs/revealjs/plugin/zoom/zoom.js"></script>
-  <script src="Ch2Lect_pt1_files/libs/revealjs/plugin/math/math.js"></script>
+  <script src="Ch2Lect_pt2_w26_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="Ch2Lect_pt2_w26_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="Ch2Lect_pt2_w26_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="Ch2Lect_pt2_w26_files/libs/revealjs/plugin/math/math.js"></script>
   <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
 
   <script>
@@ -622,7 +596,7 @@ F-statistic: 79.66 on 1 and 12 DF,  p-value: 1.206e-06</code></pre>
         progress: true,
 
         // Display the page number of the current slide
-        slideNumber: false,
+        slideNumber: 'c/t',
 
         // 'all', 'print', or 'speaker'
         showSlideNumber: 'all',
