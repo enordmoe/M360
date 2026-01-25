@@ -184,7 +184,7 @@ summary(mod1)
 
 ##  {.smaller}
 
-### How is $r^2$ the proporiton of variability explained?
+### How is $r^2$ the proportion of variability explained?
 
 :::: columns
 ::: {.column width="50%"}
