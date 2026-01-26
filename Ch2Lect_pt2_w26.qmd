@@ -92,7 +92,7 @@ right="0" height="100"}
     $$\mbox{SSTotal }=\mbox{ SSModel }+\mbox{ SSE}$$
 
 -   In formula terms:
-    $$\sum(y-\bar y)^2=\sum(\hat y-\bar y)^2=\sum(y-\hat y)^2$$
+    $$\sum(y-\bar y)^2=\sum(\hat y-\bar y)^2+\sum(y-\hat y)^2$$
 
 ::: fragment
 -   **Intuitive Idea:** A good model should do better than just
@@ -186,7 +186,7 @@ summary(mod1)
 
 ### How is $r^2$ the proportion of variability explained?
 
-:::: columns
+::::: columns
 ::: {.column width="50%"}
 ![](figures/low_rsquare.png)
 :::
@@ -194,7 +194,7 @@ summary(mod1)
 ::: {.column .fragment width="50%"}
 ![](figures/high_rsquare.png)
 :::
-::::
+:::::
 
 ## Testing the Significance of a Regression {.smaller}
 
@@ -246,9 +246,7 @@ $$t=\frac{\hat\beta_1}{\mbox{SE}_{\hat\beta_1}}\sim t_{n-2}$$
 :::
 :::::
 
-
 ## Three Regression Tests
-
 
 ### 2. ANOVA for regression $F$-test
 
@@ -271,52 +269,51 @@ $$
 
 ### 3. $t$-test for Correlation Coefficient
 
-:::: columns
+::::: columns
 ::: {.column .fragment width="50%"}
- **Hypotheses** 
-$$
+**Hypotheses** $$
 \begin{align}
 H_0:&\rho=0 \\
 H_a:&\rho\neq 0 \\
 \end{align}
 $$
 :::
-::: {.column .fragment width="50%" .fragment}
-**Test statistic**
-$$t=\frac{r\sqrt{n-2}}{\sqrt{1-r^2}} \sim t_{n-2}$$
+
+::: {.column .fragment .fragment width="50%"}
+**Test statistic** $$t=\frac{r\sqrt{n-2}}{\sqrt{1-r^2}} \sim t_{n-2}$$
 :::
-::::
-
-
+:::::
 
 ## Three Regressions Tests
 
 ::: incremental
-- All three are equivalent
+-   All three are equivalent
 
-- All test the significance of the linear regression relationship
+-   All test the significance of the linear regression relationship
 :::
-
 
 ## Effect sizes
 
-- Why is the following a meaningful measure of **effect size**
+-   Why is the following a meaningful measure of **effect size**
 
 $$
 f^2 = \frac{R^2}{1-R^2}
 $$
 
-  - This is known as **Cohen's $f^2$**.
-  
+-   This is known as **Cohen's** $f^2$.
+
 ## Summary {.smaller}
 
-- Regression ANOVA asks: does $X$ explain meaningful variability in $Y$?
+-   Regression ANOVA asks: does $X$ explain meaningful variability in
+    $Y$?
 
-- Variability decomposes as  
-  $$\text{SSTotal} = \text{SSModel} + \text{SSE}$$
+-   Variability decomposes as\
+    $$\text{SSTotal} = \text{SSModel} + \text{SSE}$$
 
-- $R^2$ measures the proportion of variability explained by the model.
+-   $R^2$ measures the proportion of variability explained by the model.
 
-- Three equivalent tests assess significance: slope $t$, ANOVA $F$, and correlation $t$.
+-   Three equivalent tests assess significance: slope $t$, ANOVA $F$,
+    and correlation $t$.
 
-- Statistical significance ≠ practical significance $\Longrightarrow$ consider effect size (e.g., <br> Cohen’s $f^2$).
+-   Statistical significance ≠ practical significance $\Longrightarrow$
+    consider effect size (e.g., <br> Cohen’s $f^2$).
