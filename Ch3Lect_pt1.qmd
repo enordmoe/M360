@@ -1,0 +1,438 @@
+---
+title: "Chapter 3: Multiple Regression<br><span style='font-size:70%'>Part 1: Sections 3.1-3.2</span>"
+subtitle: "Statistical Modeling"
+author: "MATH 360"
+format:
+  revealjs:
+    chalkboard: true
+    theme: [default, custom.scss]
+    toc: false
+    toc-depth: 1
+    slideNumber: true
+    html-math-method: mathjax
+    incremental: false
+    transition: fade
+    preview-links: auto
+    notes: true
+title-slide-attributes:
+  data-background-color: "#EA6820"
+from: markdown+emoji
+execute:
+  echo: true
+  cache: false
+editor:
+  markdown:
+    wrap: 72
+---
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(rvest)
+library(mosaic)
+library(Stat2Data)
+library(gridExtra)
+library(plotly)
+data("SpeciesArea")
+data("CountyHealth")
+data("LongJumpOlympics")
+MidtermFinal <- read.csv("http://people.kzoo.edu/enordmoe/math360/MidtermFinal.csv")
+data("WeightLossIncentive4")
+data("NFLStandings2016")
+```
+
+## Topics :pushpin: {.smaller}
+
+-   Multiple regression
+
+    -   Model
+
+    -   Prediction equation
+
+    -   Standard error of the residuals
+
+    -   Correlation matrix
+
+    -   Inference in Multiple Regression
+
+    -   Partitioning Variability
+
+    -   Adjusted $R^2$
+
+    -   Multiple Regression for Confidence and Prediction Intervals
+
+## Simple Linear Regression Model Review
+
+$$
+\begin{gather}
+Y = \beta_0 + \beta _1 X + \epsilon \\[2ex]
+\mbox{where } \epsilon \overset{\text{iid}}{\sim} N(0, \sigma_\epsilon)
+\end{gather}
+$$
+
+::: fragment
+**Question:** What if we have more than one predictor?
+:::
+
+## Example: Multiple Predictors using NFL Standings Data
+
+-   Response variable: $Y=\text{WinPct}$
+-   Predictors:
+    -   $X_1=\text{PointsFor}$
+    -   $X_2=\text{PointsAgainst}$
+
+## 
+
+### NFL Example: Data Plots Plotly Code
+
+```{r}
+#| output-location: slide
+#| fig-height: 6
+# Change proportion to Percent to make coefficients easier to work with
+NFLStandings2016 <- mutate(NFLStandings2016, WinPct = 100*WinPct)
+plot_ly(data = NFLStandings2016, x=~PointsFor, y=~PointsAgainst, z=~WinPct, type="scatter3d", mode="markers", color=~WinPct,  text= ~Team)
+```
+
+## NFL Example: More Scatterplots
+
+```{r}
+#| output-location: slide
+# scatterplot3d uses different syntax from ggplot2
+library(scatterplot3d)
+s3d <- with(NFLStandings2016,
+           scatterplot3d(PointsFor,PointsAgainst,WinPct, 
+                         type = "h",color = "blue", angle = 70, 
+                         scale.y = 1, pch = 16, main = "3d Scatterplot")
+           )
+```
+
+## Multiple Regression Model
+
+$$
+\begin{gather}
+Y = \beta_0 + \beta _1 X_1 + \beta_2 X_2 + \cdots + \beta_k X_k+ \epsilon \\[2ex]
+\mbox{where } \epsilon \overset{\text{iid}}{\sim} N(0, \sigma_\epsilon)
+\end{gather}
+$$
+
+::: fragment
+### Data
+
+-   A dataframe with $n$ rows
+
+-   Quantitative response variable $Y$
+
+-   $k<1$ Predictors $X_1, X_2, \ldots, X_k$
+:::
+
+## Multiple Regression: The 4-Step Process {.smaller}
+
+:::::::: columns
+:::: {.column width="50%"}
+1)  **Choose** a form of the model
+
+-   Select predictors\
+-   Determine appropriate functions of predictors
+
+::: fragment
+2)  **Fit** the model\
+
+-   Estimate coefficients
+    $\hat\beta_0, \hat\beta_1, \ldots, \hat\beta_k$\
+-   Estimate standard error of the residuals $\hat\sigma_\epsilon$
+:::
+::::
+
+::::: {.column width="50%"}
+::: fragment
+3)  **Assess** the fit\
+
+-   Check residual plots\
+-   Test the overall fit using ANOVA, $R^2$, and $R^2_{\text{adj}}$\
+-   Test individual predictors using $t$-tests\
+:::
+
+::: fragment
+4)  **Use**\
+
+-   Obtain predictions $\hat Y$\
+-   Compute **prediction** intervals and **confidence intervals**\
+:::
+:::::
+::::::::
+
+##  {.smaller}
+
+### NFL Example: Scatterplot with Fitted Regression Model
+
+```{r}
+#| output-location: slide
+mod1 <- lm(WinPct ~ PointsFor + PointsAgainst, data = NFLStandings2016)
+s3d <- with(NFLStandings2016,
+         scatterplot3d(PointsFor, PointsAgainst, WinPct, type = "h", color = "blue", pch = 16, angle = 50, main = "3d Scatterplot",xlim = c(250, 550), ylim = c(250,500))
+)
+s3d$plane3d(mod1, lty.box = "solid")
+```
+
+##  {.smaller}
+
+### Fitted Prediction Equation
+
+```{r}
+mod1 <- lm(WinPct ~ PointsFor + PointsAgainst, data = NFLStandings2016)
+mod1
+```
+
+$$
+\widehat{\text{WinPct}} = 78.54 + 0.1699\text{ PointsFor} -0.2482\text{ PointsAgainst}
+$$
+
+##  {.smaller}
+
+### NFL Example: Regression Summary Output
+
+```{r}
+#| output-location: fragment
+mod1 <- lm(WinPct ~ PointsFor + PointsAgainst, data = NFLStandings2016)
+summary(mod1)
+```
+
+## T-tests for Slopes
+
+-   Multiple "slopes" to test (each coefficient)
+
+:::::: columns
+::: {.column width="50%"}
+**Hypotheses** $$
+\begin{align}
+H_0:&\beta_i=0 \\
+H_a:&\beta_i\neq 0 \\
+\end{align}
+$$
+:::
+
+:::: {.column width="50%"}
+::: fragment
+**Test statistic**
+$$t=\frac{\hat\beta_i}{\mbox{SE}_{\hat\beta_i}}\sim t_{n-k-1}$$
+:::
+::::
+::::::
+
+## Confidence Intervals for Slopes
+
+-   A confidence interval for the true value of any multiple regression
+    coefficient, $\beta_i$ has the form
+    $$\hat\beta_i\pm t^* \cdot\text{SE}_{\hat\beta_i}$$
+
+    -   $t^*$ is the critical value from the $t$-distribution with
+        $n-k-1$ degrees of freedom.
+
+    -   $\text{SE}_{\hat\beta_i}$ is otained from R output.
+
+-   Confidence intervals can again be obtained directly using the
+    `confint()` function in R.
+
+## Standard Error of the Multiple Regression Model
+
+-   Recall condition: $\epsilon\sim N(0, \sigma_\epsilon)$
+
+-   Estimate standard error:
+
+$$
+\hat\sigma_\epsilon = \sqrt{\text{MSE}}= \sqrt{\frac{\text{SSE}}{n-k-1}}
+$$
+
+-   Note that degrees of freedom depend on number of predictors.
+
+## NFL Example: ANOVA Output
+
+```{r}
+#| output-location: fragment
+anova(mod1)
+```
+
+##  {.smaller}
+
+### t-test for Correlation versus t-test for Slope
+
+:::::: columns
+::: {.column width="50%"}
+-   $t$-test for slope $H_0:\beta_i=0$:
+    -   Assesses the linear association **after accounting for the other
+        predictors** in the model.\
+-   $t$-test for correlation $\rho =0$:
+    -   Assesses the linear association between two variables **by
+        themselves**.
+
+**Important**: These two tests are not equivalent in multiple
+regression.
+:::
+
+:::: {.column width="50%"}
+::: fragment
+```{r}
+cor.test(WinPct ~ PointsFor, data = NFLStandings2016)
+```
+:::
+::::
+::::::
+
+##  {.smaller}
+
+### ANOVA Test for Overall Variability
+
+-   Test the following hypotheses
+
+$$
+\begin{align}
+H_0&:\beta_1=\beta_2=\cdots=\beta_k=0\\[1ex]
+H_a&: \text{At least one } \beta_i\neq 0
+\end{align}
+$$
+
+::: fragment
+| Source | df | Sum of<br>Squares | Mean<br>Square | F | $p$-value |
+|------------|:----------:|:----------:|:----------:|:----------:|:----------:|
+| Model | $k$ | $SSModel$ | $SSModel/k$ | $MSModel/MSE$ | $F_{k,n-k-1}$ |
+| Residuals | $n-k-1$ | $SSE$ | $MSE=SSE/(n-k-1)$ |  |  |
+| Total | $n-1$ | $SSTotal$ |  |  |  |
+
+<br>
+
+-   Test using $F=\text{MSModel}/\text{MSE}$ with $k$ and $n-k-1$
+    degrees of freedom.
+:::
+
+## NFL Example: ANOVA Table
+
+-   Use `anova_alt.r` to create the `anova_alt()` function.
+
+```{r anova_alt1}
+mod1 <- lm(WinPct ~ PointsFor + PointsAgainst, data = NFLStandings2016)
+# The file anova_alt.r must be in the same folder
+source("anova_alt.r")
+# Produces standard anova table
+anova_alt(mod1)
+```
+
+##  {.smaller}
+
+### Why do we call it $R^2$?
+
+$$
+R^2=\frac{\text{SSModel}}{\text{SSTotal}}
+$$
+
+-   For a simple linear model:
+    -   $R^2$ is the squared correlation coefficient $R^2=r^2$. <br>
+-   For multiple regression:
+    -   Each predictor $X_i$ has a different correlation with $Y$.
+    -   $R^2$ is correlation between the observed and predicted values:
+        $$R^2=\text{corr}(y,\hat y)$$
+
+<br> **Note:** This interpretation is not needed for simple correlation
+but also holds there.
+
+## What makes a good multiple regression model?
+
+![](figures/good_model.png){fig-align="center"}
+
+::: aside
+Source: Stat2e Resources
+:::
+
+## 
+### Purposes and Approaches to Regression Modeling {.smaller}
+
+::::: columns
+::: {.column width="50%"}
+#### Purposes
+1.  Model and understand  
+2.  Predict  
+
+#### Competing goals
+1.  **Parsimony**: construct a simple model  
+2.  **Increase** $R^2$: construct a complex model  
+
+:::
+
+::: {.column width="50%"}
+::: {.fragment}
+#### Tradeoffs
+-   Adding terms to a model:  
+    -   Increases SSModel  
+    -   Decreases SSE  
+    -   Increases $R^2$  
+
+#### Practical question
+
+-   Is the increase in $R^2$ worth the added complexity?  
+
+:::
+:::
+:::::
+
+
+
+
+## {.smaller}
+### Adjusted $R^2$ to the Rescue
+
+- For simple regression we used:
+
+$$
+R^2 = \frac{SSModel}{SSTotal}=1-\frac{SSE}{SSTotal}
+$$
+
+- An "adjusted" version is preferred for multiple regression:
+
+$$R^2_{\text{adj    }} = 1-\frac{SSE/(n-k-1)}{SSTotal/(n-1)}=1-\frac{\hat\sigma^2_{\epsilon}}{s^2_y}$$
+
+- The adjustment is a "penalty" for adding parameters to the model.
+
+- Can be used to compare models with different numbers of predictors.
+
+## {.smaller}
+### NFL Regression Output Revisited
+
+
+```{r}
+mod1 <- lm(WinPct ~ PointsFor + PointsAgainst, data = NFLStandings2016)
+summary(mod1)
+```
+
+
+
+
+## {.smaller}
+### Confidence Intervals and Prediction Intervals for Multiple Regression
+
+- Obtain predictions by substituting $x$ values of interest:
+
+$$\hat y = \hat\beta_0 + \hat\beta_1 x_1^* + \cdots + \hat\beta_k x_k^*$$
+
+- As before, prediction intervals are much wider than confidence intervals
+
+- Use R to obtain confidence and prediction intervals
+
+
+## {.smaller}
+### NFL Regression Prediction Examples
+
+- Average (expected) winning percent for all teams with `PointsFor=350` and `PointsAgainst=300`.
+
+```{r}
+newxvals <- data.frame(PointsFor = 350, PointsAgainst = 300)
+predict(mod1, newdata = newxvals, interval = "confidence")
+```
+
+::: {.fragment}
+
+- Winning percent for a single team with `PointsFor=350` and `PointsAgainst=300`.
+
+```{r}
+predict(mod1, newdata = newxvals, interval = "prediction")
+```
+
+:::
+
