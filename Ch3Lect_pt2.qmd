@@ -1,0 +1,416 @@
+---
+title: "Chapter 3: Multiple Regression<br><span style='font-size:70%'>Part 2: Section 3.3</span>"
+subtitle: "Statistical Modeling"
+author: "MATH 360"
+format:
+  revealjs:
+    chalkboard: true
+    theme: [default, custom.scss]
+    toc: false
+    toc-depth: 1
+    slideNumber: true
+    html-math-method: mathjax
+    incremental: false
+    transition: fade
+    preview-links: auto
+    notes: true
+title-slide-attributes:
+  data-background-color: "#EA6820"
+from: markdown+emoji
+execute:
+  echo: true
+  cache: false
+editor:
+  markdown:
+    wrap: 72
+---
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(rvest)
+library(mosaic)
+library(Stat2Data)
+library(gridExtra)
+library(plotly)
+library(readr)
+funneldata <- read_csv("http://people.kzoo.edu/enordmoe/math360/funneldata.csv", col_types = cols(trial = col_factor(levels = c("1","2"))))
+funnel.hi <- filter(funneldata, height == 13)
+funnel.hilo <- filter(funneldata, height == 13 | height == 10)
+funnel.hilo <- mutate(funnel.hilo, height.hi = ifelse(height==13,1,0))
+funneldata <- mutate(funneldata, height.hi = ifelse(height==13, 1, 0),
+                   height.mid = ifelse(height == 11.5, 1, 0))
+data("SpeciesArea")
+data("CountyHealth")
+data("LongJumpOlympics")
+MidtermFinal <- read.csv("http://people.kzoo.edu/enordmoe/math360/MidtermFinal.csv")
+data("WeightLossIncentive4")
+data("NFLStandings2016")
+```
+
+## Outline
+
+::: incremental
+-   "Dummy variable" predictors
+
+    -   As a single predictor
+
+    -   With a quantitative predictor
+
+-   Comparing two lines
+
+    -   Different intercepts
+
+    -   Different lines
+
+-   Extend to more than two lines
+:::
+
+## Funnel Data:
+### Height as a Categorical Predictor
+
+::::: columns
+::: {.column width="50%"}
+-   Use height $(x)$ to predict swirling time $(y)$
+
+-   Compare high (13 inches) vs low (10 inches)
+:::
+
+::: {.column width="50%" .fragment}
+```{r, echo = FALSE}
+gf_boxplot(tswirl ~ factor(height.hi), data = funnel.hilo) %>%
+  gf_labs(title = "Swirling time by height", x = "0 = 10 inches, 1 = 13 inches" ) %>% 
+gf_theme(
+    legend.position = "top",
+    plot.title = element_text(hjust = 0.5, color = "#166DA0", size = 32),
+  )
+
+```
+
+:::
+:::::
+
+## {.smaller}
+### Two-Sample $t$ Test for Means (using pooled variances)
+:::: {.columns}
+::: {.column width="50%"}
+- Test for equal swirling times:
+
+$$
+\begin{gather}
+H_0:\mu_1=\mu_2\\
+H_a:\mu_1\neq\mu_2
+\end{gather}
+$$
+
+- Use pooled $t$-test:
+$$t=\frac{\bar y_1-\bar y_2}{s_p\sqrt{\frac 1n_1 + \frac 1n_2}}$$
+:::
+::: {.column width="50%" .fragment}
+- Assume constant variability $(\sigma_1=\sigma_2)$ and use the pooled standard deviation:
+$$
+s_p=\sqrt{\frac{(n_1-1)s_1^2+(n_2-1)s_2^2}{n_1+n_2-2}}\quad .
+$$
+:::
+::::
+
+
+## Two-sample $t$-test in R
+
+
+```{r}
+#| output-location: fragment
+t.test(tswirl ~ height.hi, var.equal = TRUE, data = funnel.hilo)
+```
+
+
+
+## {.smaller}
+### Recast this as a dummy variable regression question
+
+:::: {.columns}
+::: {.column width="30%"}
+- Regression model:
+
+$$
+\text{tswirl} = \beta_0 + \beta_1 X + \epsilon
+$$
+where
+$$X=\begin{cases} 0 & \text{height } =10 \\1 & \text{height } =13 \end{cases}$$
+
+- We call $X$ an **indicator** or **dummy** variable.
+:::
+::: {.column width="70%" .fragment}
+```{r,}
+# Plots group means on the "scatterplot"
+gf_point(tswirl ~ height.hi, data = funnel.hilo) +
+  stat_summary(fun=mean, geom="line", color="#166DA0", lwd =2 )
+```
+:::
+::::
+
+# But this is just the <br> 2-means model!
+
+
+## Dummy variable regression code and output {.smaller}
+
+
+```{r}
+#| output-location: fragment
+lm.dummy <- lm(tswirl ~ height.hi, data = funnel.hilo)
+summary(lm.dummy)
+```
+
+## Comparing the t-test and regression output?
+
+- Compare $t$ statistics and p-values.
+
+- Interpret regression intercept.
+
+- Interpret regression slope.
+
+- Where does $s_p$ appear in the output?
+
+
+## {.smaller}
+### One and Two Means Model in the Regression Setup
+
+* **Two-means model:** $Y=\beta_0+\beta_1 X_1 +\epsilon$
+  * $\mu_1 = \beta_0$
+  * $\mu_2 = \beta_0+\beta_1$
+
+<br>
+
+::: {.fragment}
+* **One-mean model:** $\beta_1=0$  $\iff$  $\mu = \beta_0$
+  * $\mu_1=\mu_2 = \beta_0$
+:::
+
+
+
+
+
+## Quantitative plus indicator predictors {.smaller}
+### Parallel lines model
+
+:::: {.columns}
+::: {.column width="50%"}
+- Example:
+
+  - $Y$ = swirling time
+  
+  - $X_1$ = distance up the channel
+  
+  - $X_2$ = height (low = 0, high = 1)
+  
+- Overall model
+
+  - $Y=\beta_0+\beta_1 X_1+\beta_2 X_2 +\epsilon$
+  
+:::
+::: {.column width="50%" .fragment}
+- Identify models for each height
+
+**low**: $X_2 = 0$ so 
+$$\begin{align}Y=& \beta_0 + \beta_1 X_1+ \beta_2\cdot 0 + \epsilon \\[1ex]
+=&\beta_0 + \beta_1 X_1+  \epsilon\end{align}$$
+
+  
+**high**: $X_2 = 1$ so 
+$$\begin{align}Y=&\beta_0 + \beta_1 X_1 + \beta_2\cdot 1 + \epsilon\\[1ex]
+=& (\beta_0+\beta_2) + \beta_1 X_1 + \epsilon\end{align}$$
+  
+:::
+::::
+
+
+
+
+
+
+##  {.smaller}
+### Funnel Data Example: Parallel Lines Regression 
+
+
+```{r}
+#| output-location: fragment
+lm.parallel = lm(tswirl ~ dist + height.hi, data = funnel.hilo)
+summary(lm.parallel)
+```
+
+
+## {.smaller}
+### Specify Fitted Models by Height
+
+- Height = Low $(X_2=0)$:
+
+$$
+\widehat{\text{tswirl}} = 2.937 + 0.318 \cdot \text{dist}
+$$
+
+::: {.fragment}
+
+
+<br>
+
+- Height = High $(X_2=1)$:
+
+$$
+\begin{align}
+\widehat{\text{tswirl}} =& 2.937 + 0.318 \cdot \text{dist} + 11.211(1)\\[1ex]
+=& 14.148 + 0.318 \cdot \text{dist} 
+\end{align}
+$$
+
+:::
+
+## {.smaller}
+### Plotting the fitted parallel lines
+
+
+```{r}
+#| output-location: fragment
+gf_point(tswirl ~ dist, color = ~factor(height.hi), data = funnel.hilo) |>
+  gf_smooth(method = "lm")
+```
+
+
+## Comparing Parallel Regression Lines
+
+- Is there a significant difference in the intercepts?
+
+- The $t$-test for the `height.hi` (dummy variable) coefficient is a test of whether the intercepts differ:
+
+$$
+\begin{gather}
+H_0: \beta_2=0\\
+H_a: \beta_2\neq 0
+\end{gather}
+$$
+
+
+
+## {.smaller}
+### Assessing the Fit
+
+
+```{r}
+# Not necessary to color by high/low but just in case
+p1 <- gf_point(resid(lm.parallel)~fitted(lm.parallel), color = ~factor(height.hi), data = funnel.hilo)
+p2 <- gf_qq(~resid(lm.parallel)) |>
+  gf_qqline()
+grid.arrange(p1, p2, ncol = 2)
+```
+
+
+
+
+
+
+## {.smaller}
+### Interaction (Two Lines) Model
+
+- Allow both intercepts and slopes to differ
+
+- The two lines model:
+
+$$
+Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1\cdot X_2 + \epsilon
+$$
+
+- $\beta_2$ models the difference in **intercepts**.
+
+- $\beta_3$ models the difference in **slopes**.
+
+
+## {.smaller}
+### Interaction (Two Lines) Model for Funnel Data
+
+#### The complete model  
+
+$$
+\text{tswirl} = \beta_0 + \beta_1 (\text{dist}) + \beta_2 (\text{funnel.hi}) + \beta_3 (\text{dist}\cdot \text{funnel.hi}) + \epsilon
+$$
+
+::: {.fragment}
+#### Specifying the model for each height:
+
+  1. Height = Low   
+  
+$$
+\begin{align}
+\text{tswirl} &= \beta_0 + \beta_1 (\text{dist}) + \beta_2 (0) + \beta_3 (\text{dist}\cdot 0) + \epsilon \\[1ex]
+ &= \beta_0 + \beta_1 (\text{dist}) + \epsilon
+\end{align}
+$$
+  
+  2. Height = High   
+  
+$$
+\begin{align}
+\text{tswirl} &= \beta_0 + \beta_1 (\text{dist}) + \beta_2 (1) + \beta_3 (\text{dist}\cdot 1) + \epsilon \\[1ex]
+ &= (\beta_0+\beta_2) + (\beta_1+\beta_3) (\text{dist}) + \epsilon
+\end{align}
+$$
+
+:::
+
+
+
+## {.smaller}
+### R Output for the Interaction Model
+
+
+
+```{r}
+#| output-location: fragment
+lm.2lines = lm(tswirl ~ dist + height.hi + dist * height.hi, data = funnel.hilo)
+summary(lm.2lines)
+```
+
+
+
+
+
+##  {.smaller}
+### Using the R Output for the Interaction Model
+
+#### Use coefficient $t$-tests
+
+- Test for different slopes:
+
+  - $H_0: \beta_3=0\text{ versus } H_a: \beta_3\neq 0$
+  
+- Test for different intercepts:
+
+  - $H_0: \beta_3=0\text{ versus } H_a: \beta_3\neq 0$
+  
+
+**Note:** Joint test for both requires a nested $F$-test (to come)  
+
+## {.smaller}
+### The Two Lines Models Can Be Generalized to More than Two Heights: 
+#### Three parallel lines
+
+```{r}
+#| output-location: slide
+cat("Three parallel lines output:\n")
+lm.parallel3 <- lm(tswirl ~ dist + factor(height), data = funneldata)
+summary(lm.parallel3)
+```
+
+
+## {.smaller}
+### Three general lines
+
+```{r}
+#| output-location: slide
+cat("Three general lines output:\n")
+lm.3lines <- lm(tswirl ~ dist + factor(height) + dist:factor(height), 
+             data = funneldata) 
+
+summary(lm.3lines)
+```
+
+
+
+

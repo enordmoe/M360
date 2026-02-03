@@ -1,716 +1,1102 @@
 <!DOCTYPE html>
-<html lang="" xml:lang="">
-  <head>
-    <title>Chapter 3: Inference for Simple Linear Regression</title>
-    <meta charset="utf-8" />
-    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
-    <link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet" />
-    <script src="libs/panelset-0.2.6/panelset.js"></script>
-    <script src="libs/clipboard-2.0.6/clipboard.min.js"></script>
-    <link href="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.css" rel="stylesheet" />
-    <script src="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.js"></script>
-    <script>window.xaringanExtraClipboard(null, {"button":"Copy Code","success":"Copied!","error":"Press Ctrl+C to Copy"})</script>
-    <link href="libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
-    <script src="libs/tile-view-0.2.6/tile-view.js"></script>
-    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
-    <link rel="stylesheet" href="extra.css" type="text/css" />
-  </head>
-  <body>
-    <textarea id="source">
-class: center, middle, inverse, title-slide
+<html lang="en"><head>
+<script src="Ch3Lect_pt2_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Ch3Lect_pt2_files/libs/quarto-html/tabby.min.js"></script>
+<script src="Ch3Lect_pt2_files/libs/quarto-html/popper.min.js"></script>
+<script src="Ch3Lect_pt2_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="Ch3Lect_pt2_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Ch3Lect_pt2_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="Ch3Lect_pt2_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.7.32">
 
-# Chapter 3: Inference for Simple Linear Regression
-## Part 2: Section 3.3
-### Applied Statistics II
+  <meta name="author" content="MATH 360">
+  <title>Chapter 3: Multiple Regression Part 2: Section 3.3</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="Ch3Lect_pt2_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="Ch3Lect_pt2_files/libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; font-weight: bold; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="Ch3Lect_pt2_files/libs/revealjs/dist/theme/quarto-1e8aac183fbd48eb13f508ef56dc9f7d.css">
+  <link href="Ch3Lect_pt2_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="Ch3Lect_pt2_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="Ch3Lect_pt2_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="Ch3Lect_pt2_files/libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
+  <link href="Ch3Lect_pt2_files/libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
+  <link href="Ch3Lect_pt2_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
 
----
+<section id="title-slide" data-background-color="#EA6820" class="quarto-title-block center">
+  <h1 class="title">Chapter 3: Multiple Regression<br><span style="font-size:70%">Part 2: Section 3.3</span></h1>
+  <p class="subtitle">Statistical Modeling</p>
 
-class: highlight-last-item
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+MATH 360 
+</div>
+</div>
+</div>
 
-
-
-
-
-
-
-
-
-
-&lt;style type="text/css"&gt;
-.highlight-last-item &gt; ul &gt; li,
-.highlight-last-item &gt; ol &gt; li {
-  opacity: 0.5;
-}
-.highlight-last-item &gt; ul &gt; li:last-of-type,
-.highlight-last-item &gt; ol &gt; li:last-of-type {
-  opacity: 1;
-}
-&lt;/style&gt;
-
-# Outline 
-
-- "Dummy variable" predictors
-
-  - As a single predictor
-
-  - With a quantitative predictor
-  
---
-  
-- Comparing two lines
-
-  - Different intercepts
-  
-  - Different lines
-  
---
-
-- Extend to more than two lines
-
----
-
-## Height as a Categorical Predictor
-
-.pull-left[
-
-
-- Use height `\((x)\)` to predict swirling time `\((y)\)`
-
-- Compare high (13 inches) vs low (10 inches)
-
-]
-
---
-.pull-right[
-
-&lt;img src="Ch3Lect_pt2_files/figure-html/unnamed-chunk-2-1.png" width="90%" /&gt;
-
-]
-
----
-### Two-Sample `\(t\)` Test for Means (using pooled variances)
-
-- Test for equal swirling times:
-
-$$
-`\begin{gather}
+</section>
+<section id="outline" class="slide level2">
+<h2>Outline</h2>
+<ul>
+<li class="fragment"><p>“Dummy variable” predictors</p>
+<ul>
+<li class="fragment"><p>As a single predictor</p></li>
+<li class="fragment"><p>With a quantitative predictor</p></li>
+</ul></li>
+<li class="fragment"><p>Comparing two lines</p>
+<ul>
+<li class="fragment"><p>Different intercepts</p></li>
+<li class="fragment"><p>Different lines</p></li>
+</ul></li>
+<li class="fragment"><p>Extend to more than two lines</p></li>
+</ul>
+</section>
+<section id="funnel-data" class="slide level2">
+<h2>Funnel Data:</h2>
+<h3 id="height-as-a-categorical-predictor">Height as a Categorical Predictor</h3>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li><p>Use height <span class="math inline">\((x)\)</span> to predict swirling time <span class="math inline">\((y)\)</span></p></li>
+<li><p>Compare high (13 inches) vs low (10 inches)</p></li>
+</ul>
+</div><div class="column fragment" style="width:50%;">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="Ch3Lect_pt2_files/figure-revealjs/unnamed-chunk-1-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div></div>
+</section>
+<section id="section" class="slide level2 smaller">
+<h2></h2>
+<h3 id="two-sample-t-test-for-means-using-pooled-variances">Two-Sample <span class="math inline">\(t\)</span> Test for Means (using pooled variances)</h3>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li>Test for equal swirling times:</li>
+</ul>
+<p><span class="math display">\[
+\begin{gather}
 H_0:\mu_1=\mu_2\\
 H_a:\mu_1\neq\mu_2
-\end{gather}`
-$$
-
-- using pooled `\(t\)`-test:
-`$$t=\frac{\bar y_1-\bar y_2}{s_p\sqrt{\frac 1n_1 + \frac 1n_2}}$$`
-
-- where we assume constant variability `\((\sigma_1=\sigma_2)\)` and use the pooled standard deviation:
-$$
+\end{gather}
+\]</span></p>
+<ul>
+<li>Use pooled <span class="math inline">\(t\)</span>-test: <span class="math display">\[t=\frac{\bar y_1-\bar y_2}{s_p\sqrt{\frac 1n_1 + \frac 1n_2}}\]</span></li>
+</ul>
+</div><div class="column fragment" style="width:50%;">
+<ul>
+<li>Assume constant variability <span class="math inline">\((\sigma_1=\sigma_2)\)</span> and use the pooled standard deviation: <span class="math display">\[
 s_p=\sqrt{\frac{(n_1-1)s_1^2+(n_2-1)s_2^2}{n_1+n_2-2}}\quad .
-$$
+\]</span></li>
+</ul>
+</div></div>
+</section>
+<section id="two-sample-t-test-in-r" class="slide level2">
+<h2>Two-sample <span class="math inline">\(t\)</span>-test in R</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a><span class="fu">t.test</span>(tswirl <span class="sc">~</span> height.hi, <span class="at">var.equal =</span> <span class="cn">TRUE</span>, <span class="at">data =</span> funnel.hilo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell fragment">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Two Sample t-test
 
-
----
-
-### Two-sample `\(t\)`-test in R
-
-.panelset[
-
-.panel[.panel-name[Code]
-
-```r
-t.test(tswirl ~ height.hi, var.equal = TRUE, data = funnel.hilo)
-```
-
-
-
-]
-
-.panel[.panel-name[Output]
-
-```
-## 
-## 	Two Sample t-test
-## 
-## data:  tswirl by height.hi
-## t = -8.3465, df = 18, p-value = 1.333e-07
-## alternative hypothesis: true difference in means between group 0 and group 1 is not equal to 0
-## 95 percent confidence interval:
-##  -14.032968  -8.389032
-## sample estimates:
-## mean in group 0 mean in group 1 
-##          10.565          21.776
-```
-
-
-
-]
-]
-
----
-
-### Recast this as a dummy variable regression question
-
-.pull-left[
-
-- Regression model:
-
-$$
+data:  tswirl by height.hi
+t = -8.3465, df = 18, p-value = 1.333e-07
+alternative hypothesis: true difference in means between group 0 and group 1 is not equal to 0
+95 percent confidence interval:
+ -14.032968  -8.389032
+sample estimates:
+mean in group 0 mean in group 1 
+         10.565          21.776 </code></pre>
+</div>
+</div>
+</section>
+<section id="section-1" class="slide level2 smaller">
+<h2></h2>
+<h3 id="recast-this-as-a-dummy-variable-regression-question">Recast this as a dummy variable regression question</h3>
+<div class="columns">
+<div class="column" style="width:30%;">
+<ul>
+<li>Regression model:</li>
+</ul>
+<p><span class="math display">\[
 \text{tswirl} = \beta_0 + \beta_1 X + \epsilon
-$$
-where
-`$$X=\begin{cases} 0 &amp; \text{height } =10 \\1 &amp; \text{height } =13 \end{cases}$$`
+\]</span> where <span class="math display">\[X=\begin{cases} 0 &amp; \text{height } =10 \\1 &amp; \text{height } =13 \end{cases}\]</span></p>
+<ul>
+<li>We call <span class="math inline">\(X\)</span> an <strong>indicator</strong> or <strong>dummy</strong> variable.</li>
+</ul>
+</div><div class="column fragment" style="width:70%;">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href=""></a><span class="co"># Plots group means on the "scatterplot"</span></span>
+<span id="cb3-2"><a href=""></a><span class="fu">gf_point</span>(tswirl <span class="sc">~</span> height.hi, <span class="at">data =</span> funnel.hilo) <span class="sc">+</span></span>
+<span id="cb3-3"><a href=""></a>  <span class="fu">stat_summary</span>(<span class="at">fun=</span>mean, <span class="at">geom=</span><span class="st">"line"</span>, <span class="at">color=</span><span class="st">"#166DA0"</span>, <span class="at">lwd =</span><span class="dv">2</span> )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="Ch3Lect_pt2_files/figure-revealjs/unnamed-chunk-3-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div></div>
+</section>
+<section>
+<section id="but-this-is-just-the-2-means-model" class="title-slide slide level1 center">
+<h1>But this is just the <br> 2-means model!</h1>
 
-- We call `\(X\)` an **indicator** or **dummy** variable.
+</section>
+<section id="dummy-variable-regression-code-and-output" class="slide level2 smaller">
+<h2>Dummy variable regression code and output</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href=""></a>lm.dummy <span class="ot">&lt;-</span> <span class="fu">lm</span>(tswirl <span class="sc">~</span> height.hi, <span class="at">data =</span> funnel.hilo)</span>
+<span id="cb4-2"><a href=""></a><span class="fu">summary</span>(lm.dummy)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell fragment">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = tswirl ~ height.hi, data = funnel.hilo)
 
-]
-.pull-right[
-&lt;img src="Ch3Lect_pt2_files/figure-html/unnamed-chunk-4-1.png" width="90%" /&gt;
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-4.0650 -2.3825 -0.7455  2.9448  4.6150 
 
-
-]
-
-
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  10.5650     0.9498  11.124 1.69e-09 ***
+height.hi    11.2110     1.3432   8.346 1.33e-07 ***
 ---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-### Dummy variable regression input and output
+Residual standard error: 3.003 on 18 degrees of freedom
+Multiple R-squared:  0.7947,    Adjusted R-squared:  0.7833 
+F-statistic: 69.66 on 1 and 18 DF,  p-value: 1.333e-07</code></pre>
+</div>
+</div>
+</section>
+<section id="comparing-the-t-test-and-regression-output" class="slide level2">
+<h2>Comparing the t-test and regression output?</h2>
+<ul>
+<li><p>Compare <span class="math inline">\(t\)</span> statistics and p-values.</p></li>
+<li><p>Interpret regression intercept.</p></li>
+<li><p>Interpret regression slope.</p></li>
+<li><p>Where does <span class="math inline">\(s_p\)</span> appear in the output?</p></li>
+</ul>
+</section>
+<section id="section-2" class="slide level2 smaller">
+<h2></h2>
+<h3 id="one-and-two-means-model-in-the-regression-setup">One and Two Means Model in the Regression Setup</h3>
+<ul>
+<li><strong>Two-means model:</strong> <span class="math inline">\(Y=\beta_0+\beta_1 X_1 +\epsilon\)</span>
+<ul>
+<li><span class="math inline">\(\mu_1 = \beta_0\)</span></li>
+<li><span class="math inline">\(\mu_2 = \beta_0+\beta_1\)</span></li>
+</ul></li>
+</ul>
+<p><br></p>
+<div class="fragment">
+<ul>
+<li><strong>One-mean model:</strong> <span class="math inline">\(\beta_1=0\)</span> <span class="math inline">\(\iff\)</span> <span class="math inline">\(\mu = \beta_0\)</span>
+<ul>
+<li><span class="math inline">\(\mu_1=\mu_2 = \beta_0\)</span></li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="quantitative-plus-indicator-predictors" class="slide level2 smaller">
+<h2>Quantitative plus indicator predictors</h2>
+<h3 id="parallel-lines-model">Parallel lines model</h3>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li><p>Example:</p>
+<ul>
+<li><p><span class="math inline">\(Y\)</span> = swirling time</p></li>
+<li><p><span class="math inline">\(X_1\)</span> = distance up the channel</p></li>
+<li><p><span class="math inline">\(X_2\)</span> = height (low = 0, high = 1)</p></li>
+</ul></li>
+<li><p>Overall model</p>
+<ul>
+<li><span class="math inline">\(Y=\beta_0+\beta_1 X_1+\beta_2 X_2 +\epsilon\)</span></li>
+</ul></li>
+</ul>
+</div><div class="column fragment" style="width:50%;">
+<ul>
+<li>Identify models for each height</li>
+</ul>
+<p><strong>low</strong>: <span class="math inline">\(X_2 = 0\)</span> so <span class="math display">\[\begin{align}Y=&amp; \beta_0 + \beta_1 X_1+ \beta_2\cdot 0 + \epsilon \\[1ex]
+=&amp;\beta_0 + \beta_1 X_1+  \epsilon\end{align}\]</span></p>
+<p><strong>high</strong>: <span class="math inline">\(X_2 = 1\)</span> so <span class="math display">\[\begin{align}Y=&amp;\beta_0 + \beta_1 X_1 + \beta_2\cdot 1 + \epsilon\\[1ex]
+=&amp; (\beta_0+\beta_2) + \beta_1 X_1 + \epsilon\end{align}\]</span></p>
+</div></div>
+</section>
+<section id="section-3" class="slide level2 smaller">
+<h2></h2>
+<h3 id="funnel-data-example-parallel-lines-regression">Funnel Data Example: Parallel Lines Regression</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href=""></a>lm.parallel <span class="ot">=</span> <span class="fu">lm</span>(tswirl <span class="sc">~</span> dist <span class="sc">+</span> height.hi, <span class="at">data =</span> funnel.hilo)</span>
+<span id="cb6-2"><a href=""></a><span class="fu">summary</span>(lm.parallel)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell fragment">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = tswirl ~ dist + height.hi, data = funnel.hilo)
 
-.panelset[
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-1.5200 -0.6068 -0.2290  0.8135  1.5980 
 
-.panel[.panel-name[Code]
-
-```r
-lm.dummy &lt;- lm(tswirl ~ height.hi, data = funnel.hilo)
-summary(lm.dummy)
-```
-
-
-
-]
-
-.panel[.panel-name[Output]
-
-```
-## 
-## Call:
-## lm(formula = tswirl ~ height.hi, data = funnel.hilo)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -4.0650 -2.3825 -0.7455  2.9448  4.6150 
-## 
-## Coefficients:
-##             Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)  10.5650     0.9498  11.124 1.69e-09 ***
-## height.hi    11.2110     1.3432   8.346 1.33e-07 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 3.003 on 18 degrees of freedom
-## Multiple R-squared:  0.7947,	Adjusted R-squared:  0.7833 
-## F-statistic: 69.66 on 1 and 18 DF,  p-value: 1.333e-07
-```
-
-
-
-]
-]
-
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  2.93700    0.70527   4.164  0.00065 ***
+dist         0.31783    0.02628  12.092 8.95e-10 ***
+height.hi   11.21100    0.44605  25.134 6.95e-15 ***
 ---
-
-### Comparing the t-test and regression output?
-
-- Compare `\(t\)` statistics and p-values.
-
-- Interpret regression intercept.
-
-- Interpret regression slope.
-
-- Where does `\(s_p\)` appear in the output?
-
-
----
-
-## Quantitative plus indicator predictors
-### Parallel lines model
-
-.pull-left[
-
-- Example:
-
-  - `\(Y\)` = swirling time
-  
-  - `\(X_1\)` = distance up the channel
-  
-  - `\(X_2\)` = height (low = 0, high = 1)
-  
-- Overall model
-
-  - `\(Y=\beta_0+\beta_1 X_1+\beta_2 X_2 +\epsilon\)`
-  
-]
-
-.pull-right[
-  
-- Identify models for each height
-
-**low**: `\(X_2 = 0\)` so 
-`$$\begin{align}Y=&amp; \beta_0 + \beta_1 X_1+ \beta_2\cdot 0 + \epsilon \\[1ex]
-=&amp;\beta_0 + \beta_1 X_1+  \epsilon\end{align}$$`
-
-  
-**high**: `\(X_2 = 1\)` so 
-`$$\begin{align}Y=&amp;\beta_0 + \beta_1 X_1 + \beta_2\cdot 1 + \epsilon\\[1ex]
-=&amp; (\beta_0+\beta_2) + \beta_1 X_1 + \epsilon\end{align}$$`
-  
-]
-
----
-
-### Funnel Data Example: Parallel Lines Regression
-
-.panelset[
-
-.panel[.panel-name[Code]
-
-```r
-lm.parallel = lm(tswirl ~ dist + height.hi, data = funnel.hilo)
-summary(lm.parallel)
-```
-
-
-
-]
-
-.panel[.panel-name[Output]
-
-```
-## 
-## Call:
-## lm(formula = tswirl ~ dist + height.hi, data = funnel.hilo)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -1.5200 -0.6068 -0.2290  0.8135  1.5980 
-## 
-## Coefficients:
-##             Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)  2.93700    0.70527   4.164  0.00065 ***
-## dist         0.31783    0.02628  12.092 8.95e-10 ***
-## height.hi   11.21100    0.44605  25.134 6.95e-15 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 0.9974 on 17 degrees of freedom
-## Multiple R-squared:  0.9786,	Adjusted R-squared:  0.9761 
-## F-statistic:   389 on 2 and 17 DF,  p-value: 6.398e-15
-```
-
-
-
-]
-
-]
-
----
-
-### Plotting the fitted parallel lines
-
-.panelset[
-
-.panel[.panel-name[Code]
-
-```r
-gf_point(tswirl ~ dist, color = ~factor(height.hi), data = funnel.hilo) %&gt;%
-  gf_smooth(method = "lm")
-```
-
-
-
-]
-
-.panel[.panel-name[Output]
-
-&lt;img src="Ch3Lect_pt2_files/figure-html/unnamed-chunk-7-1.png" width="90%" /&gt;
-
-]
-]
-
----
-
-### Comparing Parallel Regression Lines
-
-- Is there a significant difference in the intercepts?
-
-- The `\(t\)`-test for the `height.hi` (dummy variable) coefficient is a test of whether the intercepts differ:
-
-`$$H_0: \beta_2=0\\H_a: \beta_2\neq 0$$`
-
-
----
-
-### Assessing the Fit
-
-
-
-.panelset[
-
-.panel[.panel-name[Code]
-
-```r
-# Optional: Code gets a bit messy to color residuals by height
-# Don't worry about that
-p1 &lt;- gf_point(resid(lm.parallel)~fitted(lm.parallel), 
-               color = ~factor(lm.parallel$model$height.hi)) %&gt;%
-  gf_labs(color = "Height")
-p2 &lt;- gf_qq(~resid(lm.parallel)) %&gt;%
-  gf_qqline()
-grid.arrange(p1, p2, ncol = 2)
-```
-
-
-
-]
-
-.panel[.panel-name[Output]
-
-&lt;img src="Ch3Lect_pt2_files/figure-html/unnamed-chunk-8-1.png" width="90%" /&gt;
-
-]
-
-]
-
-
----
-
-### Specify Fitted Models by Height
-
-- Height = Low `\((X_2=0)\)`:
-
-$$
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.9974 on 17 degrees of freedom
+Multiple R-squared:  0.9786,    Adjusted R-squared:  0.9761 
+F-statistic:   389 on 2 and 17 DF,  p-value: 6.398e-15</code></pre>
+</div>
+</div>
+</section>
+<section id="section-4" class="slide level2 smaller">
+<h2></h2>
+<h3 id="specify-fitted-models-by-height">Specify Fitted Models by Height</h3>
+<ul>
+<li>Height = Low <span class="math inline">\((X_2=0)\)</span>:</li>
+</ul>
+<p><span class="math display">\[
 \widehat{\text{tswirl}} = 2.937 + 0.318 \cdot \text{dist}
-$$
-
---
-
-&lt;br&gt;
-
-- Height = High `\((X_2=1)\)`:
-
-$$
-`\begin{align}
+\]</span></p>
+<div class="fragment">
+<p><br></p>
+<ul>
+<li>Height = High <span class="math inline">\((X_2=1)\)</span>:</li>
+</ul>
+<p><span class="math display">\[
+\begin{align}
 \widehat{\text{tswirl}} =&amp; 2.937 + 0.318 \cdot \text{dist} + 11.211(1)\\[1ex]
-=&amp; 14.148 + 0.318 \cdot \text{dist} 
-\end{align}`
-$$
+=&amp; 14.148 + 0.318 \cdot \text{dist}
+\end{align}
+\]</span></p>
+</div>
+</section>
+<section id="section-5" class="slide level2 smaller">
+<h2></h2>
+<h3 id="plotting-the-fitted-parallel-lines">Plotting the fitted parallel lines</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href=""></a><span class="fu">gf_point</span>(tswirl <span class="sc">~</span> dist, <span class="at">color =</span> <span class="sc">~</span><span class="fu">factor</span>(height.hi), <span class="at">data =</span> funnel.hilo) <span class="sc">|&gt;</span></span>
+<span id="cb8-2"><a href=""></a>  <span class="fu">gf_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell fragment">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="Ch3Lect_pt2_files/figure-revealjs/unnamed-chunk-6-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="comparing-parallel-regression-lines" class="slide level2">
+<h2>Comparing Parallel Regression Lines</h2>
+<ul>
+<li><p>Is there a significant difference in the intercepts?</p></li>
+<li><p>The <span class="math inline">\(t\)</span>-test for the <code>height.hi</code> (dummy variable) coefficient is a test of whether the intercepts differ:</p></li>
+</ul>
+<p><span class="math display">\[
+\begin{gather}
+H_0: \beta_2=0\\
+H_a: \beta_2\neq 0
+\end{gather}
+\]</span></p>
+</section>
+<section id="section-6" class="slide level2 smaller">
+<h2></h2>
+<h3 id="assessing-the-fit">Assessing the Fit</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href=""></a><span class="co"># Not necessary to color by high/low but just in case</span></span>
+<span id="cb9-2"><a href=""></a>p1 <span class="ot">&lt;-</span> <span class="fu">gf_point</span>(<span class="fu">resid</span>(lm.parallel)<span class="sc">~</span><span class="fu">fitted</span>(lm.parallel), <span class="at">color =</span> <span class="sc">~</span><span class="fu">factor</span>(height.hi), <span class="at">data =</span> funnel.hilo)</span>
+<span id="cb9-3"><a href=""></a>p2 <span class="ot">&lt;-</span> <span class="fu">gf_qq</span>(<span class="sc">~</span><span class="fu">resid</span>(lm.parallel)) <span class="sc">|&gt;</span></span>
+<span id="cb9-4"><a href=""></a>  <span class="fu">gf_qqline</span>()</span>
+<span id="cb9-5"><a href=""></a><span class="fu">grid.arrange</span>(p1, p2, <span class="at">ncol =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
----
-
-### Interaction (Two Lines) Model
-
-- Allow both intercepts and slopes to differ
-
-- The two lines model:
-
-$$
+</div>
+<img data-src="Ch3Lect_pt2_files/figure-revealjs/unnamed-chunk-7-1.png" width="960" class="r-stretch"></section>
+<section id="section-7" class="slide level2 smaller">
+<h2></h2>
+<h3 id="interaction-two-lines-model">Interaction (Two Lines) Model</h3>
+<ul>
+<li><p>Allow both intercepts and slopes to differ</p></li>
+<li><p>The two lines model:</p></li>
+</ul>
+<p><span class="math display">\[
 Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1\cdot X_2 + \epsilon
-$$
-
-- `\(\beta_2\)` models the difference in **intercepts**.
-
-- `\(\beta_3\)` models the difference in **slopes**.
-
----
-### Interaction (Two Lines) Model for Funnel Data
-
-- The complete model
-
-$$
+\]</span></p>
+<ul>
+<li><p><span class="math inline">\(\beta_2\)</span> models the difference in <strong>intercepts</strong>.</p></li>
+<li><p><span class="math inline">\(\beta_3\)</span> models the difference in <strong>slopes</strong>.</p></li>
+</ul>
+</section>
+<section id="section-8" class="slide level2 smaller">
+<h2></h2>
+<h3 id="interaction-two-lines-model-for-funnel-data">Interaction (Two Lines) Model for Funnel Data</h3>
+<h4 id="the-complete-model">The complete model</h4>
+<p><span class="math display">\[
 \text{tswirl} = \beta_0 + \beta_1 (\text{dist}) + \beta_2 (\text{funnel.hi}) + \beta_3 (\text{dist}\cdot \text{funnel.hi}) + \epsilon
-$$
-
-- Specifying the model for each height:
-
-(1) Height = Low 
-  
-$$
-`\begin{align}
+\]</span></p>
+<div class="fragment">
+<h4 id="specifying-the-model-for-each-height">Specifying the model for each height:</h4>
+<ol type="1">
+<li>Height = Low</li>
+</ol>
+<p><span class="math display">\[
+\begin{align}
 \text{tswirl} &amp;= \beta_0 + \beta_1 (\text{dist}) + \beta_2 (0) + \beta_3 (\text{dist}\cdot 0) + \epsilon \\[1ex]
- &amp;= \beta_0 + \beta_1 (\text{dist}) + \epsilon
-\end{align}`
-$$
-  
-(2) Height = High 
-  
-$$
-`\begin{align}
+&amp;= \beta_0 + \beta_1 (\text{dist}) + \epsilon
+\end{align}
+\]</span></p>
+<ol start="2" type="1">
+<li>Height = High</li>
+</ol>
+<p><span class="math display">\[
+\begin{align}
 \text{tswirl} &amp;= \beta_0 + \beta_1 (\text{dist}) + \beta_2 (1) + \beta_3 (\text{dist}\cdot 1) + \epsilon \\[1ex]
- &amp;= (\beta_0+\beta_2) + (\beta_1+\beta_3) (\text{dist}) + \epsilon
-\end{align}`
-$$
+&amp;= (\beta_0+\beta_2) + (\beta_1+\beta_3) (\text{dist}) + \epsilon
+\end{align}
+\]</span></p>
+</div>
+</section>
+<section id="section-9" class="slide level2 smaller">
+<h2></h2>
+<h3 id="r-output-for-the-interaction-model">R Output for the Interaction Model</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href=""></a>lm<span class="fl">.2</span>lines <span class="ot">=</span> <span class="fu">lm</span>(tswirl <span class="sc">~</span> dist <span class="sc">+</span> height.hi <span class="sc">+</span> dist <span class="sc">*</span> height.hi, <span class="at">data =</span> funnel.hilo)</span>
+<span id="cb10-2"><a href=""></a><span class="fu">summary</span>(lm<span class="fl">.2</span>lines)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell fragment">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = tswirl ~ dist + height.hi + dist * height.hi, data = funnel.hilo)
 
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-1.2310 -0.6528 -0.1785  0.7065  1.7140 
+
+Coefficients:
+               Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)     2.22900    0.93851   2.375   0.0304 *  
+dist            0.34733    0.03687   9.421 6.26e-08 ***
+height.hi      12.62700    1.32726   9.514 5.47e-08 ***
+dist:height.hi -0.05900    0.05214  -1.132   0.2745    
 ---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-### R Output for the Interaction Model
+Residual standard error: 0.9893 on 16 degrees of freedom
+Multiple R-squared:  0.9802,    Adjusted R-squared:  0.9765 
+F-statistic:   264 on 3 and 16 DF,  p-value: 7.819e-14</code></pre>
+</div>
+</div>
+</section>
+<section id="section-10" class="slide level2 smaller">
+<h2></h2>
+<h3 id="using-the-r-output-for-the-interaction-model">Using the R Output for the Interaction Model</h3>
+<h4 id="use-coefficient-t-tests">Use coefficient <span class="math inline">\(t\)</span>-tests</h4>
+<ul>
+<li><p>Test for different slopes:</p>
+<ul>
+<li><span class="math inline">\(H_0: \beta_3=0\text{ versus } H_a: \beta_3\neq 0\)</span></li>
+</ul></li>
+<li><p>Test for different intercepts:</p>
+<ul>
+<li><span class="math inline">\(H_0: \beta_3=0\text{ versus } H_a: \beta_3\neq 0\)</span></li>
+</ul></li>
+</ul>
+<p><strong>Note:</strong> Joint test for both requires a nested <span class="math inline">\(F\)</span>-test (to come)</p>
+</section>
+<section id="section-11" class="slide level2 smaller">
+<h2></h2>
+<h3 id="the-two-lines-models-can-be-generalized-to-more-than-two-heights">The Two Lines Models Can Be Generalized to More than Two Heights:</h3>
+<h4 id="three-parallel-lines">Three parallel lines</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href=""></a><span class="fu">cat</span>(<span class="st">"Three parallel lines output:</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 
+</section>
+<section id="section-11-output" class="slide level2 smaller output-location-slide"><h2></h2><div class="cell output-location-slide">
+<div class="cell-output cell-output-stdout">
+<pre><code>Three parallel lines output:</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href=""></a>lm.parallel3 <span class="ot">&lt;-</span> <span class="fu">lm</span>(tswirl <span class="sc">~</span> dist <span class="sc">+</span> <span class="fu">factor</span>(height), <span class="at">data =</span> funneldata)</span>
+<span id="cb14-2"><a href=""></a><span class="fu">summary</span>(lm.parallel3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = tswirl ~ dist + factor(height), data = funneldata)
 
-.panelset[
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-1.5800 -0.6760 -0.1425  0.8460  1.5680 
 
-.panel[.panel-name[Code]
-
-```r
-lm.2lines = lm(tswirl ~ dist + height.hi + dist * height.hi, data = funnel.hilo)
-summary(lm.2lines)
-```
-
-
-
-]
-
-.panel[.panel-name[Output]
-
-```
-## 
-## Call:
-## lm(formula = tswirl ~ dist + height.hi + dist * height.hi, data = funnel.hilo)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -1.2310 -0.6528 -0.1785  0.7065  1.7140 
-## 
-## Coefficients:
-##                Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)     2.22900    0.93851   2.375   0.0304 *  
-## dist            0.34733    0.03687   9.421 6.26e-08 ***
-## height.hi      12.62700    1.32726   9.514 5.47e-08 ***
-## dist:height.hi -0.05900    0.05214  -1.132   0.2745    
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 0.9893 on 16 degrees of freedom
-## Multiple R-squared:  0.9802,	Adjusted R-squared:  0.9765 
-## F-statistic:   264 on 3 and 16 DF,  p-value: 7.819e-14
-```
-
-
-
-]
-]
-
-
+Coefficients:
+                   Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)         2.81700    0.58404   4.823 5.36e-05 ***
+dist                0.32283    0.02075  15.556 1.10e-14 ***
+factor(height)11.5  8.50400    0.43134  19.715  &lt; 2e-16 ***
+factor(height)13   11.21100    0.43134  25.991  &lt; 2e-16 ***
 ---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-## Using the R Output for the Interaction Model
+Residual standard error: 0.9645 on 26 degrees of freedom
+Multiple R-squared:  0.9741,    Adjusted R-squared:  0.9711 
+F-statistic: 325.9 on 3 and 26 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div></section><section id="section-12" class="slide level2 smaller">
+<h2></h2>
+<h3 id="three-general-lines">Three general lines</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href=""></a><span class="fu">cat</span>(<span class="st">"Three general lines output:</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 
-### Use coefficient `\(t\)`-tests
 
-- Test for different slopes:
+</section><section id="section-12-output" class="slide level2 smaller output-location-slide"><h2></h2><div class="cell output-location-slide">
+<div class="cell-output cell-output-stdout">
+<pre><code>Three general lines output:</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href=""></a>lm<span class="fl">.3</span>lines <span class="ot">&lt;-</span> <span class="fu">lm</span>(tswirl <span class="sc">~</span> dist <span class="sc">+</span> <span class="fu">factor</span>(height) <span class="sc">+</span> dist<span class="sc">:</span><span class="fu">factor</span>(height), </span>
+<span id="cb18-2"><a href=""></a>             <span class="at">data =</span> funneldata) </span>
+<span id="cb18-3"><a href=""></a></span>
+<span id="cb18-4"><a href=""></a><span class="fu">summary</span>(lm<span class="fl">.3</span>lines)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = tswirl ~ dist + factor(height) + dist:factor(height), 
+    data = funneldata)
 
-  - `\(H_0: \beta_3=0\text{ versus } H_a: \beta_3\neq 0\)`
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-1.3850 -0.6560 -0.1785  0.7715  1.7140 
+
+Coefficients:
+                        Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)              2.22900    0.92519   2.409    0.024 *  
+dist                     0.34733    0.03635   9.557 1.18e-09 ***
+factor(height)11.5       8.85200    1.30842   6.765 5.36e-07 ***
+factor(height)13        12.62700    1.30842   9.651 9.80e-10 ***
+dist:factor(height)11.5 -0.01450    0.05140  -0.282    0.780    
+dist:factor(height)13   -0.05900    0.05140  -1.148    0.262    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.9752 on 24 degrees of freedom
+Multiple R-squared:  0.9756,    Adjusted R-squared:  0.9705 
+F-statistic: 191.6 on 5 and 24 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div></section></section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="Ch3Lect_pt2_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="Ch3Lect_pt2_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="Ch3Lect_pt2_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="Ch3Lect_pt2_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="Ch3Lect_pt2_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="Ch3Lect_pt2_files/libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
+  <script src="Ch3Lect_pt2_files/libs/revealjs/plugin/quarto-support/support.js"></script>
   
-- Test for different intercepts:
 
-  - `\(H_0: \beta_3=0\text{ versus } H_a: \beta_3\neq 0\)`
-  
+  <script src="Ch3Lect_pt2_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="Ch3Lect_pt2_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="Ch3Lect_pt2_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="Ch3Lect_pt2_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
 
-**Note:** Joint test for both requires a nested `\(F\)`-test (to come)  
+  <script>
 
----
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': true,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleChalkboard(event)\"><kbd>b</kbd> Toggle Chalkboard</a></li>\n<li class=\"slide-tool-item\" data-item=\"6\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleNotesCanvas(event)\"><kbd>c</kbd> Toggle Notes Canvas</a></li>\n<li class=\"slide-tool-item\" data-item=\"7\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.downloadDrawings(event)\"><kbd>d</kbd> Download Drawings</a></li>\n<li class=\"slide-tool-item\" data-item=\"8\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'chalkboard': {"buttons":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
 
-### The Two Lines Models Can Be Generalized to More than Two Heights
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
 
-.panelset[
-.panel[.panel-name[3 parallel lines code]
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
 
-```r
-lm.parallel3 &lt;- lm(tswirl ~ dist + factor(height), data = funneldata)
-summary(lm.parallel3)
-```
-]
-.panel[.panel-name[3 parallel lines output]
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
 
-```
-## 
-## Call:
-## lm(formula = tswirl ~ dist + factor(height), data = funneldata)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -1.5800 -0.6760 -0.1425  0.8460  1.5680 
-## 
-## Coefficients:
-##                    Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)         2.81700    0.58404   4.823 5.36e-05 ***
-## dist                0.32283    0.02075  15.556 1.10e-14 ***
-## factor(height)11.5  8.50400    0.43134  19.715  &lt; 2e-16 ***
-## factor(height)13   11.21100    0.43134  25.991  &lt; 2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 0.9645 on 26 degrees of freedom
-## Multiple R-squared:  0.9741,	Adjusted R-squared:  0.9711 
-## F-statistic: 325.9 on 3 and 26 DF,  p-value: &lt; 2.2e-16
-```
+        // Display a presentation progress bar
+        progress: true,
 
-]
-.panel[.panel-name[3 lines code]
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
 
-```r
-lm.3lines &lt;- lm(tswirl ~ dist + factor(height) + dist:factor(height), 
-             data = funneldata)
-summary(lm.3lines)
-```
-]
-.panel[.panel-name[3 lines output]
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
 
-```
-## 
-## Call:
-## lm(formula = tswirl ~ dist + factor(height) + dist:factor(height), 
-##     data = funneldata)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -1.3850 -0.6560 -0.1785  0.7715  1.7140 
-## 
-## Coefficients:
-##                         Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)              2.22900    0.92519   2.409    0.024 *  
-## dist                     0.34733    0.03635   9.557 1.18e-09 ***
-## factor(height)11.5       8.85200    1.30842   6.765 5.36e-07 ***
-## factor(height)13        12.62700    1.30842   9.651 9.80e-10 ***
-## dist:factor(height)11.5 -0.01450    0.05140  -0.282    0.780    
-## dist:factor(height)13   -0.05900    0.05140  -1.148    0.262    
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 0.9752 on 24 degrees of freedom
-## Multiple R-squared:  0.9756,	Adjusted R-squared:  0.9705 
-## F-statistic: 191.6 on 5 and 24 DF,  p-value: &lt; 2.2e-16
-```
-]
-]
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
 
----
-    </textarea>
-<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
-<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
-<script>var slideshow = remark.create({
-"highlightStyle": "github",
-"highlightLines": true,
-"ratio": "16:9",
-"countIncrementalSlides": false
-});
-if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
-  window.dispatchEvent(new Event('resize'));
-});
-(function(d) {
-  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
-  if (!r) return;
-  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
-  d.head.appendChild(s);
-})(document);
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
 
-(function(d) {
-  var el = d.getElementsByClassName("remark-slides-area");
-  if (!el) return;
-  var slide, slides = slideshow.getSlides(), els = el[0].children;
-  for (var i = 1; i < slides.length; i++) {
-    slide = slides[i];
-    if (slide.properties.continued === "true" || slide.properties.count === "false") {
-      els[i - 1].className += ' has-continuation';
-    }
-  }
-  var s = d.createElement("style");
-  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
-  d.head.appendChild(s);
-})(document);
-// delete the temporary CSS (for displaying all slides initially) when the user
-// starts to view slides
-(function() {
-  var deleted = false;
-  slideshow.on('beforeShowSlide', function(slide) {
-    if (deleted) return;
-    var sheets = document.styleSheets, node;
-    for (var i = 0; i < sheets.length; i++) {
-      node = sheets[i].ownerNode;
-      if (node.dataset["target"] !== "print-only") continue;
-      node.parentNode.removeChild(node);
-    }
-    deleted = true;
-  });
-})();
-(function() {
-  "use strict"
-  // Replace <script> tags in slides area to make them executable
-  var scripts = document.querySelectorAll(
-    '.remark-slides-area .remark-slide-container script'
-  );
-  if (!scripts.length) return;
-  for (var i = 0; i < scripts.length; i++) {
-    var s = document.createElement('script');
-    var code = document.createTextNode(scripts[i].textContent);
-    s.appendChild(code);
-    var scriptAttrs = scripts[i].attributes;
-    for (var j = 0; j < scriptAttrs.length; j++) {
-      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
-    }
-    scripts[i].parentElement.replaceChild(s, scripts[i]);
-  }
-})();
-(function() {
-  var links = document.getElementsByTagName('a');
-  for (var i = 0; i < links.length; i++) {
-    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
-      links[i].target = '_blank';
-    }
-  }
-})();
-// adds .remark-code-has-line-highlighted class to <pre> parent elements
-// of code chunks containing highlighted lines with class .remark-code-line-highlighted
-(function(d) {
-  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
-  const preParents = [];
-  const findPreParent = function(line, p = 0) {
-    if (p > 1) return null; // traverse up no further than grandparent
-    const el = line.parentElement;
-    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
-  };
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
 
-  for (let line of hlines) {
-    let pre = findPreParent(line);
-    if (pre && !preParents.includes(pre)) preParents.push(pre);
-  }
-  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
-})(document);</script>
+        // Push each slide change to the browser history
+        history: true,
 
-<script>
-slideshow._releaseMath = function(el) {
-  var i, text, code, codes = el.getElementsByTagName('code');
-  for (i = 0; i < codes.length;) {
-    code = codes[i];
-    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
-      text = code.textContent;
-      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
-          /^\$\$(.|\s)+\$\$$/.test(text) ||
-          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
-        code.outerHTML = code.innerHTML;  // remove <code></code>
-        continue;
-      }
-    }
-    i++;
-  }
-};
-slideshow._releaseMath(document);
-</script>
-<!-- dynamically load mathjax for compatibility with self-contained -->
-<script>
-(function () {
-  var script = document.createElement('script');
-  script.type = 'text/javascript';
-  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
-  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
-    script.src  = script.src.replace(/^https?:/, '');
-  document.getElementsByTagName('head')[0].appendChild(script);
-})();
-</script>
-  </body>
-</html>
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'fade',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1050,
+
+        height: 700,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, RevealChalkboard, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    
+    <script>
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+      // slide changes (different for each slide format).
+      (function () {
+        // dispatch for htmlwidgets
+        function fireSlideEnter() {
+          const event = window.document.createEvent("Event");
+          event.initEvent("slideenter", true, true);
+          window.document.dispatchEvent(event);
+        }
+
+        function fireSlideChanged(previousSlide, currentSlide) {
+          fireSlideEnter();
+
+          // dispatch for shiny
+          if (window.jQuery) {
+            if (previousSlide) {
+              window.jQuery(previousSlide).trigger("hidden");
+            }
+            if (currentSlide) {
+              window.jQuery(currentSlide).trigger("shown");
+            }
+          }
+        }
+
+        // hookup for slidy
+        if (window.w3c_slidy) {
+          window.w3c_slidy.add_observer(function (slide_num) {
+            // slide_num starts at position 1
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+          });
+        }
+
+      })();
+    </script>
+
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+            const codeEl = trigger.previousElementSibling.cloneNode(true);
+            for (const childEl of codeEl.children) {
+              if (isCodeAnnotation(childEl)) {
+                childEl.remove();
+              }
+            }
+            return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>
