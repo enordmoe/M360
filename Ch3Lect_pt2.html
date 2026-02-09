@@ -225,6 +225,16 @@ MATH 360
 </section>
 <section id="funnel-data" class="slide level2">
 <h2>Funnel Data:</h2>
+<h3 id="prep-data-for-2-sample-analysis">Prep Data for 2-sample analysis</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a>funneldata <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"http://people.kzoo.edu/enordmoe/math360/funneldata.csv"</span>, <span class="at">col_types =</span> <span class="fu">cols</span>(<span class="at">trial =</span> <span class="fu">col_factor</span>(<span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"1"</span>,<span class="st">"2"</span>))))</span>
+<span id="cb1-2"><a href=""></a>funnel.hi <span class="ot">&lt;-</span> <span class="fu">filter</span>(funneldata, height <span class="sc">==</span> <span class="dv">13</span>)</span>
+<span id="cb1-3"><a href=""></a>funnel.hilo <span class="ot">&lt;-</span> <span class="fu">filter</span>(funneldata, height <span class="sc">==</span> <span class="dv">13</span> <span class="sc">|</span> height <span class="sc">==</span> <span class="dv">10</span>)</span>
+<span id="cb1-4"><a href=""></a>funnel.hilo <span class="ot">&lt;-</span> <span class="fu">mutate</span>(funnel.hilo, <span class="at">height.hi =</span> <span class="fu">ifelse</span>(height<span class="sc">==</span><span class="dv">13</span>,<span class="dv">1</span>,<span class="dv">0</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="funnel-data-1" class="slide level2">
+<h2>Funnel Data:</h2>
 <h3 id="height-as-a-categorical-predictor">Height as a Categorical Predictor</h3>
 <div class="columns">
 <div class="column" style="width:50%;">
@@ -237,7 +247,7 @@ MATH 360
 <div class="cell-output-display">
 <div>
 <figure>
-<p><img data-src="Ch3Lect_pt2_files/figure-revealjs/unnamed-chunk-1-1.png" width="960"></p>
+<p><img data-src="Ch3Lect_pt2_files/figure-revealjs/unnamed-chunk-2-1.png" width="960"></p>
 </figure>
 </div>
 </div>
@@ -272,7 +282,7 @@ s_p=\sqrt{\frac{(n_1-1)s_1^2+(n_2-1)s_2^2}{n_1+n_2-2}}\quad .
 <section id="two-sample-t-test-in-r" class="slide level2">
 <h2>Two-sample <span class="math inline">\(t\)</span>-test in R</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a><span class="fu">t.test</span>(tswirl <span class="sc">~</span> height.hi, <span class="at">var.equal =</span> <span class="cn">TRUE</span>, <span class="at">data =</span> funnel.hilo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href=""></a><span class="fu">t.test</span>(tswirl <span class="sc">~</span> height.hi, <span class="at">var.equal =</span> <span class="cn">TRUE</span>, <span class="at">data =</span> funnel.hilo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
@@ -306,13 +316,13 @@ mean in group 0 mean in group 1
 </ul>
 </div><div class="column fragment" style="width:70%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href=""></a><span class="co"># Plots group means on the "scatterplot"</span></span>
-<span id="cb3-2"><a href=""></a><span class="fu">gf_point</span>(tswirl <span class="sc">~</span> height.hi, <span class="at">data =</span> funnel.hilo) <span class="sc">+</span></span>
-<span id="cb3-3"><a href=""></a>  <span class="fu">stat_summary</span>(<span class="at">fun=</span>mean, <span class="at">geom=</span><span class="st">"line"</span>, <span class="at">color=</span><span class="st">"#166DA0"</span>, <span class="at">lwd =</span><span class="dv">2</span> )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href=""></a><span class="co"># Plots group means on the "scatterplot"</span></span>
+<span id="cb4-2"><a href=""></a><span class="fu">gf_point</span>(tswirl <span class="sc">~</span> height.hi, <span class="at">data =</span> funnel.hilo) <span class="sc">+</span></span>
+<span id="cb4-3"><a href=""></a>  <span class="fu">stat_summary</span>(<span class="at">fun=</span>mean, <span class="at">geom=</span><span class="st">"line"</span>, <span class="at">color=</span><span class="st">"#166DA0"</span>, <span class="at">lwd =</span><span class="dv">2</span> )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure>
-<p><img data-src="Ch3Lect_pt2_files/figure-revealjs/unnamed-chunk-3-1.png" width="960"></p>
+<p><img data-src="Ch3Lect_pt2_files/figure-revealjs/unnamed-chunk-4-1.png" width="960"></p>
 </figure>
 </div>
 </div>
@@ -327,8 +337,8 @@ mean in group 0 mean in group 1
 <section id="dummy-variable-regression-code-and-output" class="slide level2 smaller">
 <h2>Dummy variable regression code and output</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href=""></a>lm.dummy <span class="ot">&lt;-</span> <span class="fu">lm</span>(tswirl <span class="sc">~</span> height.hi, <span class="at">data =</span> funnel.hilo)</span>
-<span id="cb4-2"><a href=""></a><span class="fu">summary</span>(lm.dummy)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href=""></a>lm.dummy <span class="ot">&lt;-</span> <span class="fu">lm</span>(tswirl <span class="sc">~</span> height.hi, <span class="at">data =</span> funnel.hilo)</span>
+<span id="cb5-2"><a href=""></a><span class="fu">summary</span>(lm.dummy)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
@@ -413,8 +423,8 @@ F-statistic: 69.66 on 1 and 18 DF,  p-value: 1.333e-07</code></pre>
 <h2></h2>
 <h3 id="funnel-data-example-parallel-lines-regression">Funnel Data Example: Parallel Lines Regression</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href=""></a>lm.parallel <span class="ot">=</span> <span class="fu">lm</span>(tswirl <span class="sc">~</span> dist <span class="sc">+</span> height.hi, <span class="at">data =</span> funnel.hilo)</span>
-<span id="cb6-2"><a href=""></a><span class="fu">summary</span>(lm.parallel)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href=""></a>lm.parallel <span class="ot">=</span> <span class="fu">lm</span>(tswirl <span class="sc">~</span> dist <span class="sc">+</span> height.hi, <span class="at">data =</span> funnel.hilo)</span>
+<span id="cb7-2"><a href=""></a><span class="fu">summary</span>(lm.parallel)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
@@ -466,14 +476,14 @@ F-statistic:   389 on 2 and 17 DF,  p-value: 6.398e-15</code></pre>
 <h2></h2>
 <h3 id="plotting-the-fitted-parallel-lines">Plotting the fitted parallel lines</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href=""></a><span class="fu">gf_point</span>(tswirl <span class="sc">~</span> dist, <span class="at">color =</span> <span class="sc">~</span><span class="fu">factor</span>(height.hi), <span class="at">data =</span> funnel.hilo) <span class="sc">|&gt;</span></span>
-<span id="cb8-2"><a href=""></a>  <span class="fu">gf_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href=""></a><span class="fu">gf_point</span>(tswirl <span class="sc">~</span> dist, <span class="at">color =</span> <span class="sc">~</span><span class="fu">factor</span>(height.hi), <span class="at">data =</span> funnel.hilo) <span class="sc">|&gt;</span></span>
+<span id="cb9-2"><a href=""></a>  <span class="fu">gf_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output-display">
 <div>
 <figure>
-<p><img data-src="Ch3Lect_pt2_files/figure-revealjs/unnamed-chunk-6-1.png" width="960"></p>
+<p><img data-src="Ch3Lect_pt2_files/figure-revealjs/unnamed-chunk-7-1.png" width="960"></p>
 </figure>
 </div>
 </div>
@@ -496,14 +506,14 @@ H_a: \beta_2\neq 0
 <h2></h2>
 <h3 id="assessing-the-fit">Assessing the Fit</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href=""></a><span class="co"># Not necessary to color by high/low but just in case</span></span>
-<span id="cb9-2"><a href=""></a>p1 <span class="ot">&lt;-</span> <span class="fu">gf_point</span>(<span class="fu">resid</span>(lm.parallel)<span class="sc">~</span><span class="fu">fitted</span>(lm.parallel), <span class="at">color =</span> <span class="sc">~</span><span class="fu">factor</span>(height.hi), <span class="at">data =</span> funnel.hilo)</span>
-<span id="cb9-3"><a href=""></a>p2 <span class="ot">&lt;-</span> <span class="fu">gf_qq</span>(<span class="sc">~</span><span class="fu">resid</span>(lm.parallel)) <span class="sc">|&gt;</span></span>
-<span id="cb9-4"><a href=""></a>  <span class="fu">gf_qqline</span>()</span>
-<span id="cb9-5"><a href=""></a><span class="fu">grid.arrange</span>(p1, p2, <span class="at">ncol =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href=""></a><span class="co"># Not necessary to color by high/low but just in case</span></span>
+<span id="cb10-2"><a href=""></a>p1 <span class="ot">&lt;-</span> <span class="fu">gf_point</span>(<span class="fu">resid</span>(lm.parallel)<span class="sc">~</span><span class="fu">fitted</span>(lm.parallel), <span class="at">color =</span> <span class="sc">~</span><span class="fu">factor</span>(height.hi), <span class="at">data =</span> funnel.hilo)</span>
+<span id="cb10-3"><a href=""></a>p2 <span class="ot">&lt;-</span> <span class="fu">gf_qq</span>(<span class="sc">~</span><span class="fu">resid</span>(lm.parallel)) <span class="sc">|&gt;</span></span>
+<span id="cb10-4"><a href=""></a>  <span class="fu">gf_qqline</span>()</span>
+<span id="cb10-5"><a href=""></a><span class="fu">grid.arrange</span>(p1, p2, <span class="at">ncol =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 </div>
-<img data-src="Ch3Lect_pt2_files/figure-revealjs/unnamed-chunk-7-1.png" width="960" class="r-stretch"></section>
+<img data-src="Ch3Lect_pt2_files/figure-revealjs/unnamed-chunk-8-1.png" width="960" class="r-stretch"></section>
 <section id="section-7" class="slide level2 smaller">
 <h2></h2>
 <h3 id="interaction-two-lines-model">Interaction (Two Lines) Model</h3>
@@ -552,8 +562,8 @@ Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1\cdot X_2 + \epsilon
 <h2></h2>
 <h3 id="r-output-for-the-interaction-model">R Output for the Interaction Model</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href=""></a>lm<span class="fl">.2</span>lines <span class="ot">=</span> <span class="fu">lm</span>(tswirl <span class="sc">~</span> dist <span class="sc">+</span> height.hi <span class="sc">+</span> dist <span class="sc">*</span> height.hi, <span class="at">data =</span> funnel.hilo)</span>
-<span id="cb10-2"><a href=""></a><span class="fu">summary</span>(lm<span class="fl">.2</span>lines)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href=""></a>lm<span class="fl">.2</span>lines <span class="ot">=</span> <span class="fu">lm</span>(tswirl <span class="sc">~</span> dist <span class="sc">+</span> height.hi <span class="sc">+</span> dist <span class="sc">*</span> height.hi, <span class="at">data =</span> funnel.hilo)</span>
+<span id="cb11-2"><a href=""></a><span class="fu">summary</span>(lm<span class="fl">.2</span>lines)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output cell-output-stdout">
@@ -599,18 +609,17 @@ F-statistic:   264 on 3 and 16 DF,  p-value: 7.819e-14</code></pre>
 <section id="section-11" class="slide level2 smaller">
 <h2></h2>
 <h3 id="the-two-lines-models-can-be-generalized-to-more-than-two-heights">The Two Lines Models Can Be Generalized to More than Two Heights:</h3>
-<h4 id="three-parallel-lines">Three parallel lines</h4>
+<h4 id="three-parallel-lines-code">Three parallel lines code</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href=""></a><span class="fu">cat</span>(<span class="st">"Three parallel lines output:</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href=""></a>lm.parallel3 <span class="ot">&lt;-</span> <span class="fu">lm</span>(tswirl <span class="sc">~</span> dist <span class="sc">+</span> <span class="fu">factor</span>(height), <span class="at">data =</span> funneldata)</span>
+<span id="cb13-2"><a href=""></a><span class="fu">summary</span>(lm.parallel3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-
 </section>
-<section id="section-11-output" class="slide level2 smaller output-location-slide"><h2></h2><div class="cell output-location-slide">
-<div class="cell-output cell-output-stdout">
-<pre><code>Three parallel lines output:</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href=""></a>lm.parallel3 <span class="ot">&lt;-</span> <span class="fu">lm</span>(tswirl <span class="sc">~</span> dist <span class="sc">+</span> <span class="fu">factor</span>(height), <span class="at">data =</span> funneldata)</span>
-<span id="cb14-2"><a href=""></a><span class="fu">summary</span>(lm.parallel3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="section-12" class="slide level2 smaller">
+<h2></h2>
+<h3 id="the-two-lines-models-can-be-generalized-to-more-than-two-heights-1">The Two Lines Models Can Be Generalized to More than Two Heights:</h3>
+<h4 id="three-parallel-lines-output">Three parallel lines output</h4>
+<div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
@@ -633,22 +642,22 @@ Residual standard error: 0.9645 on 26 degrees of freedom
 Multiple R-squared:  0.9741,    Adjusted R-squared:  0.9711 
 F-statistic: 325.9 on 3 and 26 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
-</div></section><section id="section-12" class="slide level2 smaller">
+</div>
+</section>
+<section id="section-13" class="slide level2 smaller">
 <h2></h2>
-<h3 id="three-general-lines">Three general lines</h3>
+<h3 id="three-general-lines-code">Three general lines code</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href=""></a><span class="fu">cat</span>(<span class="st">"Three general lines output:</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href=""></a>lm<span class="fl">.3</span>lines <span class="ot">&lt;-</span> <span class="fu">lm</span>(tswirl <span class="sc">~</span> dist <span class="sc">+</span> <span class="fu">factor</span>(height) <span class="sc">+</span> dist<span class="sc">:</span><span class="fu">factor</span>(height), </span>
+<span id="cb15-2"><a href=""></a>             <span class="at">data =</span> funneldata) </span>
+<span id="cb15-3"><a href=""></a></span>
+<span id="cb15-4"><a href=""></a><span class="fu">summary</span>(lm<span class="fl">.3</span>lines)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-
-
-</section><section id="section-12-output" class="slide level2 smaller output-location-slide"><h2></h2><div class="cell output-location-slide">
-<div class="cell-output cell-output-stdout">
-<pre><code>Three general lines output:</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href=""></a>lm<span class="fl">.3</span>lines <span class="ot">&lt;-</span> <span class="fu">lm</span>(tswirl <span class="sc">~</span> dist <span class="sc">+</span> <span class="fu">factor</span>(height) <span class="sc">+</span> dist<span class="sc">:</span><span class="fu">factor</span>(height), </span>
-<span id="cb18-2"><a href=""></a>             <span class="at">data =</span> funneldata) </span>
-<span id="cb18-3"><a href=""></a></span>
-<span id="cb18-4"><a href=""></a><span class="fu">summary</span>(lm<span class="fl">.3</span>lines)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="section-14" class="slide level2" style="font-size: 60%;">
+<h2></h2>
+<h4 id="three-general-lines-output">Three general lines output</h4>
+<div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
@@ -674,7 +683,9 @@ Residual standard error: 0.9752 on 24 degrees of freedom
 Multiple R-squared:  0.9756,    Adjusted R-squared:  0.9705 
 F-statistic: 191.6 on 5 and 24 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
-</div></section></section>
+</div>
+
+</section></section>
     </div>
   <div class="quarto-auto-generated-content" style="display: none;">
 <div class="footer footer-default">

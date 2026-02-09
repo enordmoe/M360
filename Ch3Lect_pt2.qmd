@@ -33,12 +33,6 @@ library(Stat2Data)
 library(gridExtra)
 library(plotly)
 library(readr)
-funneldata <- read_csv("http://people.kzoo.edu/enordmoe/math360/funneldata.csv", col_types = cols(trial = col_factor(levels = c("1","2"))))
-funnel.hi <- filter(funneldata, height == 13)
-funnel.hilo <- filter(funneldata, height == 13 | height == 10)
-funnel.hilo <- mutate(funnel.hilo, height.hi = ifelse(height==13,1,0))
-funneldata <- mutate(funneldata, height.hi = ifelse(height==13, 1, 0),
-                   height.mid = ifelse(height == 11.5, 1, 0))
 data("SpeciesArea")
 data("CountyHealth")
 data("LongJumpOlympics")
@@ -64,6 +58,17 @@ data("NFLStandings2016")
 
 -   Extend to more than two lines
 :::
+
+## Funnel Data:
+### Prep Data for 2-sample analysis
+
+```{r}
+funneldata <- read_csv("http://people.kzoo.edu/enordmoe/math360/funneldata.csv", col_types = cols(trial = col_factor(levels = c("1","2"))))
+funnel.hi <- filter(funneldata, height == 13)
+funnel.hilo <- filter(funneldata, height == 13 | height == 10)
+funnel.hilo <- mutate(funnel.hilo, height.hi = ifelse(height==13,1,0))
+```
+
 
 ## Funnel Data:
 ### Height as a Categorical Predictor
@@ -389,22 +394,26 @@ summary(lm.2lines)
 
 ## {.smaller}
 ### The Two Lines Models Can Be Generalized to More than Two Heights: 
-#### Three parallel lines
+#### Three parallel lines code
 
-```{r}
-#| output-location: slide
-cat("Three parallel lines output:\n")
+```{r eval = FALSE}
 lm.parallel3 <- lm(tswirl ~ dist + factor(height), data = funneldata)
 summary(lm.parallel3)
 ```
 
+## {.smaller}
+### The Two Lines Models Can Be Generalized to More than Two Heights: 
+#### Three parallel lines output
+
+```{r echo = FALSE}
+lm.parallel3 <- lm(tswirl ~ dist + factor(height), data = funneldata)
+summary(lm.parallel3)
+```
 
 ## {.smaller}
-### Three general lines
+### Three general lines code
 
-```{r}
-#| output-location: slide
-cat("Three general lines output:\n")
+```{r eval = FALSE}
 lm.3lines <- lm(tswirl ~ dist + factor(height) + dist:factor(height), 
              data = funneldata) 
 
@@ -412,5 +421,14 @@ summary(lm.3lines)
 ```
 
 
+## {style="font-size: 60%;"}
+#### Three general lines output
+
+```{r echo = FALSE}
+lm.3lines <- lm(tswirl ~ dist + factor(height) + dist:factor(height), 
+             data = funneldata) 
+
+summary(lm.3lines)
+```
 
 
