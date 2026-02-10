@@ -1,0 +1,531 @@
+---
+title: "Chapter 3: Multiple Regression<br><span style='font-size:70%'>Part 3: Sections 3.4-3.5</span>"
+subtitle: "Statistical Modeling"
+author: "MATH 360"
+format:
+  revealjs:
+    chalkboard: true
+    theme: [default, custom.scss]
+    toc: false
+    toc-depth: 1
+    slideNumber: true
+    html-math-method: mathjax
+    incremental: false
+    transition: fade
+    preview-links: auto
+    notes: true
+title-slide-attributes:
+  data-background-color: "#EA6820"
+from: markdown+emoji
+execute:
+  echo: true
+  cache: false
+editor:
+  markdown:
+    wrap: 72
+---
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(rvest)
+library(mosaic)
+library(Stat2Data)
+library(gridExtra)
+library(plotly)
+library(readr)
+data("SpeciesArea")
+data("CountyHealth")
+data("LongJumpOlympics")
+MidtermFinal <- read.csv("http://people.kzoo.edu/enordmoe/math360/MidtermFinal.csv")
+data("WeightLossIncentive4")
+data("NFLStandings2016")
+data("Perch")
+```
+
+## Outline
+
+::: incremental
+-   Interaction model
+
+-   Polynomial regression
+
+    -   Quadratic model
+
+-   Second-order model
+
+-   Multicollinearity
+
+    -   Variance Inflation Factor (VIF)
+:::
+
+## Funnel Data:
+
+### Prep Data for 2-sample analysis
+
+```{r}
+funneldata <- read_csv("http://people.kzoo.edu/enordmoe/math360/funneldata.csv", col_types = cols(trial = col_factor(levels = c("1","2"))))
+funnel.hilo <- filter(funneldata, height == 13 | height == 10)
+funnel.hilo <- mutate(funnel.hilo, height.hi = ifelse(height==13,1,0))
+```
+
+## Interaction {.smaller}
+
+Recall the funnel data model for two regression lines:
+
+$$
+\text{tswirl} = \beta_0 + \beta_1 (\text{dist}) + \beta_2 (\text{funnel.hi}) + \beta_3 (\text{dist}\cdot \text{funnel.hi}) + \epsilon
+$$
+
+-   The product term $\beta_3 (\text{dist}\cdot \text{funnel.hi})$
+    allows for different effects of distance for low and high settings.
+
+**Interaction:** When the relationship between two variables *changes*
+depending on a third variable.
+
+-   Consider adding a product term to account for interactions where the
+    context suggests it.
+
+## Fish Weight Analysis {.smaller}
+
+### Example 3.11
+
+-   **Dataset:** [**Perch**]{.red} (measurements for 56 fish)
+
+    -   **Predictors:** `Length`, `Width` (in cm)
+
+    -   **Response:** `Weight` (in gm)
+
+::: fragment
+-   Fit a two-predictor model with an interaction.
+:::
+
+<br>
+
+::: fragment
+-   **Questions**:
+    -   Why might the product of the two explanatory variables be
+        important here?\
+    -   What does the product represent?
+:::
+
+##  {.smaller}
+
+### Example R Code for [**Perch**]{.red} Data
+
+```{r, panelset = TRUE, fig.height = 3.5}
+#| output-location: fragment
+data("Perch")
+perch_mod <- lm(Weight ~ Length + Width + I(Length * Width), data = Perch)
+summary(perch_mod)
+```
+
+##  {.smaller}
+
+### Example R Code for [**Perch**]{.red} Data
+
+::: incremental
+Points to note:
+
+-   Use of `I()` to create product term without creating a new variable.
+
+-   Interpretation of coefficient of interaction.
+
+    -   Compare "effect" of an increase in `Width` for different values
+        of `Length`
+
+    -   For example: write the model for different values of `Length`
+        (e.g., 20 cm and 40 cm)
+
+    -   Note difference in effect of an extra 1cm in `Width`.
+:::
+
+##  {.smaller}
+
+### Example R Code for [**Perch**]{.red} Data
+
+```{r, panelset = TRUE, fig.height = 3.5}
+#| output-location: fragment
+anova(perch_mod)
+```
+
+##  {.smaller}
+
+### Example R Code for [**Perch**]{.red} Data
+
+```{r, panelset = TRUE, fig.height = 3.5}
+gf_point(resid(perch_mod) ~ fitted(perch_mod)) %>%
+  gf_hline(yintercept = ~0, col = "red")
+```
+
+-   Consider `log(Weight)` given non-constant variance.
+
+##  {.smaller}
+
+### Example: State SAT Scores
+
+**Response variable** $(Y)$:\
+- `SAT` state average combined SAT score
+
+<br>
+
+**Potential predictors** $(X)$:
+
+-   `Takers`: % taking SAT exam
+
+-   `Expend`: spending per student (\$100s)
+
+<br>
+
+**Data:** [**state_sat**]{.red}
+
+##  {.smaller}
+
+### Results of Fitting Linear Model
+
+::::: columns
+::: {.column width="50%"}
+```{r, echo = FALSE}
+state_sat <- read.csv("http://people.kzoo.edu/enordmoe/math360/StateSAT.csv")
+gf_point(SAT ~ Takers, data = state_sat) %>%
+  gf_smooth(method = "lm", color = "blue") 
+```
+:::
+
+::: {.column width="50%"}
+```{r, echo = FALSE}
+satmod_lin <- lm(SAT ~ Takers, data = state_sat)
+gf_point(resid(satmod_lin) ~ fitted(satmod_lin)) %>%
+  gf_hline(yintercept = ~0, color = "red")
+```
+:::
+:::::
+
+::: fragment
+<br>
+
+$\Longrightarrow$ Consider a "curved" line.
+:::
+
+##  {.smaller}
+
+### Polynomial Regression
+
+For a single predictor $X$, consider:
+
+$$
+Y = \beta_0 + \beta_1 X + \beta_2 X^2 + \cdots + \beta_p X^p + \epsilon\\[1ex]
+$$
+
+::: fragment
+Special cases:
+
+$$
+\begin{align}
+Y &= \beta_0 + \beta_1 X + \epsilon & \text{(linear)}\\[1ex]
+Y &= \beta_0 + \beta_1 X + \beta_2 X^2 +\epsilon &\text{(quadratic)}\\[1ex]
+Y &= \beta_0 + \beta_1 X + \beta_2 X^2 +\beta_3 X^3 +\epsilon &\text{(cubic)}
+\end{align}
+$$
+
+<br>
+
+**Caution:** Beware of "overfitting" with large powers $p$.
+:::
+
+## Fitting a Polynomial Regression in R {.smaller}
+
+**Method 1:**
+
+-   Use `mutate()` to create new columns with the powers of the
+    predictor variable.
+
+::: fragment
+**Method 2:**
+
+-   To avoid creating a new column in the data, use `I()` in the `lm()`
+    specification:
+
+```{r, eval = FALSE}
+quadmod <- lm(SAT ~ Takers + I(Takers^2), data = state_sat)
+```
+:::
+
+##  {.smaller}
+
+### Quadratic Model for SAT
+
+```{r, fig.height = 3.5}
+#| output-location: fragment
+state_sat <- read.csv("http://people.kzoo.edu/enordmoe/math360/StateSAT.csv")
+quadmod <- lm(SAT ~ Takers + I(Takers^2), data = state_sat)
+summary(quadmod)
+```
+
+::: fragment
+[Fitted model]{.red}:
+$\quad\widehat{\text{SAT}} = 1053.1 -7.161(\text{Takers})+0.0710(\text{Takers}^2)$
+:::
+
+##  {.smaller}
+
+### SAT data: Plot the Quadratic Model
+
+```{r, fig.height = 3.5}
+#| output-location: fragment
+# Use the name of the fitted lm model 
+quad_curve <- makeFun(quadmod) 
+coef(quad_curve) # Check the coefficients
+gf_point(SAT ~ Takers, data = state_sat) %>%
+  gf_function(quad_curve, color = "red")
+```
+
+##  {.smaller}
+
+### SAT Data: Residual Plot
+
+```{r, panelset = TRUE, fig.height = 3.5}
+#| output-location: fragment
+# Use the name of the fitted lm model 
+gf_point(resid(quadmod) ~ fitted(quadmod)) %>%
+  gf_hline(yintercept = ~ 0, color = "red")
+```
+
+##  {.smaller}
+
+### Guidelines for Choosing the Polynomial Degree
+
+-   Use the minimum degree needed to capture the structure of the data.
+
+-   Check the $t$ test of the coefficient for the highest power.
+
+-   Keep lower powers even if they are not "significant."
+
+:::: fragment
+<br>
+
+::: callout-tip
+If you include $x^p$, keep $1, x, x^2, \dots, x^{p-1}$ so the model is
+hierarchical; then the test of the highest-degree term answers the right
+question: “Do we need *more* curvature than the lower-degree model
+already provides?”
+:::
+::::
+
+------------------------------------------------------------------------
+
+![](https://www.liverpool.ac.uk/pfg/Who/Blog/files/2088_c953_512.gif)
+
+------------------------------------------------------------------------
+
+##  {.smaller}
+
+### Complete Second Order Models
+
+**Definition:** A complete second-order model for two predictors would
+be 
+$$
+Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1^2 + \beta_4 X_2^2 + \beta_5 X_1X_2 + \epsilon
+$$
+
+
+-   Allows for curvature in both variables and the possibility of
+    interaction.
+
+-   Linear and quadratic models can be obtained by setting certain
+    $\beta_i=0$.
+
+<br>
+
+**Example**: Try a full second-order model for SAT data
+
+##  {.smaller}
+
+### Visualizing Second-Order Models
+
+![](figures/second_order.png){fig-align="center"}
+
+
+## {.smaller}
+### Example: Second Order Model for SAT Data
+
+
+```{r, fig.height = 3.5}
+#| output-location: fragment
+sat_second <- lm(SAT ~ Takers + Expend + I(Takers^2) 
+                 + I(Expend^2) + I(Takers*Expend), data = state_sat)
+summary(sat_second)
+```
+
+
+## Example: Can the model be simplified?
+
+::: {.incremental}
+
+- Do we need the interaction? 
+
+- Do we need both quadratic terms?
+
+- Do we even need the `Expend` terms?  
+
+:::
+
+::: {.fragment}
+
+**Stay tuned** for the nested $F$ test (Section 3.6)
+:::
+
+
+#  {background-color="#FAD9C7"}
+
+::: {#title-slide .center}
+[Multicollinearity]{style="font-size: 2.5em; font-weight: bold;"}
+:::
+
+## Mulitcollinearity
+
+- What is it?
+
+  - Two or more predictors are strongly associated with each other.
+  
+- Why is it a problem?
+
+  - Individual coefficients and $t$ tests can be deceptive and unreliable.
+
+<br>
+
+
+**Bad news:** No cures, just treatments!
+
+## {.smaller}
+### Effects of Multicollinearity
+
+If predictors are highly correlated among themselves, then:
+
+1. The regression coefficients and tests can be extremely variable and difficult to interpret individually.
+
+1. One variable alone might work as well as many.
+
+<br>
+
+::: {.fragment}
+
+- Approach may depend on the goal of the analysis: description vs prediction.
+
+:::
+
+
+## How to Detect Multicollinearity? {.smaller}
+### 1. Correlation Matrix
+
+- **Dataset:** **[MidtermFinalA]{.red}** (class scores)
+
+  - **Response:** `Final` exam score
+
+  - **Predictors:** `Quiz` average, `Class` participation, and `Midterm` score
+  
+
+## {.smaller}
+### Correlation Matrix for MidtermFinalA {.smaller}
+
+- Note high correlation between `Midterm` and `Quiz`
+
+
+```{r, fig.height = 3.5}
+#| output-location: fragment
+MidtermFinalA <- read.csv("http://people.kzoo.edu/enordmoe/math360/MidtermFinalA.csv")
+options(digits = 3)
+M <- MidtermFinalA |> 
+  select(Midterm, Final, Quiz, Class) |> 
+  cor()
+M
+# or use cor(MidtermFinalA[2:5])
+options(digits=5)
+```
+
+---
+
+## {.smaller}
+### Multicollinearity: Simulation
+
+- Explore stability of regression results in the presence of multicollinearity
+
+  - `Quiz` and `Midterm` are related
+  
+  - `Class` participation is independent of the others.
+  
+- Link to download <a href="https://www.dropbox.com/s/w9y31uny2tyejwd/SimMultiFinal.R" download>SimMultiFinal.R</a>
+
+
+
+## How to Detect Multicollinearity? {.smaller}
+### 2. Variance Inflation Factor (VIF)
+
+$$
+\text{VIF} = \frac{1}{1-R_i^2} 
+$$
+where $R_i^2$ is the $R^2$ for the regression predicting variable $X_i$ from the other *predictor variables*.
+
+<br>
+
+::: {.fragment}
+
+
+**Beware** if $\text{VIF}>5$ $\Longleftrightarrow$ $R_i^2>80\%$.
+
+:::
+
+::: callout-tip
+Obtain $\text{VIF}$ using **car** package in R.
+:::
+
+## {style="font-size: 60%;"}
+#### Example: MidtermFinalA Dataset
+
+
+```{r, panelset = TRUE, fig.height = 3.5}
+# output-location:fragment
+finalmodel <- lm(Final ~ Midterm + Quiz + Class, data = MidtermFinalA)
+summary(finalmodel)
+#install.packages(car)
+library(car)
+vif(finalmodel)
+```
+
+## {.smaller}
+### Output for Checking VIF calculation
+
+- The calculation agrees up to rounding: 
+$\text{VIF} = \frac{1}{1-.948} = 19.23$
+
+
+```{r,  fig.height = 3.5}
+#| output-location: fragment
+summary(lm(Midterm  ~  Quiz + Class, data = MidtermFinalA))
+```
+
+
+## 
+### What to Do if You Have Multicollinearity?
+
+::: {.incremental}
+
+1. Choose a better set of predictors.
+
+1. Eliminate some of the redundant predictors.
+
+1. Combine predictors to create a (possibly weighted) scale.
+
+1. "Ignore" the individual coefficients and tests if prediction is the primary goal.
+
+:::
+
+::: {.fragment}
+
+
+::: callout-tip
+The best remedies often depend on the purpose of the analysis.
+:::
+
+:::
+
+

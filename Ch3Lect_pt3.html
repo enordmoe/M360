@@ -1,871 +1,1237 @@
 <!DOCTYPE html>
-<html lang="" xml:lang="">
-  <head>
-    <title>Chapter 3: Inference for Simple Linear Regression</title>
-    <meta charset="utf-8" />
-    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
-    <link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet" />
-    <script src="libs/panelset-0.2.6/panelset.js"></script>
-    <script src="libs/clipboard-2.0.6/clipboard.min.js"></script>
-    <link href="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.css" rel="stylesheet" />
-    <script src="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.js"></script>
-    <script>window.xaringanExtraClipboard(null, {"button":"Copy Code","success":"Copied!","error":"Press Ctrl+C to Copy"})</script>
-    <link href="libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
-    <script src="libs/tile-view-0.2.6/tile-view.js"></script>
-    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
-    <link rel="stylesheet" href="extra.css" type="text/css" />
-  </head>
-  <body>
-    <textarea id="source">
-class: center, middle, inverse, title-slide
-
-# Chapter 3: Inference for Simple Linear Regression
-## Part 3: Section 3.4-3.5
-### Applied Statistics II
-
----
-
-class: highlight-last-item
-
-
-
-
-
-
-
-
-
-
-&lt;style type="text/css"&gt;
-.highlight-last-item &gt; ul &gt; li,
-.highlight-last-item &gt; ol &gt; li {
-  opacity: 0.5;
-}
-.highlight-last-item &gt; ul &gt; li:last-of-type,
-.highlight-last-item &gt; ol &gt; li:last-of-type {
-  opacity: 1;
-}
-&lt;/style&gt;
-
-# Outline 
-
-- Interaction model
-
---
-
-- Polynomial regression
-
-  - Quadratic model
-  
---
-  
-- Second-order model
-
---
-
-- Multicollinearity
-
-  - Variance Inflation Factor (VIF)
-
----
-
-## Interaction
-
-Recall the funnel data model for two regression lines:
-
-$$
-\text{tswirl} = \beta_0 + \beta_1 (\text{dist}) + \beta_2 (\text{funnel.hi}) + \beta_3 (\text{dist}\cdot \text{funnel.hi}) + \epsilon
-$$
-
-- The product term `\(\beta_3 (\text{dist}\cdot \text{funnel.hi})\)` allows for different effects of distance for low and high settings.
-
---
-
-&lt;br&gt;
-
-**Interaction:** When the relationship between two variables changes depending on a third variable.
-
-  - Consider adding a product term to account for interactions where the context suggests it.
-
----
-
-## Fish Weight Analysis
-### Example 3.11
-
-- **Dataset:** **.red[Perch]** (measurements for 56 fish)
-
-  - **Predictors:** `Length`, `Width` (in cm)
-  
-  - **Response:** `Weight` (in gm)
-
-&lt;br&gt;
-
-* Fit a two-predictor model with an interaction.
-
-* Question: Why might the product of the two explanatory variables be important here? What does the product represent?
-
----
-### Example R Code for **.red[Perch]** Data
-
-
-.panelset[
-
-.panel[.panel-name[Code]
-
-```r
-data("Perch")
-perch_mod &lt;- lm(Weight ~ Length + Width + I(Length * Width), data = Perch)
-summary(perch_mod)
-```
-
-
-
-]
-
-.panel[.panel-name[Output]
-
-```
-## 
-## Call:
-## lm(formula = Weight ~ Length + Width + I(Length * Width), data = Perch)
-## 
-## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -140.106  -12.226    1.230    8.489  181.408 
-## 
-## Coefficients:
-##                   Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)       113.9349    58.7844   1.938    0.058 .  
-## Length             -3.4827     3.1521  -1.105    0.274    
-## Width             -94.6309    22.2954  -4.244 9.06e-05 ***
-## I(Length * Width)   5.2412     0.4131  12.687  &lt; 2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 44.24 on 52 degrees of freedom
-## Multiple R-squared:  0.9847,	Adjusted R-squared:  0.9838 
-## F-statistic:  1115 on 3 and 52 DF,  p-value: &lt; 2.2e-16
-```
-
-
-
-]
-]
-
----
-
-### Example R Code for **.red[Perch]** Data
-
-Points to note:
-
-- Use of `I()` to create product term without creating a new variable.
-
-- Interpretation of coefficient of interaction.
-
-  - Compare "effect" of an increase in `Width` for different values of `Length`
-  
-  - For example: write the model for different values of `Length` (e.g., 20 cm and 40 cm)
-  
-  - Note difference in effect of an extra 1cm in `Width`.
-  
----
-### Example R Code for **.red[Perch]** Data
-
-.panelset[
-
-.panel[.panel-name[Code]
-
-```r
-anova(perch_mod)
-```
-
-
-
-]
-
-.panel[.panel-name[Output]
-
-```
-## Analysis of Variance Table
-## 
-## Response: Weight
-##                   Df  Sum Sq Mean Sq  F value    Pr(&gt;F)    
-## Length             1 6118739 6118739 3126.571 &lt; 2.2e-16 ***
-## Width              1  110593  110593   56.511 7.416e-10 ***
-## I(Length * Width)  1  314997  314997  160.958 &lt; 2.2e-16 ***
-## Residuals         52  101765    1957                       
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-```
-
-
-
-]
-]
-
----
-### Example R Code for **.red[Perch]** Data
-
-.panelset[
-
-.panel[.panel-name[Code]
-
-```r
-gf_point(resid(perch_mod) ~ fitted(perch_mod)) %&gt;%
-  gf_hline(yintercept = ~0, col = "red")
-```
-
-
-
-]
-
-.panel[.panel-name[Output]
-
-&lt;img src="Ch3Lect_pt3_files/figure-html/unnamed-chunk-4-1.png" width="90%" /&gt;
-
-]
-]
-
--  Consider `log(Weight)` given non-constant variance.
-
----
-
-### Example: State SAT Scores
-
-**Response variable `\((Y)\)`:** 
-  - `SAT` state average combined SAT score
-  
-**Potential predictors `\((X)\)`:**
-
-  - `Takers`: % taking SAT exam
-  
-  - `Expend`: spending per student ($100s)
-  
-&lt;br&gt;
-
-**Data:** **.red[state_sat]**
-
-
----
-
-### Results of Fitting Linear Model
-
-.pull-left[
-&lt;img src="Ch3Lect_pt3_files/figure-html/unnamed-chunk-5-1.png" width="90%" /&gt;
-
-]
-
-.pull-right[
-&lt;img src="Ch3Lect_pt3_files/figure-html/unnamed-chunk-6-1.png" width="90%" /&gt;
-
-]
-
-&lt;br&gt;
-
-`\(\Longrightarrow\)` Consider a "curved" line.
-
----
-
-## Polynomial Regression
-
-For a single predictor `\(X\)`, consider:
-
-$$
-`\begin{align}
-Y &amp;= \beta_0 + \beta_1 X + \beta_2 X^2 + \cdots + \beta_p X^p + \epsilon\\[1ex]
-Y &amp;= \beta_0 + \beta_1 X + \epsilon \text{(linear)}\\[1ex]
-Y &amp;= \beta_0 + \beta_1 X + \beta_2 X^2 +\epsilon \text{(quadratic)}\\[1ex]
-Y &amp;= \beta_0 + \beta_1 X + \beta_2 X^2 +\beta_3 X^3 +\epsilon \text{(cubic)}
-\end{align}`
-$$
-
-&lt;br&gt;
-
-**Caution:** Beware of "overfitting" with large powers `\(p\)`.
-
----
-
-## Fitting a Polynomial Regression in R
-
-**Method 1:** 
-
-  - Use `mutate()` to create new columns with the powers of the predictor variable.
-
---
-
-**Method 2:** 
-
-  - To avoid creating a new column in the data, use `I()` in the `lm()` specification:
-
-
-```r
-quadmod &lt;- lm(SAT ~ Takers + I(Takers^2), data = state_sat)
-```
-
----
-
-## Quadratic Model for SAT
-
-.panelset[
-
-.panel[.panel-name[Code]
-
-```r
-state_sat &lt;- read.csv("http://people.kzoo.edu/enordmoe/math360/StateSAT.csv")
-quadmod &lt;- lm(SAT ~ Takers + I(Takers^2), data = state_sat)
-summary(quadmod)
-```
-
-
-
-]
-
-.panel[.panel-name[Output]
-
-```
-## 
-## Call:
-## lm(formula = SAT ~ Takers + I(Takers^2), data = state_sat)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -83.015 -16.636   0.783  22.167  55.714 
-## 
-## Coefficients:
-##               Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept) 1053.13112    9.27372 113.561  &lt; 2e-16 ***
-## Takers        -7.16159    0.89220  -8.027 2.32e-10 ***
-## I(Takers^2)    0.07102    0.01405   5.055 6.99e-06 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 29.93 on 47 degrees of freedom
-## Multiple R-squared:  0.8289,	Adjusted R-squared:  0.8216 
-## F-statistic: 113.8 on 2 and 47 DF,  p-value: &lt; 2.2e-16
-```
-
-
-
-]
-]
-
-.red[Fitted model]: `\(\quad\widehat{\text{SAT}} = 1053.1 -7.161(\text{Takers})+0.0710(\text{Takers}^2)\)`
-
----
-
-## SAT data: Plot the Quadratic Model
-
-.panelset[
-
-.panel[.panel-name[Code]
-
-```r
-# Use the name of the fitted lm model 
-quad_curve &lt;- makeFun(quadmod) 
-gf_point(SAT ~ Takers, data = state_sat) %&gt;%
-  gf_function(quad_curve, color = "red")
-```
-
-
-
-]
-
-.panel[.panel-name[Output]
-
-&lt;img src="Ch3Lect_pt3_files/figure-html/unnamed-chunk-9-1.png" width="90%" /&gt;
-
-]
-]
-
----
-
-## SAT Data: Residual Plot
-
-.panelset[
-
-.panel[.panel-name[Code]
-
-```r
-# Use the name of the fitted lm model 
-gf_point(resid(quadmod) ~ fitted(quadmod)) %&gt;%
-  gf_hline(yintercept = ~ 0, color = "red")
-```
-
-
-
-]
-
-.panel[.panel-name[Output]
-
-&lt;img src="Ch3Lect_pt3_files/figure-html/unnamed-chunk-10-1.png" width="90%" /&gt;
-
-]
-]
-
----
-
-## Guidelines for Choosing the Polynomial Degree
-
-- Use the minimum degree needed to capture the structure of the data.
-
-- Check the `\(t\)` test of the coefficient for the highest power.
-
-- Keep lower powers even if they are not "significant."
-
----
-background-image: url(https://www.liverpool.ac.uk/pfg/Who/Blog/files/2088_c953_512.gif)
-background-size: contain
-
----
-
-### Complete Second Order Models
-
-**Definition:** A complete second-order model for two predictors would be
-$$
-Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1^2 + \beta_4 X_2^2 + \beta_5 X_1X_2 + \epsilon
-$$
-
-- Allows for curvature in both variables and the possibility of interaction.
-
-- Linear and quadratic models can be obtained by setting certain `\(\beta_i=0\)`.
-
-&lt;br&gt;
-
-**Example**: Try a full second-order model for SAT data
-
-
----
-class: inverse
-
-### Visualizing Second-Order Models
-
-&lt;img src="figures/second_order.png" width="65%" style="display: block; margin: auto;" /&gt;
-
----
-
-### Example: Second Order Model for SAT Data
-
-.panelset[
-
-.panel[.panel-name[Code]
-
-```r
-sat_second &lt;- lm(SAT ~ Takers + Expend + I(Takers^2) 
-                 + I(Expend^2) + I(Takers*Expend), data = state_sat)
-summary(sat_second)
-```
-
-
-
-]
-
-.panel[.panel-name[Output]
-
-```
-## 
-## Call:
-## lm(formula = SAT ~ Takers + Expend + I(Takers^2) + I(Expend^2) + 
-##     I(Takers * Expend), data = state_sat)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -50.472 -13.535   1.023   8.866  60.870 
-## 
-## Coefficients:
-##                     Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)        893.66283   36.14094  24.727  &lt; 2e-16 ***
-## Takers              -7.05561    0.83740  -8.426 9.96e-11 ***
-## Expend              10.33333    2.49600   4.140 0.000155 ***
-## I(Takers^2)          0.07725    0.01328   5.816 6.28e-07 ***
-## I(Expend^2)         -0.11775    0.04426  -2.660 0.010851 *  
-## I(Takers * Expend)  -0.03344    0.03716  -0.900 0.373087    
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 23.68 on 44 degrees of freedom
-## Multiple R-squared:  0.8997,	Adjusted R-squared:  0.8883 
-## F-statistic: 78.96 on 5 and 44 DF,  p-value: &lt; 2.2e-16
-```
-
-
-
-]
-]
-
----
-
-### Example: Can the model be simplified?
-
-- Do we need the interaction? 
-
-- Do we need both quadratic terms?
-
-- Do we even need the `Expend` terms?  
-
-**Stay tuned** for the nested `\(F\)` test (Section 3.6)
-
----
-class: inverse, middle, center
-
-## Multicollinearity
-
----
-
-## Mulitcollinearity
-
-- What is it?
-
---
-
-  - Two or more predictors are strongly associated with each other.
-  
---
-  
-- Why is it a problem?
-
---
-
-  - Individual coefficients and `\(t\)` tests can be deceptive and unreliable.
-
---
-
-&lt;br&gt;
-
-
-**Bad news:** No cures, just treatments!
----
-
-### Effects of Multicollinearity
-
-- If predictors are highly correlated among themselves:
-
-1. The regression coefficients and tests can be extremely variable and difficult to interpret individually.
-
-1. One variable alone might work as well as many.
-
-&lt;br&gt;
-
-- Approach may depend on the goal of the analysis: description vs prediction.
-
----
-
-## How to Detect Multicollinearity?
-### 1. Correlation Matrix
-
-- **Dataset:** **.red[MidtermFinalA]** (class scores)
-
-  - **Response:** `Final` exam score
-
-  - **Predictors:** `Quiz` average, `Class` participation, and `Midterm` score
-  
----
-
-### Correlation Matrix for MidtermFinalA
-
-- Note high correlation between `Midterm` and `Quiz`
-
-.panelset[
-
-.panel[.panel-name[Code]
-
-```r
-MidtermFinalA &lt;- read.csv("http://people.kzoo.edu/enordmoe/math360/MidtermFinalA.csv")
-options(digits = 3)
-M &lt;- MidtermFinalA %&gt;%
-  select(Midterm, Final, Quiz, Class) %&gt;%
-  cor()
-M
-# or use cor(MidtermFinalA[2:5])
-options(digits=5)
-```
-
-
-
-]
-
-.panel[.panel-name[Output]
-
-```
-##         Midterm Final  Quiz Class
-## Midterm   1.000 0.754 0.972 0.279
-## Final     0.754 1.000 0.743 0.144
-## Quiz      0.972 0.743 1.000 0.234
-## Class     0.279 0.144 0.234 1.000
-```
-
-
-
-]
-]
-
----
-
-### Multicollinearity: Simulation
-
-- Explore stability of regression results in the presence of multicollinearity
-
-  - `Quiz` and `Midterm` are related
-  
-  - `Class` participation is independent of the others.
-  
-- Link to download &lt;a href="https://www.dropbox.com/s/w9y31uny2tyejwd/SimMultiFinal.R" download&gt;SimMultiFinal.R&lt;/a&gt;
-
----
-
-## How to Detect Multicollinearity?
-### 2. Variance Inflation Factor (VIF)
-
-$$
-\text{VIF} = \frac{1}{1-R_i^2} 
-$$
-where `\(R_i^2\)` is the `\(R^2\)` for the regression predicting variable `\(X_i\)` from the other *predictor variables*.
-
-&lt;br&gt;
-
-**Beware** if `\(\text{VIF}&gt;5\)` `\(\Longleftrightarrow\)` `\(R_i^2&gt;80\%\)`.
-
-&lt;br&gt;
-
-- Obtain `\(\text{VIF}\)` using **car** package in R.
-
----
-
-### Example: MidtermFinalA Dataset
-
-.panelset[
-
-.panel[.panel-name[Code]
-
-```r
-finalmodel &lt;- lm(Final ~ Midterm + Quiz + Class, data = MidtermFinalA)
-summary(finalmodel)
-#install.packages(car)
-library(car)
-vif(finalmodel)
-```
-
-
-
-]
-
-.panel[.panel-name[Output]
-
-```
-## 
-## Call:
-## lm(formula = Final ~ Midterm + Quiz + Class, data = MidtermFinalA)
-## 
-## Residuals:
-##    Min     1Q Median     3Q    Max 
-## -19.35  -6.17   0.41   5.90  17.41 
-## 
-## Coefficients:
-##             Estimate Std. Error t value Pr(&gt;|t|)  
-## (Intercept)   19.158      9.679    1.98    0.058 .
-## Midterm        1.271      1.091    1.17    0.254  
-## Quiz           0.499      2.024    0.25    0.807  
-## Class         -0.117      0.232   -0.51    0.616  
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 9.93 on 27 degrees of freedom
-## Multiple R-squared:  0.575,	Adjusted R-squared:  0.527 
-## F-statistic: 12.2 on 3 and 27 DF,  p-value: 3.22e-05
-## 
-## Midterm    Quiz   Class 
-## 19.2840 18.8098  1.1158
-```
-
-
-
-]
-]
-
----
-
-### Output for Checking VIF calculation
-
-- The calculation agrees up to rounding: 
-`\(\text{VIF} = \frac{1}{1-.948} = 19.23\)`
-
-.panelset[
-
-.panel[.panel-name[Code]
-
-```r
-summary(lm(Midterm  ~  Quiz + Class, data = MidtermFinalA))
-```
-
-
-
-]
-
-.panel[.panel-name[Output]
-
-```
-## 
-## Call:
-## lm(formula = Midterm ~ Quiz + Class, data = MidtermFinalA)
-## 
-## Residuals:
-##    Min     1Q Median     3Q    Max 
-## -3.478 -1.127  0.141  1.004  3.939 
-## 
-## Coefficients:
-##             Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)   2.9568     1.5812    1.87    0.072 .  
-## Quiz          1.8026     0.0832   21.67   &lt;2e-16 ***
-## Class         0.0484     0.0391    1.24    0.226    
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 1.72 on 28 degrees of freedom
-## Multiple R-squared:  0.948,	Adjusted R-squared:  0.944 
-## F-statistic:  256 on 2 and 28 DF,  p-value: &lt;2e-16
-```
-
-
-
-]
-]
-
-
----
-
-### What to Do if You Have Multicollinearity?
-
-1. Choose a better set of predictors.
-
-1. Eliminate some of the redundant predictors.
-
-1. Combine predictors to create a (possibly weighted) scale.
-
-1. "Ignore" the individual coefficients and tests if prediction is the primary goal.
-
-&lt;br&gt;
-
-- Best remedies depend on the purpose of the analysis.
-    </textarea>
-<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
-<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
-<script>var slideshow = remark.create({
-"highlightStyle": "github",
-"highlightLines": true,
-"ratio": "16:9",
-"countIncrementalSlides": false
-});
-if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
-  window.dispatchEvent(new Event('resize'));
-});
-(function(d) {
-  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
-  if (!r) return;
-  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
-  d.head.appendChild(s);
-})(document);
-
-(function(d) {
-  var el = d.getElementsByClassName("remark-slides-area");
-  if (!el) return;
-  var slide, slides = slideshow.getSlides(), els = el[0].children;
-  for (var i = 1; i < slides.length; i++) {
-    slide = slides[i];
-    if (slide.properties.continued === "true" || slide.properties.count === "false") {
-      els[i - 1].className += ' has-continuation';
+<html lang="en"><head>
+<script src="Ch3Lect_pt3_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Ch3Lect_pt3_files/libs/quarto-html/tabby.min.js"></script>
+<script src="Ch3Lect_pt3_files/libs/quarto-html/popper.min.js"></script>
+<script src="Ch3Lect_pt3_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="Ch3Lect_pt3_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Ch3Lect_pt3_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="Ch3Lect_pt3_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.7.32">
+
+  <meta name="author" content="MATH 360">
+  <title>Chapter 3: Multiple Regression Part 3: Sections 3.4-3.5</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="Ch3Lect_pt3_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="Ch3Lect_pt3_files/libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
     }
-  }
-  var s = d.createElement("style");
-  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
-  d.head.appendChild(s);
-})(document);
-// delete the temporary CSS (for displaying all slides initially) when the user
-// starts to view slides
-(function() {
-  var deleted = false;
-  slideshow.on('beforeShowSlide', function(slide) {
-    if (deleted) return;
-    var sheets = document.styleSheets, node;
-    for (var i = 0; i < sheets.length; i++) {
-      node = sheets[i].ownerNode;
-      if (node.dataset["target"] !== "print-only") continue;
-      node.parentNode.removeChild(node);
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
     }
-    deleted = true;
-  });
-})();
-(function() {
-  "use strict"
-  // Replace <script> tags in slides area to make them executable
-  var scripts = document.querySelectorAll(
-    '.remark-slides-area .remark-slide-container script'
-  );
-  if (!scripts.length) return;
-  for (var i = 0; i < scripts.length; i++) {
-    var s = document.createElement('script');
-    var code = document.createTextNode(scripts[i].textContent);
-    s.appendChild(code);
-    var scriptAttrs = scripts[i].attributes;
-    for (var j = 0; j < scriptAttrs.length; j++) {
-      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
     }
-    scripts[i].parentElement.replaceChild(s, scripts[i]);
-  }
-})();
-(function() {
-  var links = document.getElementsByTagName('a');
-  for (var i = 0; i < links.length; i++) {
-    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
-      links[i].target = '_blank';
-    }
-  }
-})();
-// adds .remark-code-has-line-highlighted class to <pre> parent elements
-// of code chunks containing highlighted lines with class .remark-code-line-highlighted
-(function(d) {
-  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
-  const preParents = [];
-  const findPreParent = function(line, p = 0) {
-    if (p > 1) return null; // traverse up no further than grandparent
-    const el = line.parentElement;
-    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
-  };
-
-  for (let line of hlines) {
-    let pre = findPreParent(line);
-    if (pre && !preParents.includes(pre)) preParents.push(pre);
-  }
-  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
-})(document);</script>
-
-<script>
-slideshow._releaseMath = function(el) {
-  var i, text, code, codes = el.getElementsByTagName('code');
-  for (i = 0; i < codes.length;) {
-    code = codes[i];
-    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
-      text = code.textContent;
-      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
-          /^\$\$(.|\s)+\$\$$/.test(text) ||
-          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
-        code.outerHTML = code.innerHTML;  // remove <code></code>
-        continue;
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
       }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
-    i++;
-  }
-};
-slideshow._releaseMath(document);
-</script>
-<!-- dynamically load mathjax for compatibility with self-contained -->
-<script>
-(function () {
-  var script = document.createElement('script');
-  script.type = 'text/javascript';
-  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
-  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
-    script.src  = script.src.replace(/^https?:/, '');
-  document.getElementsByTagName('head')[0].appendChild(script);
-})();
-</script>
-  </body>
-</html>
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; font-weight: bold; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="Ch3Lect_pt3_files/libs/revealjs/dist/theme/quarto-1e8aac183fbd48eb13f508ef56dc9f7d.css">
+  <link href="Ch3Lect_pt3_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="Ch3Lect_pt3_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="Ch3Lect_pt3_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="Ch3Lect_pt3_files/libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
+  <link href="Ch3Lect_pt3_files/libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
+  <link href="Ch3Lect_pt3_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" data-background-color="#EA6820" class="quarto-title-block center">
+  <h1 class="title">Chapter 3: Multiple Regression<br><span style="font-size:70%">Part 3: Sections 3.4-3.5</span></h1>
+  <p class="subtitle">Statistical Modeling</p>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+MATH 360 
+</div>
+</div>
+</div>
+
+</section>
+<section id="outline" class="slide level2">
+<h2>Outline</h2>
+<ul>
+<li class="fragment"><p>Interaction model</p></li>
+<li class="fragment"><p>Polynomial regression</p>
+<ul>
+<li class="fragment">Quadratic model</li>
+</ul></li>
+<li class="fragment"><p>Second-order model</p></li>
+<li class="fragment"><p>Multicollinearity</p>
+<ul>
+<li class="fragment">Variance Inflation Factor (VIF)</li>
+</ul></li>
+</ul>
+</section>
+<section id="funnel-data" class="slide level2">
+<h2>Funnel Data:</h2>
+<h3 id="prep-data-for-2-sample-analysis">Prep Data for 2-sample analysis</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a>funneldata <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"http://people.kzoo.edu/enordmoe/math360/funneldata.csv"</span>, <span class="at">col_types =</span> <span class="fu">cols</span>(<span class="at">trial =</span> <span class="fu">col_factor</span>(<span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"1"</span>,<span class="st">"2"</span>))))</span>
+<span id="cb1-2"><a href=""></a>funnel.hilo <span class="ot">&lt;-</span> <span class="fu">filter</span>(funneldata, height <span class="sc">==</span> <span class="dv">13</span> <span class="sc">|</span> height <span class="sc">==</span> <span class="dv">10</span>)</span>
+<span id="cb1-3"><a href=""></a>funnel.hilo <span class="ot">&lt;-</span> <span class="fu">mutate</span>(funnel.hilo, <span class="at">height.hi =</span> <span class="fu">ifelse</span>(height<span class="sc">==</span><span class="dv">13</span>,<span class="dv">1</span>,<span class="dv">0</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="interaction" class="slide level2 smaller">
+<h2>Interaction</h2>
+<p>Recall the funnel data model for two regression lines:</p>
+<p><span class="math display">\[
+\text{tswirl} = \beta_0 + \beta_1 (\text{dist}) + \beta_2 (\text{funnel.hi}) + \beta_3 (\text{dist}\cdot \text{funnel.hi}) + \epsilon
+\]</span></p>
+<ul>
+<li>The product term <span class="math inline">\(\beta_3 (\text{dist}\cdot \text{funnel.hi})\)</span> allows for different effects of distance for low and high settings.</li>
+</ul>
+<p><strong>Interaction:</strong> When the relationship between two variables <em>changes</em> depending on a third variable.</p>
+<ul>
+<li>Consider adding a product term to account for interactions where the context suggests it.</li>
+</ul>
+</section>
+<section id="fish-weight-analysis" class="slide level2 smaller">
+<h2>Fish Weight Analysis</h2>
+<h3 id="example-3.11">Example 3.11</h3>
+<ul>
+<li><p><strong>Dataset:</strong> <span class="red"><strong>Perch</strong></span> (measurements for 56 fish)</p>
+<ul>
+<li><p><strong>Predictors:</strong> <code>Length</code>, <code>Width</code> (in cm)</p></li>
+<li><p><strong>Response:</strong> <code>Weight</code> (in gm)</p></li>
+</ul></li>
+</ul>
+<div class="fragment">
+<ul>
+<li>Fit a two-predictor model with an interaction.</li>
+</ul>
+</div>
+<p><br></p>
+<div class="fragment">
+<ul>
+<li><strong>Questions</strong>:
+<ul>
+<li>Why might the product of the two explanatory variables be important here?<br>
+</li>
+<li>What does the product represent?</li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="section" class="slide level2 smaller">
+<h2></h2>
+<h3 id="example-r-code-for-perch-data">Example R Code for <span class="red"><strong>Perch</strong></span> Data</h3>
+<div class="cell" data-panelset="true">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href=""></a><span class="fu">data</span>(<span class="st">"Perch"</span>)</span>
+<span id="cb2-2"><a href=""></a>perch_mod <span class="ot">&lt;-</span> <span class="fu">lm</span>(Weight <span class="sc">~</span> Length <span class="sc">+</span> Width <span class="sc">+</span> <span class="fu">I</span>(Length <span class="sc">*</span> Width), <span class="at">data =</span> Perch)</span>
+<span id="cb2-3"><a href=""></a><span class="fu">summary</span>(perch_mod)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell fragment" data-panelset="true">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = Weight ~ Length + Width + I(Length * Width), data = Perch)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-140.106  -12.226    1.230    8.489  181.408 
+
+Coefficients:
+                  Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)       113.9349    58.7844   1.938    0.058 .  
+Length             -3.4827     3.1521  -1.105    0.274    
+Width             -94.6309    22.2954  -4.244 9.06e-05 ***
+I(Length * Width)   5.2412     0.4131  12.687  &lt; 2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 44.24 on 52 degrees of freedom
+Multiple R-squared:  0.9847,    Adjusted R-squared:  0.9838 
+F-statistic:  1115 on 3 and 52 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+</section>
+<section id="section-1" class="slide level2 smaller">
+<h2></h2>
+<h3 id="example-r-code-for-perch-data-1">Example R Code for <span class="red"><strong>Perch</strong></span> Data</h3>
+<p>Points to note:</p>
+<ul>
+<li class="fragment"><p>Use of <code>I()</code> to create product term without creating a new variable.</p></li>
+<li class="fragment"><p>Interpretation of coefficient of interaction.</p>
+<ul>
+<li class="fragment"><p>Compare “effect” of an increase in <code>Width</code> for different values of <code>Length</code></p></li>
+<li class="fragment"><p>For example: write the model for different values of <code>Length</code> (e.g., 20 cm and 40 cm)</p></li>
+<li class="fragment"><p>Note difference in effect of an extra 1cm in <code>Width</code>.</p></li>
+</ul></li>
+</ul>
+</section>
+<section id="section-2" class="slide level2 smaller">
+<h2></h2>
+<h3 id="example-r-code-for-perch-data-2">Example R Code for <span class="red"><strong>Perch</strong></span> Data</h3>
+<div class="cell" data-panelset="true">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href=""></a><span class="fu">anova</span>(perch_mod)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell fragment" data-panelset="true">
+<div class="cell-output cell-output-stdout">
+<pre><code>Analysis of Variance Table
+
+Response: Weight
+                  Df  Sum Sq Mean Sq  F value    Pr(&gt;F)    
+Length             1 6118739 6118739 3126.571 &lt; 2.2e-16 ***
+Width              1  110593  110593   56.511 7.416e-10 ***
+I(Length * Width)  1  314997  314997  160.958 &lt; 2.2e-16 ***
+Residuals         52  101765    1957                       
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+</section>
+<section id="section-3" class="slide level2 smaller">
+<h2></h2>
+<h3 id="example-r-code-for-perch-data-3">Example R Code for <span class="red"><strong>Perch</strong></span> Data</h3>
+<div class="cell" data-panelset="true">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href=""></a><span class="fu">gf_point</span>(<span class="fu">resid</span>(perch_mod) <span class="sc">~</span> <span class="fu">fitted</span>(perch_mod)) <span class="sc">%&gt;%</span></span>
+<span id="cb6-2"><a href=""></a>  <span class="fu">gf_hline</span>(<span class="at">yintercept =</span> <span class="sc">~</span><span class="dv">0</span>, <span class="at">col =</span> <span class="st">"red"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+</div>
+<img data-src="Ch3Lect_pt3_files/figure-revealjs/unnamed-chunk-4-1.png" width="960" class="r-stretch"><ul>
+<li>Consider <code>log(Weight)</code> given non-constant variance.</li>
+</ul>
+</section>
+<section id="section-4" class="slide level2 smaller">
+<h2></h2>
+<h3 id="example-state-sat-scores">Example: State SAT Scores</h3>
+<p><strong>Response variable</strong> <span class="math inline">\((Y)\)</span>:<br>
+- <code>SAT</code> state average combined SAT score</p>
+<p><br></p>
+<p><strong>Potential predictors</strong> <span class="math inline">\((X)\)</span>:</p>
+<ul>
+<li><p><code>Takers</code>: % taking SAT exam</p></li>
+<li><p><code>Expend</code>: spending per student ($100s)</p></li>
+</ul>
+<p><br></p>
+<p><strong>Data:</strong> <span class="red"><strong>state_sat</strong></span></p>
+</section>
+<section id="section-5" class="slide level2 smaller">
+<h2></h2>
+<h3 id="results-of-fitting-linear-model">Results of Fitting Linear Model</h3>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="Ch3Lect_pt3_files/figure-revealjs/unnamed-chunk-5-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="Ch3Lect_pt3_files/figure-revealjs/unnamed-chunk-6-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div></div>
+<div class="fragment">
+<p><br></p>
+<p><span class="math inline">\(\Longrightarrow\)</span> Consider a “curved” line.</p>
+</div>
+</section>
+<section id="section-6" class="slide level2 smaller">
+<h2></h2>
+<h3 id="polynomial-regression">Polynomial Regression</h3>
+<p>For a single predictor <span class="math inline">\(X\)</span>, consider:</p>
+<p><span class="math display">\[
+Y = \beta_0 + \beta_1 X + \beta_2 X^2 + \cdots + \beta_p X^p + \epsilon\\[1ex]
+\]</span></p>
+<div class="fragment">
+<p>Special cases:</p>
+<p><span class="math display">\[
+\begin{align}
+Y &amp;= \beta_0 + \beta_1 X + \epsilon &amp; \text{(linear)}\\[1ex]
+Y &amp;= \beta_0 + \beta_1 X + \beta_2 X^2 +\epsilon &amp;\text{(quadratic)}\\[1ex]
+Y &amp;= \beta_0 + \beta_1 X + \beta_2 X^2 +\beta_3 X^3 +\epsilon &amp;\text{(cubic)}
+\end{align}
+\]</span></p>
+<p><br></p>
+<p><strong>Caution:</strong> Beware of “overfitting” with large powers <span class="math inline">\(p\)</span>.</p>
+</div>
+</section>
+<section id="fitting-a-polynomial-regression-in-r" class="slide level2 smaller">
+<h2>Fitting a Polynomial Regression in R</h2>
+<p><strong>Method 1:</strong></p>
+<ul>
+<li>Use <code>mutate()</code> to create new columns with the powers of the predictor variable.</li>
+</ul>
+<div class="fragment">
+<p><strong>Method 2:</strong></p>
+<ul>
+<li>To avoid creating a new column in the data, use <code>I()</code> in the <code>lm()</code> specification:</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href=""></a>quadmod <span class="ot">&lt;-</span> <span class="fu">lm</span>(SAT <span class="sc">~</span> Takers <span class="sc">+</span> <span class="fu">I</span>(Takers<span class="sc">^</span><span class="dv">2</span>), <span class="at">data =</span> state_sat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</section>
+<section id="section-7" class="slide level2 smaller">
+<h2></h2>
+<h3 id="quadratic-model-for-sat">Quadratic Model for SAT</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href=""></a>state_sat <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"http://people.kzoo.edu/enordmoe/math360/StateSAT.csv"</span>)</span>
+<span id="cb8-2"><a href=""></a>quadmod <span class="ot">&lt;-</span> <span class="fu">lm</span>(SAT <span class="sc">~</span> Takers <span class="sc">+</span> <span class="fu">I</span>(Takers<span class="sc">^</span><span class="dv">2</span>), <span class="at">data =</span> state_sat)</span>
+<span id="cb8-3"><a href=""></a><span class="fu">summary</span>(quadmod)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell fragment">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = SAT ~ Takers + I(Takers^2), data = state_sat)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-83.015 -16.636   0.783  22.167  55.714 
+
+Coefficients:
+              Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) 1053.13112    9.27372 113.561  &lt; 2e-16 ***
+Takers        -7.16159    0.89220  -8.027 2.32e-10 ***
+I(Takers^2)    0.07102    0.01405   5.055 6.99e-06 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 29.93 on 47 degrees of freedom
+Multiple R-squared:  0.8289,    Adjusted R-squared:  0.8216 
+F-statistic: 113.8 on 2 and 47 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<div class="fragment">
+<p><span class="red">Fitted model</span>: <span class="math inline">\(\quad\widehat{\text{SAT}} = 1053.1 -7.161(\text{Takers})+0.0710(\text{Takers}^2)\)</span></p>
+</div>
+</section>
+<section id="section-8" class="slide level2 smaller">
+<h2></h2>
+<h3 id="sat-data-plot-the-quadratic-model">SAT data: Plot the Quadratic Model</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href=""></a><span class="co"># Use the name of the fitted lm model </span></span>
+<span id="cb10-2"><a href=""></a>quad_curve <span class="ot">&lt;-</span> <span class="fu">makeFun</span>(quadmod) </span>
+<span id="cb10-3"><a href=""></a><span class="fu">coef</span>(quad_curve) <span class="co"># Check the coefficients</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell fragment">
+<div class="cell-output cell-output-stdout">
+<pre><code>  (Intercept)        Takers   I(Takers^2) 
+1053.13112399   -7.16159459    0.07102452 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href=""></a><span class="fu">gf_point</span>(SAT <span class="sc">~</span> Takers, <span class="at">data =</span> state_sat) <span class="sc">%&gt;%</span></span>
+<span id="cb12-2"><a href=""></a>  <span class="fu">gf_function</span>(quad_curve, <span class="at">color =</span> <span class="st">"red"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="Ch3Lect_pt3_files/figure-revealjs/unnamed-chunk-9-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="section-9" class="slide level2 smaller">
+<h2></h2>
+<h3 id="sat-data-residual-plot">SAT Data: Residual Plot</h3>
+<div class="cell" data-panelset="true">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href=""></a><span class="co"># Use the name of the fitted lm model </span></span>
+<span id="cb13-2"><a href=""></a><span class="fu">gf_point</span>(<span class="fu">resid</span>(quadmod) <span class="sc">~</span> <span class="fu">fitted</span>(quadmod)) <span class="sc">%&gt;%</span></span>
+<span id="cb13-3"><a href=""></a>  <span class="fu">gf_hline</span>(<span class="at">yintercept =</span> <span class="sc">~</span> <span class="dv">0</span>, <span class="at">color =</span> <span class="st">"red"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell fragment" data-panelset="true">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="Ch3Lect_pt3_files/figure-revealjs/unnamed-chunk-10-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="section-10" class="slide level2 smaller">
+<h2></h2>
+<h3 id="guidelines-for-choosing-the-polynomial-degree">Guidelines for Choosing the Polynomial Degree</h3>
+<ul>
+<li><p>Use the minimum degree needed to capture the structure of the data.</p></li>
+<li><p>Check the <span class="math inline">\(t\)</span> test of the coefficient for the highest power.</p></li>
+<li><p>Keep lower powers even if they are not “significant.”</p></li>
+</ul>
+<div class="fragment">
+<p><br></p>
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Tip</strong></p>
+</div>
+<div class="callout-content">
+<p>If you include <span class="math inline">\(x^p\)</span>, keep <span class="math inline">\(1, x, x^2, \dots, x^{p-1}\)</span> so the model is hierarchical; then the test of the highest-degree term answers the right question: “Do we need <em>more</em> curvature than the lower-degree model already provides?”</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="slide level2">
+
+
+<img data-src="https://www.liverpool.ac.uk/pfg/Who/Blog/files/2088_c953_512.gif" class="r-stretch"></section>
+<section id="section-11" class="slide level2 smaller">
+<h2></h2>
+<h3 id="complete-second-order-models">Complete Second Order Models</h3>
+<p><strong>Definition:</strong> A complete second-order model for two predictors would be <span class="math display">\[
+Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1^2 + \beta_4 X_2^2 + \beta_5 X_1X_2 + \epsilon
+\]</span></p>
+<ul>
+<li><p>Allows for curvature in both variables and the possibility of interaction.</p></li>
+<li><p>Linear and quadratic models can be obtained by setting certain <span class="math inline">\(\beta_i=0\)</span>.</p></li>
+</ul>
+<p><br></p>
+<p><strong>Example</strong>: Try a full second-order model for SAT data</p>
+</section>
+<section id="section-12" class="slide level2 smaller">
+<h2></h2>
+<h3 id="visualizing-second-order-models">Visualizing Second-Order Models</h3>
+
+<img data-src="figures/second_order.png" class="quarto-figure quarto-figure-center r-stretch"></section>
+<section id="section-13" class="slide level2 smaller">
+<h2></h2>
+<h3 id="example-second-order-model-for-sat-data">Example: Second Order Model for SAT Data</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href=""></a>sat_second <span class="ot">&lt;-</span> <span class="fu">lm</span>(SAT <span class="sc">~</span> Takers <span class="sc">+</span> Expend <span class="sc">+</span> <span class="fu">I</span>(Takers<span class="sc">^</span><span class="dv">2</span>) </span>
+<span id="cb14-2"><a href=""></a>                 <span class="sc">+</span> <span class="fu">I</span>(Expend<span class="sc">^</span><span class="dv">2</span>) <span class="sc">+</span> <span class="fu">I</span>(Takers<span class="sc">*</span>Expend), <span class="at">data =</span> state_sat)</span>
+<span id="cb14-3"><a href=""></a><span class="fu">summary</span>(sat_second)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell fragment">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = SAT ~ Takers + Expend + I(Takers^2) + I(Expend^2) + 
+    I(Takers * Expend), data = state_sat)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-50.472 -13.535   1.023   8.866  60.870 
+
+Coefficients:
+                    Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)        893.66283   36.14094  24.727  &lt; 2e-16 ***
+Takers              -7.05561    0.83740  -8.426 9.96e-11 ***
+Expend              10.33333    2.49600   4.140 0.000155 ***
+I(Takers^2)          0.07725    0.01328   5.816 6.28e-07 ***
+I(Expend^2)         -0.11775    0.04426  -2.660 0.010851 *  
+I(Takers * Expend)  -0.03344    0.03716  -0.900 0.373087    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 23.68 on 44 degrees of freedom
+Multiple R-squared:  0.8997,    Adjusted R-squared:  0.8883 
+F-statistic: 78.96 on 5 and 44 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+</section>
+<section id="example-can-the-model-be-simplified" class="slide level2">
+<h2>Example: Can the model be simplified?</h2>
+<ul>
+<li class="fragment"><p>Do we need the interaction?</p></li>
+<li class="fragment"><p>Do we need both quadratic terms?</p></li>
+<li class="fragment"><p>Do we even need the <code>Expend</code> terms?</p></li>
+</ul>
+<div class="fragment">
+<p><strong>Stay tuned</strong> for the nested <span class="math inline">\(F\)</span> test (Section 3.6)</p>
+</div>
+</section>
+<section>
+<section id="section-14" class="title-slide slide level1 center" data-background-color="#FAD9C7">
+<h1></h1>
+<div id="title-slide" class="center">
+<p><span style="font-size: 2.5em; font-weight: bold;">Multicollinearity</span></p>
+</div>
+</section>
+<section id="mulitcollinearity" class="slide level2">
+<h2>Mulitcollinearity</h2>
+<ul>
+<li><p>What is it?</p>
+<ul>
+<li>Two or more predictors are strongly associated with each other.</li>
+</ul></li>
+<li><p>Why is it a problem?</p>
+<ul>
+<li>Individual coefficients and <span class="math inline">\(t\)</span> tests can be deceptive and unreliable.</li>
+</ul></li>
+</ul>
+<p><br></p>
+<p><strong>Bad news:</strong> No cures, just treatments!</p>
+</section>
+<section id="section-15" class="slide level2 smaller">
+<h2></h2>
+<h3 id="effects-of-multicollinearity">Effects of Multicollinearity</h3>
+<p>If predictors are highly correlated among themselves, then:</p>
+<ol type="1">
+<li><p>The regression coefficients and tests can be extremely variable and difficult to interpret individually.</p></li>
+<li><p>One variable alone might work as well as many.</p></li>
+</ol>
+<p><br></p>
+<div class="fragment">
+<ul>
+<li>Approach may depend on the goal of the analysis: description vs prediction.</li>
+</ul>
+</div>
+</section>
+<section id="how-to-detect-multicollinearity" class="slide level2 smaller">
+<h2>How to Detect Multicollinearity?</h2>
+<h3 id="correlation-matrix">1. Correlation Matrix</h3>
+<ul>
+<li><p><strong>Dataset:</strong> <strong><span class="red">MidtermFinalA</span></strong> (class scores)</p>
+<ul>
+<li><p><strong>Response:</strong> <code>Final</code> exam score</p></li>
+<li><p><strong>Predictors:</strong> <code>Quiz</code> average, <code>Class</code> participation, and <code>Midterm</code> score</p></li>
+</ul></li>
+</ul>
+</section>
+<section id="section-16" class="slide level2 smaller">
+<h2></h2>
+<h3 class="smaller" id="correlation-matrix-for-midtermfinala">Correlation Matrix for MidtermFinalA</h3>
+<ul>
+<li>Note high correlation between <code>Midterm</code> and <code>Quiz</code></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href=""></a>MidtermFinalA <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"http://people.kzoo.edu/enordmoe/math360/MidtermFinalA.csv"</span>)</span>
+<span id="cb16-2"><a href=""></a><span class="fu">options</span>(<span class="at">digits =</span> <span class="dv">3</span>)</span>
+<span id="cb16-3"><a href=""></a>M <span class="ot">&lt;-</span> MidtermFinalA <span class="sc">|&gt;</span> </span>
+<span id="cb16-4"><a href=""></a>  <span class="fu">select</span>(Midterm, Final, Quiz, Class) <span class="sc">|&gt;</span> </span>
+<span id="cb16-5"><a href=""></a>  <span class="fu">cor</span>()</span>
+<span id="cb16-6"><a href=""></a>M</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell fragment">
+<div class="cell-output cell-output-stdout">
+<pre><code>        Midterm Final  Quiz Class
+Midterm   1.000 0.754 0.972 0.279
+Final     0.754 1.000 0.743 0.144
+Quiz      0.972 0.743 1.000 0.234
+Class     0.279 0.144 0.234 1.000</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href=""></a><span class="co"># or use cor(MidtermFinalA[2:5])</span></span>
+<span id="cb18-2"><a href=""></a><span class="fu">options</span>(<span class="at">digits=</span><span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="section-17" class="slide level2 smaller">
+<h2></h2>
+<h3 id="multicollinearity-simulation">Multicollinearity: Simulation</h3>
+<ul>
+<li><p>Explore stability of regression results in the presence of multicollinearity</p>
+<ul>
+<li><p><code>Quiz</code> and <code>Midterm</code> are related</p></li>
+<li><p><code>Class</code> participation is independent of the others.</p></li>
+</ul></li>
+<li><p>Link to download <a href="https://www.dropbox.com/s/w9y31uny2tyejwd/SimMultiFinal.R" download="">SimMultiFinal.R</a></p></li>
+</ul>
+</section>
+<section id="how-to-detect-multicollinearity-1" class="slide level2 smaller">
+<h2>How to Detect Multicollinearity?</h2>
+<h3 id="variance-inflation-factor-vif">2. Variance Inflation Factor (VIF)</h3>
+<p><span class="math display">\[
+\text{VIF} = \frac{1}{1-R_i^2}
+\]</span> where <span class="math inline">\(R_i^2\)</span> is the <span class="math inline">\(R^2\)</span> for the regression predicting variable <span class="math inline">\(X_i\)</span> from the other <em>predictor variables</em>.</p>
+<p><br></p>
+<div class="fragment">
+<p><strong>Beware</strong> if <span class="math inline">\(\text{VIF}&gt;5\)</span> <span class="math inline">\(\Longleftrightarrow\)</span> <span class="math inline">\(R_i^2&gt;80\%\)</span>.</p>
+</div>
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Tip</strong></p>
+</div>
+<div class="callout-content">
+<p>Obtain <span class="math inline">\(\text{VIF}\)</span> using <strong>car</strong> package in R.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="section-18" class="slide level2" style="font-size: 60%;">
+<h2></h2>
+<h4 id="example-midtermfinala-dataset">Example: MidtermFinalA Dataset</h4>
+<div class="cell" data-panelset="true">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href=""></a><span class="co"># output-location:fragment</span></span>
+<span id="cb19-2"><a href=""></a>finalmodel <span class="ot">&lt;-</span> <span class="fu">lm</span>(Final <span class="sc">~</span> Midterm <span class="sc">+</span> Quiz <span class="sc">+</span> Class, <span class="at">data =</span> MidtermFinalA)</span>
+<span id="cb19-3"><a href=""></a><span class="fu">summary</span>(finalmodel)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = Final ~ Midterm + Quiz + Class, data = MidtermFinalA)
+
+Residuals:
+   Min     1Q Median     3Q    Max 
+-19.35  -6.17   0.41   5.90  17.41 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)  
+(Intercept)   19.158      9.679    1.98    0.058 .
+Midterm        1.271      1.091    1.17    0.254  
+Quiz           0.499      2.024    0.25    0.807  
+Class         -0.117      0.232   -0.51    0.616  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 9.93 on 27 degrees of freedom
+Multiple R-squared:  0.575, Adjusted R-squared:  0.527 
+F-statistic: 12.2 on 3 and 27 DF,  p-value: 3.22e-05</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href=""></a><span class="co">#install.packages(car)</span></span>
+<span id="cb21-2"><a href=""></a><span class="fu">library</span>(car)</span>
+<span id="cb21-3"><a href=""></a><span class="fu">vif</span>(finalmodel)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Midterm    Quiz   Class 
+19.2840 18.8098  1.1158 </code></pre>
+</div>
+</div>
+</section>
+<section id="section-19" class="slide level2 smaller">
+<h2></h2>
+<h3 id="output-for-checking-vif-calculation">Output for Checking VIF calculation</h3>
+<ul>
+<li>The calculation agrees up to rounding: <span class="math inline">\(\text{VIF} = \frac{1}{1-.948} = 19.23\)</span></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href=""></a><span class="fu">summary</span>(<span class="fu">lm</span>(Midterm  <span class="sc">~</span>  Quiz <span class="sc">+</span> Class, <span class="at">data =</span> MidtermFinalA))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell fragment">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = Midterm ~ Quiz + Class, data = MidtermFinalA)
+
+Residuals:
+   Min     1Q Median     3Q    Max 
+-3.478 -1.127  0.141  1.004  3.939 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)   2.9568     1.5812    1.87    0.072 .  
+Quiz          1.8026     0.0832   21.67   &lt;2e-16 ***
+Class         0.0484     0.0391    1.24    0.226    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 1.72 on 28 degrees of freedom
+Multiple R-squared:  0.948, Adjusted R-squared:  0.944 
+F-statistic:  256 on 2 and 28 DF,  p-value: &lt;2e-16</code></pre>
+</div>
+</div>
+</section>
+<section id="section-20" class="slide level2">
+<h2></h2>
+<h3 id="what-to-do-if-you-have-multicollinearity">What to Do if You Have Multicollinearity?</h3>
+<ol type="1">
+<li class="fragment"><p>Choose a better set of predictors.</p></li>
+<li class="fragment"><p>Eliminate some of the redundant predictors.</p></li>
+<li class="fragment"><p>Combine predictors to create a (possibly weighted) scale.</p></li>
+<li class="fragment"><p>“Ignore” the individual coefficients and tests if prediction is the primary goal.</p></li>
+</ol>
+<div class="fragment">
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Tip</strong></p>
+</div>
+<div class="callout-content">
+<p>The best remedies often depend on the purpose of the analysis.</p>
+</div>
+</div>
+</div>
+</div>
+
+</section></section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="Ch3Lect_pt3_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="Ch3Lect_pt3_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="Ch3Lect_pt3_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="Ch3Lect_pt3_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="Ch3Lect_pt3_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="Ch3Lect_pt3_files/libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
+  <script src="Ch3Lect_pt3_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="Ch3Lect_pt3_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="Ch3Lect_pt3_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="Ch3Lect_pt3_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="Ch3Lect_pt3_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': true,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleChalkboard(event)\"><kbd>b</kbd> Toggle Chalkboard</a></li>\n<li class=\"slide-tool-item\" data-item=\"6\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleNotesCanvas(event)\"><kbd>c</kbd> Toggle Notes Canvas</a></li>\n<li class=\"slide-tool-item\" data-item=\"7\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.downloadDrawings(event)\"><kbd>d</kbd> Download Drawings</a></li>\n<li class=\"slide-tool-item\" data-item=\"8\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'chalkboard': {"buttons":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'fade',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1050,
+
+        height: 700,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, RevealChalkboard, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    
+    <script>
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+      // slide changes (different for each slide format).
+      (function () {
+        // dispatch for htmlwidgets
+        function fireSlideEnter() {
+          const event = window.document.createEvent("Event");
+          event.initEvent("slideenter", true, true);
+          window.document.dispatchEvent(event);
+        }
+
+        function fireSlideChanged(previousSlide, currentSlide) {
+          fireSlideEnter();
+
+          // dispatch for shiny
+          if (window.jQuery) {
+            if (previousSlide) {
+              window.jQuery(previousSlide).trigger("hidden");
+            }
+            if (currentSlide) {
+              window.jQuery(currentSlide).trigger("shown");
+            }
+          }
+        }
+
+        // hookup for slidy
+        if (window.w3c_slidy) {
+          window.w3c_slidy.add_observer(function (slide_num) {
+            // slide_num starts at position 1
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+          });
+        }
+
+      })();
+    </script>
+
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+            const codeEl = trigger.previousElementSibling.cloneNode(true);
+            for (const childEl of codeEl.children) {
+              if (isCodeAnnotation(childEl)) {
+                childEl.remove();
+              }
+            }
+            return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>
