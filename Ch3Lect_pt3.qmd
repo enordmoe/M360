@@ -528,4 +528,103 @@ The best remedies often depend on the purpose of the analysis.
 
 :::
 
+## 
+### Nested Models
+
+**Definition**: If all of the predictors in Model A are also in a bigger Model B, we say that Model A is <br>**nested** in Model B.
+
+--
+
+**Example:**
+
+  - $\text{tswirl} = \beta_0 + \beta_1 (\text{dist}) + \epsilon$ is *nested* in
+  
+  - $\text{tswirl} = \beta_0 + \beta_1 (\text{dist}) + \beta_2 (\text{funnel.hi}) + \beta_3 (\text{dist}\cdot \text{funnel.hi}) + \epsilon$
+
+--
+
+**Test for nested models:**
+
+  - Do we really need the *extra* terms in Model B? 
+  
+  - Do the extra terms significantly improve on Model A?
+
+---
+
+## Nested Models
+
+### What does “nested” mean?
+
+A model is **nested** within a larger model if:
+
+- Every predictor in the smaller model appears in the larger model  
+- The larger model contains *additional* terms  
+
+---
+
+### Example
+
+**Model A (Reduced Model):**
+
+$$
+\text{tswirl} = \beta_0 + \beta_1(\text{dist}) + \epsilon
+$$
+
+::: {.fragment}
+
+**Model B (Full Model):**
+
+$$
+\text{tswirl} = \beta_0 
++ \beta_1(\text{dist}) 
++ \beta_2(\text{funnel.hi}) 
++ \beta_3(\text{dist}\cdot\text{funnel.hi}) 
++ \epsilon
+$$
+
+:::
+
+::: {.fragment}
+
+Model A is **nested in** Model B.
+
+:::
+
+---
+
+### The Statistical Question
+
+::: {.fragment}
+Do the extra terms in Model B improve the model?
+:::
+
+::: {.fragment}
+
+$$
+H_0: \beta_2 = \beta_3 = 0
+$$
+
+:::
+
+::: {.fragment}
+
+$$
+H_A: \text{At least one of } \beta_2, \beta_3 \neq 0
+$$
+
+:::
+
+---
+
+### Interpretation
+
+::: {.fragment}
+If we reject $H_0$  
+→ The larger model significantly improves fit.
+:::
+
+::: {.fragment}
+If we fail to reject $H_0$  
+→ The simpler model is sufficient.
+:::
 

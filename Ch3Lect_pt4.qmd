@@ -1,0 +1,406 @@
+---
+title: "Chapter 3: Multiple Regression<br><span style='font-size:70%'>Part 4: Section 3.6</span>"
+subtitle: "Statistical Modeling"
+author: "MATH 360"
+format:
+  revealjs:
+    chalkboard: true
+    theme: [default, custom.scss]
+    toc: false
+    toc-depth: 1
+    slideNumber: true
+    html-math-method: mathjax
+    incremental: false
+    transition: fade
+    preview-links: auto
+    notes: true
+title-slide-attributes:
+  data-background-color: "#EA6820"
+from: markdown+emoji
+execute:
+  echo: true
+  cache: false
+editor:
+  markdown:
+    wrap: 72
+---
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(mosaic)
+library(Stat2Data)
+library(gridExtra)
+library(plotly)
+library(readr)
+data("SpeciesArea")
+data("CountyHealth")
+data("LongJumpOlympics")
+MidtermFinal <- read.csv("http://people.kzoo.edu/enordmoe/math360/MidtermFinal.csv")
+data("WeightLossIncentive4")
+data("NFLStandings2016")
+data("Perch")
+
+```
+
+## Outline
+
+::: incremental
+- Comparing Two Lines
+
+- Nested $F$-test
+
+:::
+
+
+## Funnel Data {.smaller}
+
+### Prep Data for multiple regression analysis
+
+```{r}
+funneldata <- read_csv("http://people.kzoo.edu/enordmoe/math360/funneldata.csv", col_types = cols(trial = col_factor(levels = c("1","2"))))
+funnel.hi <- filter(funneldata, height == 13)
+funnel.hilo <- filter(funneldata, height == 13 | height == 10)
+funnel.hilo <- mutate(funnel.hilo, height.hi = ifelse(height==13,1,0))
+funneldata <- mutate(funneldata, height.hi = ifelse(height==13, 1, 0),
+                   height.mid = ifelse(height == 11.5, 1, 0))
+
+```
+
+## {.smaller}
+### Funnel Data Model for Two Regression Lines
+
+Recall the funnel data model for two regression lines:
+
+$$
+\text{tswirl} = \beta_0 + \beta_1 (\text{dist}) + \beta_2 (\text{funnel.hi}) + \beta_3 (\text{dist}\cdot \text{funnel.hi}) + \epsilon
+$$
+
+::: {.fragment}
+
+- Test for different slopes:
+
+  - **t-test:** $H_0:\beta_3=0$ versus $H_a:\beta_3\neq 0$
+  
+:::
+
+::: {.fragment}
+
+- Test for different intercepts:
+
+  - **t-test:** $H_0:\beta_2=0$ versus $H_a:\beta_2\neq 0$
+
+:::
+
+::: {.fragment}
+
+- Test for different lines:
+
+  - Test: $H_0: \beta_2=\beta_3=0$ versus $\text{At least one }\beta_i\neq 0$.
+  
+    - How?
+    
+:::
+
+
+## Second Order Model for SAT Data  Revisited {style="font-size: 60%;"}
+
+
+
+```{r}
+#| output-location: fragment
+state_sat <- read.csv("http://people.kzoo.edu/enordmoe/math360/StateSAT.csv")
+sat_second <- lm(SAT ~ Takers + Expend + I(Takers^2) 
+                 + I(Expend^2) + I(Takers*Expend), data = state_sat)
+summary(sat_second)
+```
+
+##
+### Second Order Model for SAT Data  Revisited
+
+**Inference Questions**
+
+::: {.incremental}
+
+- Do we need both quadratic terms?
+  
+- Do we need the terms with Expend
+  
+:::
+
+::: {.fragment}
+
+<br>
+
+**Question:** How to test just a subset of predictors :question:
+
+:::
+
+::: {.fragment}
+
+<br>
+
+**Answer**: Nested $F$-test
+
+:::
+
+
+## Nested Models
+
+### What does “nested” mean?
+
+A model is **nested** within a larger model if:
+
+- Every predictor in the smaller model appears in the larger model  
+- The larger model contains *additional* terms  
+
+## Example
+
+**Model A (Reduced Model):**
+
+$$
+\text{tswirl} = \beta_0 + \beta_1(\text{dist}) + \epsilon
+$$
+
+::: {.fragment}
+
+**Model B (Full Model):**
+
+$$
+\text{tswirl} = \beta_0 
++ \beta_1(\text{dist}) 
++ \beta_2(\text{funnel.hi}) 
++ \beta_3(\text{dist}\cdot\text{funnel.hi}) 
++ \epsilon
+$$
+
+:::
+
+::: {.fragment}
+
+Model A is **nested in** Model B.
+
+:::
+
+## The Statistical Question
+
+::: {.fragment}
+Do the extra terms in Model B improve the model?
+:::
+
+::: {.fragment}
+
+$$
+H_0: \beta_2 = \beta_3 = 0
+$$
+
+:::
+
+::: {.fragment}
+
+$$
+H_A: \text{At least one of } \beta_2, \beta_3 \neq 0
+$$
+
+:::
+
+## Interpretation
+
+Possible outcomes for a nested test:
+
+::: {.fragment}
+
+* We reject $H_0$ if the larger model significantly improves fit.
+
+:::
+
+::: {.fragment}
+
+* We fail to reject $H_0$ if the  simpler model is sufficient.
+
+:::
+
+
+
+## The Nested F-test Step 1{style="font-size: 70%;"}
+### How Much Do the Extra Predictors Explain?
+
+::: {.fragment}
+Start with two nested models:
+
+- **Reduced model** → leaves unexplained variability  
+  $$
+  SSE_{\text{Reduced}}
+  $$
+
+- **Full model** → leaves unexplained variability  
+  $$
+  SSE_{\text{Full}}
+  $$
+:::
+
+::: {.fragment}
+For nested models,
+
+$$
+SSE_{\text{Full}} \le SSE_{\text{Reduced}}
+$$
+
+Adding predictors can never increase SSE.
+:::
+
+::: {.fragment}
+The **extra variability explained** is
+
+$$
+SS_{\text{extra}}
+=
+SSE_{\text{Reduced}} - SSE_{\text{Full}}
+$$
+:::
+
+---
+
+## The Nested F-test Step 2
+### Convert to a Mean Square
+
+
+::: {.fragment}
+If $q$ = number of added predictors, then
+
+$$
+MS_{\text{extra}}
+=
+\frac{SS_{\text{extra}}}{q}
+$$
+:::
+
+
+
+## The Nested F-test Step 3
+### Form the $F$ Statistic
+
+::: {.fragment}
+Compare the extra mean square to the full model MSE:
+
+$$
+F
+=
+\frac{MS_{\text{extra}}}{MSE_{\text{Full}}}
+$$
+:::
+
+::: {.fragment}
+Equivalently,
+
+$$
+F
+=
+\frac{(SSE_{\text{Reduced}} - SSE_{\text{Full}})/q}
+{SSE_{\text{Full}}/(n - k - 1)}
+$$
+:::
+
+## The Nested F-test Step 4
+####  Hypothesis Test
+
+
+::: {.fragment}
+#### Test
+
+- $H_0$: All added coefficients equal 0  
+- $H_a$: At least one added coefficient $\neq 0$
+:::
+
+::: {.fragment}
+#### Compare to an $F$ distribution with degrees of freedom:
+
+- $\text{df}_1 = q$  
+- $\text{df}_2 =$ error df from the full model
+:::
+
+::: {.fragment}
+Small $P$-value $\Rightarrow$ the extra predictors significantly **improve** the model.
+
+  * We would prefer the full model
+:::
+
+## {style="font-size: 50%;"}
+### Example: Comparing Models with Nested F-Test in R
+
+1. R computes the compute the regression output for the Full Model
+
+
+```{r}
+#| output-location: fragment
+sat_full <- lm(SAT ~ Takers + Expend + I(Takers^2) 
+                 + I(Expend^2) + I(Takers*Expend), data = state_sat)
+summary(sat_full)
+anova(sat_full)
+```
+
+
+## {style="font-size: 60%;"}
+### Example: Comparing Models with Nested F-Test in R Part 2
+
+2. R computes the compute the regression output for the reduced model:
+
+```{r}
+#| output-location: fragment
+sat_reduced <- lm(SAT ~ Takers + I(Takers^2), data = state_sat)
+summary(sat_reduced)
+anova(sat_reduced)
+```
+
+
+## {style="font-size: 60%;"}
+### Example: Comparing Models with Nested F-Test in R: Part 3
+
+3. R computes the compute the nested $F$ statistic and $p$-value 
+
+```{r}
+#| output-location: fragment
+# Reduced model is first
+anova(sat_reduced, sat_full)
+```
+
+::: {.fragment}
+
+<br> 
+
+$\Rightarrow$ Strong evidence in favor of the full model, the extra terms help.
+
+:::
+
+##
+### Example: Nested F-Test Calculation
+
+$$\begin{align}
+F&=\frac{(\text{SSE}_\text{Reduced}-\text{SSE}_\text{Full})/(\#\text{ of extra predictors})}{\text{MSE}_\text{Full}}\\[2ex]
+&=\frac{(42101-24669)/(47-44)}{24669/44}\\[2ex]
+&=\frac{(17432)/3}{24669/44}= 10.364
+\end{align}$$
+
+```{r}
+1-pf(10.364, 3, 44)
+```
+
+
+## Special Cases for Nested F-Test
+
+
+- Test all predictors
+
+  - "Usual" ANOVA $F$-test for the full model
+
+- Test a single predictor (set one $\beta_i=0$)
+
+  - "F test" equivalent of $t$- test
+  
+
+  
+## Your Turn
+  
+* Funnel Data
+  
+* Car data
+

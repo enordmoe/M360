@@ -1,0 +1,339 @@
+---
+title: "9.1 Logistic Regression"
+subtitle: "Binary Response Variables"
+author: "Statistical Models (Stat 2)"
+format:
+  revealjs:
+    chalkboard: true
+    theme: [default, custom.scss]
+    reveal-options:
+      slideNumber: true
+    html-math-method: mathjax
+title-slide-attributes:
+  data-background-color: "#EA6820"
+from: markdown+emoji
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+```{r setup, echo=FALSE}
+library(mosaic)
+library(ggformula)
+library(Stat2Data)
+data("Pulse")
+```
+
+## Big Picture
+
+* So far: **quantitative response variables**
+* New situation: **categorical response variables**
+* Focus of this section:
+
+  * Binary response ($Y = 0/1$)
+  * Modeling **proportions / probabilities**
+  * Logistic regression
+
+---
+
+## Categorical Response Variables
+
+In many applications, the response variable $Y$ is **categorical**, not quantitative.
+
+Examples:
+
+* Yes / No
+* Success / Failure
+* Pass / Fail
+* Disease / No disease
+
+---
+
+## Binary Logistic Regression
+
+We focus first on the case where:
+
+* Response variable $Y$ has **two categories**
+* Often coded as:
+
+  * $Y = 1$ (success)
+  * $Y = 0$ (failure)
+
+Assume (for now):
+
+* One **quantitative predictor** $X$
+
+---
+
+## Example: Pulse Data
+
+* Response:
+  $$
+  Y = \text{Sex} \quad (0 = \text{Male},; 1 = \text{Female})
+  $$
+
+* Predictor:
+  $$
+  X = \text{Height (in inches)}
+  $$
+
+---
+
+## Trying Linear Regression (Illustration Only)
+
+If we code Sex as 0/1 and fit a linear regression:
+
+* The fitted values can be **less than 0 or greater than 1**
+* The relationship is not realistic for probabilities
+
+This motivates a new type of model.
+
+---
+
+## Sex vs Height
+
+```{r}
+gf_point(Sex ~ Hgt, data = Pulse) |>
+  gf_smooth(method = "lm", se = FALSE)
+```
+
+---
+
+## Jittered Version
+
+```{r}
+gf_jitter(Sex ~ Hgt, data = Pulse, width = 0, height = 0.05)
+```
+
+---
+
+## What Does the Mean Represent?
+
+In ordinary regression, the model predicts the **mean of $Y$**.
+
+For a 0/1 variable:
+
+$$
+\text{mean of } Y = \text{proportion of 1’s}
+$$
+
+That is,
+
+$$
+\pi = P(Y = 1)
+$$
+
+---
+
+## Goal of Logistic Regression
+
+**Goal:**
+Predict the **population proportion of successes**, $\pi$, at any value of $X$.
+
+Example question:
+
+> What proportion of all 68-inch-tall students are female?
+
+---
+
+## Binary Logistic Regression Model
+
+* $Y$ = binary response
+* $X$ = quantitative predictor
+* $\pi(x)$ = proportion of successes at predictor value $x$
+
+The logistic regression model directly models **$\pi(x)$**.
+
+---
+
+## Equivalent Forms of the Model
+
+Logistic regression can be written in several equivalent ways:
+
+* Probability form
+* Odds form
+* Log-odds (logit) form
+
+Each highlights a different interpretation.
+
+---
+
+## What Does the Logistic Curve Look Like?
+
+* Output is **between 0 and 1**
+* Shape is **S-shaped**
+* Changes slowly at extremes
+* Changes most rapidly near the middle
+
+---
+
+## The Logit Function
+
+The **logit** transformation is:
+
+$$
+\text{logit}(\pi) = \log\left(\frac{\pi}{1 - \pi}\right)
+$$
+
+This transforms probabilities in $(0,1)$ to real numbers.
+
+---
+
+## Key Modeling Assumption
+
+Logistic regression assumes:
+
+> A **linear relationship** between the predictor and the **log-odds**.
+
+That is,
+
+$$
+\log\left(\frac{\pi}{1 - \pi}\right)
+$$
+
+is linear in $X$.
+
+---
+
+## Binary Logistic Regression in R
+
+In R, logistic regression is fit using `glm()` with:
+
+```r
+family = binomial
+```
+
+---
+
+## Predicted Proportion (Pulse Example)
+
+```{r}
+mod.sex <- glm(Sex ~ Hgt, data = Pulse, family = binomial)
+mod.sex
+```
+
+---
+
+## Jittered Data with Fitted Model
+
+```{r}
+gf_jitter(Sex ~ Hgt, data = Pulse, height = 0.05) |>
+  gf_smooth(method = "glm", method.args = list(family = binomial),
+            se = FALSE)
+```
+
+---
+
+## Example: Golf Putts
+
+* Response:
+
+  * Made putt (1) / Missed putt (0)
+* Predictor:
+
+  * Length of putt (feet)
+
+Goal:
+
+* Predict the **probability a putt is made** as a function of distance
+
+---
+
+## Logistic Regression for Putting
+
+```{r}
+data(Putts1)
+mod.putt <- glm(Made ~ Length, data = Putts1, family = binomial)
+mod.putt
+```
+
+---
+
+## Predicted Probabilities
+
+From the fitted model, we can compute:
+
+$$
+\hat{\pi}(x) = \text{predicted probability of success}
+$$
+
+for any putt length $x$.
+
+---
+
+## Probability Form of the Model (1 of 2)
+
+The logistic model can be written as:
+
+$$
+\pi(x) = \frac{e^{\beta_0 + \beta_1 x}}{1 + e^{\beta_0 + \beta_1 x}}
+$$
+
+---
+
+## Probability Form of the Model (2 of 2)
+
+This guarantees:
+
+* $0 < \pi(x) < 1$
+* Smooth, nonlinear relationship in $x$
+
+---
+
+## Odds
+
+The **odds of success** are defined as:
+
+$$
+\text{odds} = \frac{\pi}{1 - \pi}
+$$
+
+Interpretation:
+
+* Odds = 1 → equally likely
+* Odds > 1 → success more likely
+* Odds < 1 → failure more likely
+
+---
+
+## Odds and Logistic Regression
+
+A little algebra shows:
+
+$$
+\log(\text{odds}) = \beta_0 + \beta_1 x
+$$
+
+This is why logistic regression is sometimes called a **log-odds model**.
+
+---
+
+## Golf Putts: Odds
+
+```{r}
+odds <- exp(coef(mod.putt)[1] + coef(mod.putt)[2] * Putts1$Length)
+head(odds)
+```
+
+---
+
+## Golf Putts: Log(Odds)
+
+```{r}
+log(odds) |> head()
+```
+
+---
+
+## Summary
+
+* Logistic regression is used when $Y$ is **binary**
+* Models **probabilities**, not raw outcomes
+* Assumes linearity in **log-odds**
+* Output is interpretable in terms of:
+
+  * Probabilities
+  * Odds
+  * Log-odds
+

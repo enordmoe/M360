@@ -1,495 +1,1057 @@
 <!DOCTYPE html>
-<html lang="" xml:lang="">
-  <head>
-    <title>Chapter 3: Inference for Simple Linear Regression</title>
-    <meta charset="utf-8" />
-    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
-    <link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet" />
-    <script src="libs/panelset-0.2.6/panelset.js"></script>
-    <script src="libs/clipboard-2.0.6/clipboard.min.js"></script>
-    <link href="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.css" rel="stylesheet" />
-    <script src="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.js"></script>
-    <script>window.xaringanExtraClipboard(null, {"button":"Copy Code","success":"Copied!","error":"Press Ctrl+C to Copy"})</script>
-    <link href="libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
-    <script src="libs/tile-view-0.2.6/tile-view.js"></script>
-    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
-    <link rel="stylesheet" href="extra.css" type="text/css" />
-  </head>
-  <body>
-    <textarea id="source">
-class: center, middle, inverse, title-slide
-
-# Chapter 3: Inference for Simple Linear Regression
-## Part 3: Section 3.6
-### Applied Statistics II
-
----
-
-class: highlight-last-item
-
-
-
-
-
-
-
-
-
-
-&lt;style type="text/css"&gt;
-.highlight-last-item &gt; ul &gt; li,
-.highlight-last-item &gt; ol &gt; li {
-  opacity: 0.5;
-}
-.highlight-last-item &gt; ul &gt; li:last-of-type,
-.highlight-last-item &gt; ol &gt; li:last-of-type {
-  opacity: 1;
-}
-&lt;/style&gt;
-
-# Outline 
-
-- Comparing Two Lines
-
---
-
-- Nested `\(F\)`-test
-
-
----
-
-### Funnel Data Model for Two Regression Lines
-
-Recall the funnel data model for two regression lines:
-
-$$
-\text{tswirl} = \beta_0 + \beta_1 (\text{dist}) + \beta_2 (\text{funnel.hi}) + \beta_3 (\text{dist}\cdot \text{funnel.hi}) + \epsilon
-$$
-
-- Test for different slopes:
-
-  - **t-test:** `\(H_0:\beta_3=0\)` versus `\(H_a:\beta_3\neq 0\)`
-  
---
-  
-- Test for different intercepts:
-
-  - **t-test:** `\(H_0:\beta_2=0\)` versus `\(H_a:\beta_2\neq 0\)`
-
---
-  
-- Test for different lines:
-
-  - Test: `\(H_0: \beta_2=\beta_3=0\)` versus `\(\text{At least one }\beta_i\neq 0\)`.
-  
-    - How?
-    
----
-### Second Order Model for SAT Data  Revisited
-
-.panelset[
-
-.panel[.panel-name[Code]
-
-```r
-state_sat &lt;- read.csv("http://people.kzoo.edu/enordmoe/math360/StateSAT.csv")
-sat_second &lt;- lm(SAT ~ Takers + Expend + I(Takers^2) 
-                 + I(Expend^2) + I(Takers*Expend), data = state_sat)
-summary(sat_second)
-```
-
-
-
-]
-
-.panel[.panel-name[Output]
-
-```
-## 
-## Call:
-## lm(formula = SAT ~ Takers + Expend + I(Takers^2) + I(Expend^2) + 
-##     I(Takers * Expend), data = state_sat)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -50.472 -13.535   1.023   8.866  60.870 
-## 
-## Coefficients:
-##                     Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)        893.66283   36.14094  24.727  &lt; 2e-16 ***
-## Takers              -7.05561    0.83740  -8.426 9.96e-11 ***
-## Expend              10.33333    2.49600   4.140 0.000155 ***
-## I(Takers^2)          0.07725    0.01328   5.816 6.28e-07 ***
-## I(Expend^2)         -0.11775    0.04426  -2.660 0.010851 *  
-## I(Takers * Expend)  -0.03344    0.03716  -0.900 0.373087    
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 23.68 on 44 degrees of freedom
-## Multiple R-squared:  0.8997,	Adjusted R-squared:  0.8883 
-## F-statistic: 78.96 on 5 and 44 DF,  p-value: &lt; 2.2e-16
-```
-
-
-
-]
-]
-
----
-### Second Order Model for SAT Data  Revisited
-
-**Inference Questions**
-
-  - Do we need both quadratic terms?
-  
---
-  
-  - Do we need the terms with Expend
-  
---
-
-**Q**: How to test just a subset of predictors?
-
---
-
-**A**: Nested `\(F\)`-test
-
-
----
-
-### Nested Models
-
-**Definition**: If all of the predictors in Model A are also in a bigger Model B, we say that Model A is &lt;br&gt;**nested** in Model B.
-
---
-
-**Example:**
-
-  - `\(\text{tswirl} = \beta_0 + \beta_1 (\text{dist}) + \epsilon\)` is *nested* in
-  
-  - `\(\text{tswirl} = \beta_0 + \beta_1 (\text{dist}) + \beta_2 (\text{funnel.hi}) + \beta_3 (\text{dist}\cdot \text{funnel.hi}) + \epsilon\)`
-
---
-
-**Test for nested models:**
-
-  - Do we really need the *extra* terms in Model B? 
-  
-  - Do the extra terms significantly improve on Model A?
-
----
-
-### Nested `\(F\)` test Procedure
-
-1. Find how much "extra" variability is explained when the "new" terms being tested are added.
-
---
-
-2. Divide by the number of new terms to get a mean square for the new part of the model.
-
---
-
-3. Divide this mean square by the MSE for the "full" model to get an `\(F\)` statistic.
-
---
-
-4. Compare to an F distribution to find the `\(P\)`-value
-
----
-
-## How much variability is explained by the "extra" predictors? 
-
-- `\(\text{SSE}_\text{Full}\)` - SS left unexplained by the full model
-
-- `\(\text{SSE}_\text{Reduced}\)` - SS left unexplained by the reduced model
-
-  - Note  `\(\text{SSE}_\text{Full}\le \text{SSE}_\text{Reduced}\)` for nested models.
-  
---
-
-&lt;br&gt;
-
-**Difference in variability explained:**
-
-`$$\text{SSE}_\text{Reduced}-\text{SSE}_\text{Full}$$`
-
-`\(\Longrightarrow\)` the difference is the "new" variability explained by the "extra" predictors in the full model.
-
----
-## Nested `\(F\)`-test
-
-Test:
-- `\(H_0: \beta_i=0\)` for a "subset" of predictors
-
-- `\(H_a: \text{At least one }\beta_i\neq 0\)` 
-
-`$$F=\frac{(\text{SSE}_\text{Reduced}-\text{SSE}_\text{Full})/(\#\text{ of extra predictors})}{\text{SSE}_\text{Full}/(n-k-1)}$$`
-
---
-
-or, equivalently
-
-
-`$$F=\frac{(\text{SSE}_\text{Reduced}-\text{SSE}_\text{Full})/(\#\text{ of extra predictors})}{\text{MSE}_\text{Full}}$$`
-
-- Compare to `\(F\)` with `\(df_1=\#\text{ of extra predictors}\)` and `\(df_2=\text{error df in full model}\)`.
----
-
-### Example: Comparing Models with Nested F-Test in R
-
-
-
-.panelset[
-.panel[.panel-name[R code]
-
-```r
-sat_full &lt;- lm(SAT ~ Takers + Expend + I(Takers^2) 
-                 + I(Expend^2) + I(Takers*Expend), data = state_sat)
-summary(sat_second)
-anova(sat_second)
-sat_reduced &lt;- lm(SAT ~ Takers + I(Takers^2), data = state_sat)
-anova(sat_reduced)
-anova(sat_reduced, sat_full)
-```
-]
-.panel[.panel-name[full model output]
-
-```
-## 
-## Call:
-## lm(formula = SAT ~ Takers + Expend + I(Takers^2) + I(Expend^2) + 
-##     I(Takers * Expend), data = state_sat)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -50.472 -13.535   1.023   8.866  60.870 
-## 
-## Coefficients:
-##                     Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)        893.66283   36.14094  24.727  &lt; 2e-16 ***
-## Takers              -7.05561    0.83740  -8.426 9.96e-11 ***
-## Expend              10.33333    2.49600   4.140 0.000155 ***
-## I(Takers^2)          0.07725    0.01328   5.816 6.28e-07 ***
-## I(Expend^2)         -0.11775    0.04426  -2.660 0.010851 *  
-## I(Takers * Expend)  -0.03344    0.03716  -0.900 0.373087    
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 23.68 on 44 degrees of freedom
-## Multiple R-squared:  0.8997,	Adjusted R-squared:  0.8883 
-## F-statistic: 78.96 on 5 and 44 DF,  p-value: &lt; 2.2e-16
-```
-]
-.panel[.panel-name[full model anova]
-
-```
-## Analysis of Variance Table
-## 
-## Response: SAT
-##                    Df Sum Sq Mean Sq  F value    Pr(&gt;F)    
-## Takers              1 181024  181024 322.8794 &lt; 2.2e-16 ***
-## Expend              1   8709    8709  15.5334 0.0002865 ***
-## I(Takers^2)         1  25877   25877  46.1541 2.295e-08 ***
-## I(Expend^2)         1   5278    5278   9.4148 0.0036773 ** 
-## I(Takers * Expend)  1    454     454   0.8098 0.3730865    
-## Residuals          44  24669     561                       
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-```
-
-]
-.panel[.panel-name[reduced model output]
-
-```
-## Analysis of Variance Table
-## 
-## Response: SAT
-##             Df Sum Sq Mean Sq F value    Pr(&gt;F)    
-## Takers       1 181024  181024 202.089 &lt; 2.2e-16 ***
-## I(Takers^2)  1  22886   22886  25.549 6.992e-06 ***
-## Residuals   47  42101     896                      
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-```
-
-]
-.panel[.panel-name[nested F test]
-
-```
-## Analysis of Variance Table
-## 
-## Model 1: SAT ~ Takers + I(Takers^2)
-## Model 2: SAT ~ Takers + Expend + I(Takers^2) + I(Expend^2) + I(Takers * 
-##     Expend)
-##   Res.Df   RSS Df Sum of Sq      F    Pr(&gt;F)    
-## 1     47 42101                                  
-## 2     44 24669  3     17432 10.364 2.787e-05 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-```
-]
-]
-
----
-
-### Example: Nested F Calculation
-
-`$$\begin{align}
-F&amp;=\frac{(\text{SSE}_\text{Reduced}-\text{SSE}_\text{Full})/(\#\text{ of extra predictors})}{\text{MSE}_\text{Full}}\\[2ex]
-&amp;=\frac{(64987-24669)/(48-44)}{24669/44}\\[2ex]
-&amp;=\frac{(40318)/4}{24669/44}= 17.978
-\end{align}$$`
-
-
-```r
-1-pf(10.364, 3, 44)
-```
-
-```
-## [1] 2.787342e-05
-```
-
----
-
-### Special Cases for Nested F Test
-
-
-- Test all predictors
-
-  - "Usual" ANOVA `\(F\)`-test for the full model
-
-- Test a single predictor (set one `\(\beta_i=0\)`)
-
-  - "F test" equivalent of `\(t\)`- test
-  
-  ---
-  
-  ### Your Turn
-  
-  - Funnel Data
-  
-  - Car data
-    </textarea>
-<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
-<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
-<script>var slideshow = remark.create({
-"highlightStyle": "github",
-"highlightLines": true,
-"ratio": "16:9",
-"countIncrementalSlides": false
-});
-if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
-  window.dispatchEvent(new Event('resize'));
-});
-(function(d) {
-  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
-  if (!r) return;
-  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
-  d.head.appendChild(s);
-})(document);
-
-(function(d) {
-  var el = d.getElementsByClassName("remark-slides-area");
-  if (!el) return;
-  var slide, slides = slideshow.getSlides(), els = el[0].children;
-  for (var i = 1; i < slides.length; i++) {
-    slide = slides[i];
-    if (slide.properties.continued === "true" || slide.properties.count === "false") {
-      els[i - 1].className += ' has-continuation';
+<html lang="en"><head>
+<script src="Ch3Lect_pt4_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Ch3Lect_pt4_files/libs/quarto-html/tabby.min.js"></script>
+<script src="Ch3Lect_pt4_files/libs/quarto-html/popper.min.js"></script>
+<script src="Ch3Lect_pt4_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="Ch3Lect_pt4_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Ch3Lect_pt4_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="Ch3Lect_pt4_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.7.32">
+
+  <meta name="author" content="MATH 360">
+  <title>Chapter 3: Multiple Regression Part 4: Section 3.6</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="Ch3Lect_pt4_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="Ch3Lect_pt4_files/libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
     }
-  }
-  var s = d.createElement("style");
-  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
-  d.head.appendChild(s);
-})(document);
-// delete the temporary CSS (for displaying all slides initially) when the user
-// starts to view slides
-(function() {
-  var deleted = false;
-  slideshow.on('beforeShowSlide', function(slide) {
-    if (deleted) return;
-    var sheets = document.styleSheets, node;
-    for (var i = 0; i < sheets.length; i++) {
-      node = sheets[i].ownerNode;
-      if (node.dataset["target"] !== "print-only") continue;
-      node.parentNode.removeChild(node);
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
     }
-    deleted = true;
-  });
-})();
-(function() {
-  "use strict"
-  // Replace <script> tags in slides area to make them executable
-  var scripts = document.querySelectorAll(
-    '.remark-slides-area .remark-slide-container script'
-  );
-  if (!scripts.length) return;
-  for (var i = 0; i < scripts.length; i++) {
-    var s = document.createElement('script');
-    var code = document.createTextNode(scripts[i].textContent);
-    s.appendChild(code);
-    var scriptAttrs = scripts[i].attributes;
-    for (var j = 0; j < scriptAttrs.length; j++) {
-      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
     }
-    scripts[i].parentElement.replaceChild(s, scripts[i]);
-  }
-})();
-(function() {
-  var links = document.getElementsByTagName('a');
-  for (var i = 0; i < links.length; i++) {
-    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
-      links[i].target = '_blank';
-    }
-  }
-})();
-// adds .remark-code-has-line-highlighted class to <pre> parent elements
-// of code chunks containing highlighted lines with class .remark-code-line-highlighted
-(function(d) {
-  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
-  const preParents = [];
-  const findPreParent = function(line, p = 0) {
-    if (p > 1) return null; // traverse up no further than grandparent
-    const el = line.parentElement;
-    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
-  };
-
-  for (let line of hlines) {
-    let pre = findPreParent(line);
-    if (pre && !preParents.includes(pre)) preParents.push(pre);
-  }
-  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
-})(document);</script>
-
-<script>
-slideshow._releaseMath = function(el) {
-  var i, text, code, codes = el.getElementsByTagName('code');
-  for (i = 0; i < codes.length;) {
-    code = codes[i];
-    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
-      text = code.textContent;
-      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
-          /^\$\$(.|\s)+\$\$$/.test(text) ||
-          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
-        code.outerHTML = code.innerHTML;  // remove <code></code>
-        continue;
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
       }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
-    i++;
-  }
-};
-slideshow._releaseMath(document);
-</script>
-<!-- dynamically load mathjax for compatibility with self-contained -->
-<script>
-(function () {
-  var script = document.createElement('script');
-  script.type = 'text/javascript';
-  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
-  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
-    script.src  = script.src.replace(/^https?:/, '');
-  document.getElementsByTagName('head')[0].appendChild(script);
-})();
-</script>
-  </body>
-</html>
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; font-weight: bold; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="Ch3Lect_pt4_files/libs/revealjs/dist/theme/quarto-1e8aac183fbd48eb13f508ef56dc9f7d.css">
+  <link href="Ch3Lect_pt4_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="Ch3Lect_pt4_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="Ch3Lect_pt4_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="Ch3Lect_pt4_files/libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
+  <link href="Ch3Lect_pt4_files/libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
+  <link href="Ch3Lect_pt4_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" data-background-color="#EA6820" class="quarto-title-block center">
+  <h1 class="title">Chapter 3: Multiple Regression<br><span style="font-size:70%">Part 4: Section 3.6</span></h1>
+  <p class="subtitle">Statistical Modeling</p>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+MATH 360 
+</div>
+</div>
+</div>
+
+</section>
+<section id="outline" class="slide level2">
+<h2>Outline</h2>
+<ul>
+<li class="fragment"><p>Comparing Two Lines</p></li>
+<li class="fragment"><p>Nested <span class="math inline">\(F\)</span>-test</p></li>
+</ul>
+</section>
+<section id="funnel-data" class="slide level2 smaller">
+<h2>Funnel Data</h2>
+<h3 id="prep-data-for-multiple-regression-analysis">Prep Data for multiple regression analysis</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a>funneldata <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"http://people.kzoo.edu/enordmoe/math360/funneldata.csv"</span>, <span class="at">col_types =</span> <span class="fu">cols</span>(<span class="at">trial =</span> <span class="fu">col_factor</span>(<span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"1"</span>,<span class="st">"2"</span>))))</span>
+<span id="cb1-2"><a href=""></a>funnel.hi <span class="ot">&lt;-</span> <span class="fu">filter</span>(funneldata, height <span class="sc">==</span> <span class="dv">13</span>)</span>
+<span id="cb1-3"><a href=""></a>funnel.hilo <span class="ot">&lt;-</span> <span class="fu">filter</span>(funneldata, height <span class="sc">==</span> <span class="dv">13</span> <span class="sc">|</span> height <span class="sc">==</span> <span class="dv">10</span>)</span>
+<span id="cb1-4"><a href=""></a>funnel.hilo <span class="ot">&lt;-</span> <span class="fu">mutate</span>(funnel.hilo, <span class="at">height.hi =</span> <span class="fu">ifelse</span>(height<span class="sc">==</span><span class="dv">13</span>,<span class="dv">1</span>,<span class="dv">0</span>))</span>
+<span id="cb1-5"><a href=""></a>funneldata <span class="ot">&lt;-</span> <span class="fu">mutate</span>(funneldata, <span class="at">height.hi =</span> <span class="fu">ifelse</span>(height<span class="sc">==</span><span class="dv">13</span>, <span class="dv">1</span>, <span class="dv">0</span>),</span>
+<span id="cb1-6"><a href=""></a>                   <span class="at">height.mid =</span> <span class="fu">ifelse</span>(height <span class="sc">==</span> <span class="fl">11.5</span>, <span class="dv">1</span>, <span class="dv">0</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="section" class="slide level2 smaller">
+<h2></h2>
+<h3 id="funnel-data-model-for-two-regression-lines">Funnel Data Model for Two Regression Lines</h3>
+<p>Recall the funnel data model for two regression lines:</p>
+<p><span class="math display">\[
+\text{tswirl} = \beta_0 + \beta_1 (\text{dist}) + \beta_2 (\text{funnel.hi}) + \beta_3 (\text{dist}\cdot \text{funnel.hi}) + \epsilon
+\]</span></p>
+<div class="fragment">
+<ul>
+<li><p>Test for different slopes:</p>
+<ul>
+<li><strong>t-test:</strong> <span class="math inline">\(H_0:\beta_3=0\)</span> versus <span class="math inline">\(H_a:\beta_3\neq 0\)</span></li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li><p>Test for different intercepts:</p>
+<ul>
+<li><strong>t-test:</strong> <span class="math inline">\(H_0:\beta_2=0\)</span> versus <span class="math inline">\(H_a:\beta_2\neq 0\)</span></li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li><p>Test for different lines:</p>
+<ul>
+<li><p>Test: <span class="math inline">\(H_0: \beta_2=\beta_3=0\)</span> versus <span class="math inline">\(\text{At least one }\beta_i\neq 0\)</span>.</p>
+<ul>
+<li>How?</li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="second-order-model-for-sat-data-revisited" class="slide level2" style="font-size: 60%;">
+<h2>Second Order Model for SAT Data Revisited</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href=""></a>state_sat <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"http://people.kzoo.edu/enordmoe/math360/StateSAT.csv"</span>)</span>
+<span id="cb2-2"><a href=""></a>sat_second <span class="ot">&lt;-</span> <span class="fu">lm</span>(SAT <span class="sc">~</span> Takers <span class="sc">+</span> Expend <span class="sc">+</span> <span class="fu">I</span>(Takers<span class="sc">^</span><span class="dv">2</span>) </span>
+<span id="cb2-3"><a href=""></a>                 <span class="sc">+</span> <span class="fu">I</span>(Expend<span class="sc">^</span><span class="dv">2</span>) <span class="sc">+</span> <span class="fu">I</span>(Takers<span class="sc">*</span>Expend), <span class="at">data =</span> state_sat)</span>
+<span id="cb2-4"><a href=""></a><span class="fu">summary</span>(sat_second)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell fragment">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = SAT ~ Takers + Expend + I(Takers^2) + I(Expend^2) + 
+    I(Takers * Expend), data = state_sat)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-50.472 -13.535   1.023   8.866  60.870 
+
+Coefficients:
+                    Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)        893.66283   36.14094  24.727  &lt; 2e-16 ***
+Takers              -7.05561    0.83740  -8.426 9.96e-11 ***
+Expend              10.33333    2.49600   4.140 0.000155 ***
+I(Takers^2)          0.07725    0.01328   5.816 6.28e-07 ***
+I(Expend^2)         -0.11775    0.04426  -2.660 0.010851 *  
+I(Takers * Expend)  -0.03344    0.03716  -0.900 0.373087    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 23.68 on 44 degrees of freedom
+Multiple R-squared:  0.8997,    Adjusted R-squared:  0.8883 
+F-statistic: 78.96 on 5 and 44 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+</section>
+<section id="section-1" class="slide level2">
+<h2></h2>
+<h3 id="second-order-model-for-sat-data-revisited-1">Second Order Model for SAT Data Revisited</h3>
+<p><strong>Inference Questions</strong></p>
+<ul>
+<li class="fragment"><p>Do we need both quadratic terms?</p></li>
+<li class="fragment"><p>Do we need the terms with Expend</p></li>
+</ul>
+<div class="fragment">
+<p><br></p>
+<p><strong>Question:</strong> How to test just a subset of predictors <span class="emoji" data-emoji="question">❓</span></p>
+</div>
+<div class="fragment">
+<p><br></p>
+<p><strong>Answer</strong>: Nested <span class="math inline">\(F\)</span>-test</p>
+</div>
+</section>
+<section id="nested-models" class="slide level2">
+<h2>Nested Models</h2>
+<h3 id="what-does-nested-mean">What does “nested” mean?</h3>
+<p>A model is <strong>nested</strong> within a larger model if:</p>
+<ul>
+<li>Every predictor in the smaller model appears in the larger model<br>
+</li>
+<li>The larger model contains <em>additional</em> terms</li>
+</ul>
+</section>
+<section id="example" class="slide level2">
+<h2>Example</h2>
+<p><strong>Model A (Reduced Model):</strong></p>
+<p><span class="math display">\[
+\text{tswirl} = \beta_0 + \beta_1(\text{dist}) + \epsilon
+\]</span></p>
+<div class="fragment">
+<p><strong>Model B (Full Model):</strong></p>
+<p><span class="math display">\[
+\text{tswirl} = \beta_0
++ \beta_1(\text{dist})
++ \beta_2(\text{funnel.hi})
++ \beta_3(\text{dist}\cdot\text{funnel.hi})
++ \epsilon
+\]</span></p>
+</div>
+<div class="fragment">
+<p>Model A is <strong>nested in</strong> Model B.</p>
+</div>
+</section>
+<section id="the-statistical-question" class="slide level2">
+<h2>The Statistical Question</h2>
+<div class="fragment">
+<p>Do the extra terms in Model B improve the model?</p>
+</div>
+<div class="fragment">
+<p><span class="math display">\[
+H_0: \beta_2 = \beta_3 = 0
+\]</span></p>
+</div>
+<div class="fragment">
+<p><span class="math display">\[
+H_A: \text{At least one of } \beta_2, \beta_3 \neq 0
+\]</span></p>
+</div>
+</section>
+<section id="interpretation" class="slide level2">
+<h2>Interpretation</h2>
+<p>Possible outcomes for a nested test:</p>
+<div class="fragment">
+<ul>
+<li>We reject <span class="math inline">\(H_0\)</span> if the larger model significantly improves fit.</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>We fail to reject <span class="math inline">\(H_0\)</span> if the simpler model is sufficient.</li>
+</ul>
+</div>
+</section>
+<section id="the-nested-f-test-step-1" class="slide level2" style="font-size: 70%;">
+<h2>The Nested F-test Step 1</h2>
+<h3 id="how-much-do-the-extra-predictors-explain">How Much Do the Extra Predictors Explain?</h3>
+<div class="fragment">
+<p>Start with two nested models:</p>
+<ul>
+<li><p><strong>Reduced model</strong> → leaves unexplained variability<br>
+<span class="math display">\[
+SSE_{\text{Reduced}}
+\]</span></p></li>
+<li><p><strong>Full model</strong> → leaves unexplained variability<br>
+<span class="math display">\[
+SSE_{\text{Full}}
+\]</span></p></li>
+</ul>
+</div>
+<div class="fragment">
+<p>For nested models,</p>
+<p><span class="math display">\[
+SSE_{\text{Full}} \le SSE_{\text{Reduced}}
+\]</span></p>
+<p>Adding predictors can never increase SSE.</p>
+</div>
+<div class="fragment">
+<p>The <strong>extra variability explained</strong> is</p>
+<p><span class="math display">\[
+SS_{\text{extra}}
+=
+SSE_{\text{Reduced}} - SSE_{\text{Full}}
+\]</span></p>
+</div>
+</section>
+<section id="the-nested-f-test-step-2" class="slide level2">
+<h2>The Nested F-test Step 2</h2>
+<h3 id="convert-to-a-mean-square">Convert to a Mean Square</h3>
+<div class="fragment">
+<p>If <span class="math inline">\(q\)</span> = number of added predictors, then</p>
+<p><span class="math display">\[
+MS_{\text{extra}}
+=
+\frac{SS_{\text{extra}}}{q}
+\]</span></p>
+</div>
+</section>
+<section id="the-nested-f-test-step-3" class="slide level2">
+<h2>The Nested F-test Step 3</h2>
+<h3 id="form-the-f-statistic">Form the <span class="math inline">\(F\)</span> Statistic</h3>
+<div class="fragment">
+<p>Compare the extra mean square to the full model MSE:</p>
+<p><span class="math display">\[
+F
+=
+\frac{MS_{\text{extra}}}{MSE_{\text{Full}}}
+\]</span></p>
+</div>
+<div class="fragment">
+<p>Equivalently,</p>
+<p><span class="math display">\[
+F
+=
+\frac{(SSE_{\text{Reduced}} - SSE_{\text{Full}})/q}
+{SSE_{\text{Full}}/(n - k - 1)}
+\]</span></p>
+</div>
+</section>
+<section id="the-nested-f-test-step-4" class="slide level2">
+<h2>The Nested F-test Step 4</h2>
+<h4 id="hypothesis-test">Hypothesis Test</h4>
+<div class="fragment">
+<h4 id="test">Test</h4>
+<ul>
+<li><span class="math inline">\(H_0\)</span>: All added coefficients equal 0<br>
+</li>
+<li><span class="math inline">\(H_a\)</span>: At least one added coefficient <span class="math inline">\(\neq 0\)</span></li>
+</ul>
+</div>
+<div class="fragment">
+<h4 id="compare-to-an-f-distribution-with-degrees-of-freedom">Compare to an <span class="math inline">\(F\)</span> distribution with degrees of freedom:</h4>
+<ul>
+<li><span class="math inline">\(\text{df}_1 = q\)</span><br>
+</li>
+<li><span class="math inline">\(\text{df}_2 =\)</span> error df from the full model</li>
+</ul>
+</div>
+<div class="fragment">
+<p>Small <span class="math inline">\(P\)</span>-value <span class="math inline">\(\Rightarrow\)</span> the extra predictors significantly <strong>improve</strong> the model.</p>
+<ul>
+<li>We would prefer the full model</li>
+</ul>
+</div>
+</section>
+<section id="section-2" class="slide level2" style="font-size: 50%;">
+<h2></h2>
+<h3 id="example-comparing-models-with-nested-f-test-in-r">Example: Comparing Models with Nested F-Test in R</h3>
+<ol type="1">
+<li>R computes the compute the regression output for the Full Model</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href=""></a>sat_full <span class="ot">&lt;-</span> <span class="fu">lm</span>(SAT <span class="sc">~</span> Takers <span class="sc">+</span> Expend <span class="sc">+</span> <span class="fu">I</span>(Takers<span class="sc">^</span><span class="dv">2</span>) </span>
+<span id="cb4-2"><a href=""></a>                 <span class="sc">+</span> <span class="fu">I</span>(Expend<span class="sc">^</span><span class="dv">2</span>) <span class="sc">+</span> <span class="fu">I</span>(Takers<span class="sc">*</span>Expend), <span class="at">data =</span> state_sat)</span>
+<span id="cb4-3"><a href=""></a><span class="fu">summary</span>(sat_full)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell fragment">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = SAT ~ Takers + Expend + I(Takers^2) + I(Expend^2) + 
+    I(Takers * Expend), data = state_sat)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-50.472 -13.535   1.023   8.866  60.870 
+
+Coefficients:
+                    Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)        893.66283   36.14094  24.727  &lt; 2e-16 ***
+Takers              -7.05561    0.83740  -8.426 9.96e-11 ***
+Expend              10.33333    2.49600   4.140 0.000155 ***
+I(Takers^2)          0.07725    0.01328   5.816 6.28e-07 ***
+I(Expend^2)         -0.11775    0.04426  -2.660 0.010851 *  
+I(Takers * Expend)  -0.03344    0.03716  -0.900 0.373087    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 23.68 on 44 degrees of freedom
+Multiple R-squared:  0.8997,    Adjusted R-squared:  0.8883 
+F-statistic: 78.96 on 5 and 44 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href=""></a><span class="fu">anova</span>(sat_full)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Analysis of Variance Table
+
+Response: SAT
+                   Df Sum Sq Mean Sq  F value    Pr(&gt;F)    
+Takers              1 181024  181024 322.8794 &lt; 2.2e-16 ***
+Expend              1   8709    8709  15.5334 0.0002865 ***
+I(Takers^2)         1  25877   25877  46.1541 2.295e-08 ***
+I(Expend^2)         1   5278    5278   9.4148 0.0036773 ** 
+I(Takers * Expend)  1    454     454   0.8098 0.3730865    
+Residuals          44  24669     561                       
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+</section>
+<section id="section-3" class="slide level2" style="font-size: 60%;">
+<h2></h2>
+<h3 id="example-comparing-models-with-nested-f-test-in-r-part-2">Example: Comparing Models with Nested F-Test in R Part 2</h3>
+<ol start="2" type="1">
+<li>R computes the compute the regression output for the reduced model:</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href=""></a>sat_reduced <span class="ot">&lt;-</span> <span class="fu">lm</span>(SAT <span class="sc">~</span> Takers <span class="sc">+</span> <span class="fu">I</span>(Takers<span class="sc">^</span><span class="dv">2</span>), <span class="at">data =</span> state_sat)</span>
+<span id="cb8-2"><a href=""></a><span class="fu">summary</span>(sat_reduced)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell fragment">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = SAT ~ Takers + I(Takers^2), data = state_sat)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-83.015 -16.636   0.783  22.167  55.714 
+
+Coefficients:
+              Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) 1053.13112    9.27372 113.561  &lt; 2e-16 ***
+Takers        -7.16159    0.89220  -8.027 2.32e-10 ***
+I(Takers^2)    0.07102    0.01405   5.055 6.99e-06 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 29.93 on 47 degrees of freedom
+Multiple R-squared:  0.8289,    Adjusted R-squared:  0.8216 
+F-statistic: 113.8 on 2 and 47 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href=""></a><span class="fu">anova</span>(sat_reduced)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Analysis of Variance Table
+
+Response: SAT
+            Df Sum Sq Mean Sq F value    Pr(&gt;F)    
+Takers       1 181024  181024 202.089 &lt; 2.2e-16 ***
+I(Takers^2)  1  22886   22886  25.549 6.992e-06 ***
+Residuals   47  42101     896                      
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+</section>
+<section id="section-4" class="slide level2" style="font-size: 60%;">
+<h2></h2>
+<h3 id="example-comparing-models-with-nested-f-test-in-r-part-3">Example: Comparing Models with Nested F-Test in R: Part 3</h3>
+<ol start="3" type="1">
+<li>R computes the compute the nested <span class="math inline">\(F\)</span> statistic and <span class="math inline">\(p\)</span>-value</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href=""></a><span class="co"># Reduced model is first</span></span>
+<span id="cb12-2"><a href=""></a><span class="fu">anova</span>(sat_reduced, sat_full)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell fragment">
+<div class="cell-output cell-output-stdout">
+<pre><code>Analysis of Variance Table
+
+Model 1: SAT ~ Takers + I(Takers^2)
+Model 2: SAT ~ Takers + Expend + I(Takers^2) + I(Expend^2) + I(Takers * 
+    Expend)
+  Res.Df   RSS Df Sum of Sq      F    Pr(&gt;F)    
+1     47 42101                                  
+2     44 24669  3     17432 10.364 2.787e-05 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+<div class="fragment">
+<p><br></p>
+<p><span class="math inline">\(\Rightarrow\)</span> Strong evidence in favor of the full model, the extra terms help.</p>
+</div>
+</section>
+<section id="section-5" class="slide level2">
+<h2></h2>
+<h3 id="example-nested-f-test-calculation">Example: Nested F-Test Calculation</h3>
+<p><span class="math display">\[\begin{align}
+F&amp;=\frac{(\text{SSE}_\text{Reduced}-\text{SSE}_\text{Full})/(\#\text{ of extra predictors})}{\text{MSE}_\text{Full}}\\[2ex]
+&amp;=\frac{(42101-24669)/(47-44)}{24669/44}\\[2ex]
+&amp;=\frac{(17432)/3}{24669/44}= 10.364
+\end{align}\]</span></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href=""></a><span class="dv">1</span><span class="sc">-</span><span class="fu">pf</span>(<span class="fl">10.364</span>, <span class="dv">3</span>, <span class="dv">44</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2.787342e-05</code></pre>
+</div>
+</div>
+</section>
+<section id="special-cases-for-nested-f-test" class="slide level2">
+<h2>Special Cases for Nested F-Test</h2>
+<ul>
+<li><p>Test all predictors</p>
+<ul>
+<li>“Usual” ANOVA <span class="math inline">\(F\)</span>-test for the full model</li>
+</ul></li>
+<li><p>Test a single predictor (set one <span class="math inline">\(\beta_i=0\)</span>)</p>
+<ul>
+<li>“F test” equivalent of <span class="math inline">\(t\)</span>- test</li>
+</ul></li>
+</ul>
+</section>
+<section id="your-turn" class="slide level2">
+<h2>Your Turn</h2>
+<ul>
+<li><p>Funnel Data</p></li>
+<li><p>Car data</p></li>
+</ul>
+
+</section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="Ch3Lect_pt4_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="Ch3Lect_pt4_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="Ch3Lect_pt4_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="Ch3Lect_pt4_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="Ch3Lect_pt4_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="Ch3Lect_pt4_files/libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
+  <script src="Ch3Lect_pt4_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="Ch3Lect_pt4_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="Ch3Lect_pt4_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="Ch3Lect_pt4_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="Ch3Lect_pt4_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': true,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleChalkboard(event)\"><kbd>b</kbd> Toggle Chalkboard</a></li>\n<li class=\"slide-tool-item\" data-item=\"6\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleNotesCanvas(event)\"><kbd>c</kbd> Toggle Notes Canvas</a></li>\n<li class=\"slide-tool-item\" data-item=\"7\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.downloadDrawings(event)\"><kbd>d</kbd> Download Drawings</a></li>\n<li class=\"slide-tool-item\" data-item=\"8\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'chalkboard': {"buttons":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'fade',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1050,
+
+        height: 700,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, RevealChalkboard, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    
+    <script>
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+      // slide changes (different for each slide format).
+      (function () {
+        // dispatch for htmlwidgets
+        function fireSlideEnter() {
+          const event = window.document.createEvent("Event");
+          event.initEvent("slideenter", true, true);
+          window.document.dispatchEvent(event);
+        }
+
+        function fireSlideChanged(previousSlide, currentSlide) {
+          fireSlideEnter();
+
+          // dispatch for shiny
+          if (window.jQuery) {
+            if (previousSlide) {
+              window.jQuery(previousSlide).trigger("hidden");
+            }
+            if (currentSlide) {
+              window.jQuery(currentSlide).trigger("shown");
+            }
+          }
+        }
+
+        // hookup for slidy
+        if (window.w3c_slidy) {
+          window.w3c_slidy.add_observer(function (slide_num) {
+            // slide_num starts at position 1
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+          });
+        }
+
+      })();
+    </script>
+
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+            const codeEl = trigger.previousElementSibling.cloneNode(true);
+            for (const childEl of codeEl.children) {
+              if (isCodeAnnotation(childEl)) {
+                childEl.remove();
+              }
+            }
+            return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>
