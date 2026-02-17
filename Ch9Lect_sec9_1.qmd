@@ -1,0 +1,601 @@
+---
+title: "Section 9.1: Logistic Regression"
+subtitle: "Statistical Modeling"
+author: "MATH 360"
+format:
+  revealjs:
+    chalkboard: true
+    theme: [default, custom.scss]
+    toc: false
+    toc-depth: 1
+    slideNumber: true
+    html-math-method: mathjax
+    incremental: false
+    transition: fade
+    preview-links: auto
+    notes: true
+title-slide-attributes:
+  data-background-color: "#EA6820"
+from: markdown+emoji
+execute:
+  echo: true
+  cache: false
+editor:
+  markdown:
+    wrap: 72
+---
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(mosaic)
+library(ggformula)
+library(Stat2Data)
+```
+
+## Outline
+
+-   Categorical response variables
+-   Binary logistic regression
+-   Interpreting the logit, probabilities, and odds
+-   Examples
+
+## Overview {.smaller}
+
+### Modeling Categorical Responses
+
+-   So far, regression and ANOVA assumed a **quantitative** response
+    $Y$.
+
+-   What if $Y$ is **categorical**?
+
+::::: columns
+::: {.column .fragment width="50%"}
+**Binary (2 categories)**\
+- smoker / non-smoker\
+- survives / dies\
+- accept / reject
+
+**Ordinal (ordered categories)**\
+- agree / neutral / disagree\
+- often / seldom / never
+:::
+
+::: {.column .fragment width="50%"}
+**Nominal (unordered categories)**\
+- Dem / Ind / Rep\
+- Skippy / Jif / Peter Pan
+:::
+:::::
+
+##  {.smaller}
+
+### Example: Political Preference
+
+::: fragment
+**Nominal response**
+
+$$
+Y =
+\begin{cases}
+\text{Democrat} \\
+\text{Republican} \\
+\text{Independent}
+\end{cases}
+$$
+:::
+
+::: fragment
+**Three kinds of logistic regression**
+
+-   Binary\
+-   Ordinal\
+-   Nominal\
+:::
+
+::: fragment
+<br>
+
+### :dart: Chapter 9: Binary Logistic Regression
+:::
+
+## Binary Logistic Regression
+
+One approach:
+
+-   Code the binary response $Y$ as a $(0,1)$ indicator variable.
+-   Start with a single quantitative predictor $X$.
+
+**Goal:** predict the population proportion of successes $\pi$ for any
+value $x$.
+
+## Example: Pulse {.smaller}
+
+$Y$ = Sex (0 = Male, 1 = Female)
+
+$X$ = Height (inches)
+
+For illustration: try an ordinary linear regression
+
+```{r}
+data("Pulse")
+mod1 <- lm(Sex ~ Hgt, data = Pulse)
+summary(mod1)
+```
+
+Predict sex given Height = 65 inches? 75 inches?
+
+## Scatterplot of Sex vs Hgt
+
+```{r}
+# Height is amount of jittering
+# alpha between 0 and 1 controls transparency
+gf_jitter(Sex ~ Hgt, data = Pulse, 
+          height = .05, alpha = .7) |> 
+  gf_smooth(method = "lm")
+```
+
+-   Does this look like a good summary of the data?
+
+-   What do the predicted values mean?
+
+## $\pi$ = Proportion of “Successes”
+
+-   In ordinary regression, the model predicts the mean $Y$ for any
+    combination of predictors.
+
+-   For a 0/1 indicator variable, what is the "mean"?
+
+$$
+\bar y = \frac{\sum y_i}{n}= \frac{\text{Number of 1's}}{\text{Number of trials}} = \text{Proportion of "successes"}
+$$
+
+Ex: What proportion of all 68-inch-tall students are female?
+
+## Binary Logistic Regression Model {.smaller}
+
+-   Let $Y$ be a binary response and $X$ a quantitative predictor.
+
+-   Let $\pi(x)=P(Y=1\mid X=x)$ $==>$ the **true** probability that
+    $Y=1$ given a certain value $x$
+
+::: fragment
+**Two Equivalent forms:**
+:::
+
+::: fragment
+#### Probability form
+
+$$\pi=\frac{e^{\beta_0+\beta_1 x}}{1+e^{\beta_0+\beta_1 x}}$$
+:::
+
+::: fragment
+#### Logit (log-odds) form
+
+$$\log\left(\frac{\pi}{1-\pi}\right)=\beta_0+\beta_1 x$$
+
+-   Models the log-odds as a linear function of $x$.
+:::
+
+## Logit Function
+
+The transformation
+
+$$\text{logit}(\pi)=\log\left(\frac{\pi}{1-\pi}\right)$$
+
+maps probabilities in $(0,1)$ to all real numbers.
+
+Try the [Desmos
+calculator](https://www.desmos.com/calculator/og1bbcoicf) to visualize
+the curve.
+
+## Binary Logistic Regression Output {.smaller}
+
+```{r}
+# Note the use of glm() and family = binomial
+mod2 <- glm(Sex ~ Hgt, family = binomial, data = Pulse)
+summary(mod2)
+```
+
+## Predicted Proportion Female using R {.smaller}
+
+```{r}
+logit_fun <- makeFun(mod2)
+gf_jitter(Sex ~ Hgt, data = Pulse, height = 0.05,
+          alpha = 0.7) |>
+  gf_fun(logit_fun, color = "blue", linewidth = .75)
+```
+
+$$
+\hat{\pi}=
+\frac{e^{\,64.1416 - 0.9424\cdot\text{Hgt}}}
+     {1 + e^{\,64.1416 - 0.9424\cdot\text{Hgts}}}
+$$
+
+## Predicted Proportion Female using R {.smaller}
+
+::: callout-important
+Plotting the data here with a vertical scale only really makes sense if
+it's coded as a 0-1 variable. 
+:::
+
+## Example: Golf Putts
+
+Build a model to predict the probability a putt is made (success) based on its length (in feet).
+
+
+| Length (ft) | 3 | 4 | 5 | 6 | 7 |
+|-------------|---|---|---|---|---|
+| **Made**    | 84 | 88 | 61 | 61 | 44 |
+| **Missed**  | 17 | 31 | 47 | 64 | 90 |
+| **Total**   | 101 | 119 | 108 | 125 | 134 |
+
+
+Data set: `Putts1`
+
+
+## Four probabilities at a fixed value of $x$ {.smaller}
+
+## Four probabilities at a fixed $x$ {.smaller}
+
+For any fixed value of the predictor $x$, there are four probabilities:
+
+|               | **True value** | **Fitted value** |
+|---------------|----------------|------------------|
+| **Actual**    | $p = \text{true } P(\text{Yes}) \text{ for this } x$ | $\hat{p} = \dfrac{\#\text{Yes}}{\#\text{Yes} + \#\text{No}} \text{ for this } x$ |
+| **Model**     | $\pi = \text{true } P(\text{Yes}) \text{ from model}$ | $\hat{\pi} = \text{fitted } P(\text{Yes}) \text{ from model}$ |
+
+::: {.fragment}
+
+
+**Key ideas:**
+
+* $\hat{p}$ is a *sample proportion* using only cases where the predictor equals $x$.
+* $\hat{\pi}$ is the *model-based estimate* using **all** data.  
+:::
+
+::: {.fragment}
+
+If a logistic model is exactly correct, then $p = \pi$ and both fitted values estimate the same quantity.
+
+:::
+
+
+
+## Logistic Regression for Putting: Individual Data
+
+```{r}
+data(Putts1)
+head(Putts1)
+```
+
+## Logistic Regression for Putting: Grouped Data
+
+```{r}
+data(Putts2)
+head(Putts2)
+```
+
+## Logistic Regression Output for Putting {.smaller}
+
+```{r}
+mod_putt <- glm(Made~Length, data = Putts1, family=binomial)
+summary(mod_putt)
+```
+::: {.fragment}
+
+The fitted model:
+
+$$
+\hat{\pi}
+=
+\frac{e^{\,3.257 - 0.5661\,\text{Length}}}
+     {1 + e^{\,3.257 - 0.5661\,\text{Length}}}
+$$
+
+:::
+
+
+## Golf Putts Probabilities (1 of 2) {.smaller}
+
+$$
+\hat{p} = \frac{\#\text{made}}{\#\text{trials}}
+\qquad \text{(from the data)}
+$$
+<table style="width:100%; border-collapse:collapse; table-layout:fixed; text-align:center;">
+  <colgroup>
+    <col style="width:20%;">
+    <col style="width:16%;">
+    <col style="width:16%;">
+    <col style="width:16%;">
+    <col style="width:16%;">
+    <col style="width:16%;">
+  </colgroup>
+<tr>
+  <th style="border:2px solid black; padding:18px; text-align:center;">Length</th>
+  <th style="border:2px solid black; padding:18px; text-align:center;">3</th>
+  <th style="border:2px solid black; padding:18px; text-align:center;">4</th>
+  <th style="border:2px solid black; padding:18px; text-align:center;">5</th>
+  <th style="border:2px solid black; padding:18px; text-align:center;">6</th>
+  <th style="border:2px solid black; padding:18px; text-align:center;">7</th>
+</tr>
+  <tr>
+    <td style="border:2px solid black; padding:28px; vertical-align:middle;">$\hat{p}$</td>
+    <td style="border:2px solid black; padding:28px;">0.832</td>
+    <td style="border:2px solid black; padding:28px;"></td>
+    <td style="border:2px solid black; padding:28px;"></td>
+    <td style="border:2px solid black; padding:28px;"></td>
+    <td style="border:2px solid black; padding:28px;"></td>
+  </tr>
+  <tr>
+    <td style="border:2px solid black; padding:28px; vertical-align:middle;">$\hat{\pi}$</td>
+    <td style="border:2px solid black; padding:28px;">0.826</td>
+    <td style="border:2px solid black; padding:28px;"></td>
+    <td style="border:2px solid black; padding:28px;"></td>
+    <td style="border:2px solid black; padding:28px;"></td>
+    <td style="border:2px solid black; padding:28px;"></td>
+  </tr>
+</table>
+
+$$
+\hat{\pi}
+=
+\frac{e^{\,3.257 - 0.5666\,\text{Length}}}
+     {1 + e^{\,3.257 - 0.5666\,\text{Length}}} \qquad \text{(from the model)}
+$$
+
+
+
+
+## Probability Form of Putting Model {.smaller}
+
+
+```{r}
+#| output-location: slide
+# Fitted probability function
+pi_hat <- makeFun(mod_putt, type = "response")
+# Empirical p_hats from grouped data
+Putts2 <- Putts2 |>
+  mutate(
+    p_hat      = Made / Trials,
+    logit_phat = log(p_hat / (1 - p_hat))
+  )
+# Plot empirical proportions + fitted logistic curve
+gf_point(p_hat ~ Length, data = Putts2) |>
+  gf_fun(pi_hat, color = "red") |>
+  gf_refine(
+    scale_x_continuous(
+      limits = c(2, 12),
+      breaks = seq(2, 12, by = 2)
+    ) 
+    ) |>
+  gf_labs(y = "Proportion Made", x = "Length (ft)")
+```
+
+```{r echo=FALSE}
+# Extract and round coefficients for display
+b0 <- round(coef(mod_putt)[1], 3)
+b1 <- round(coef(mod_putt)[2], 3)
+```
+
+$$
+\hat{\pi}
+=
+\frac{e^{\,`r b0` \; + \; (`r b1`)\,\text{Length}}}
+     {1 + e^{\,`r b0` \; + \; (`r b1`)\,\text{Length}}}
+$$
+
+
+
+
+## Odds
+
+Define the **odds** of success at $x$ as
+
+$$\text{odds}(x)=\frac{P(\text{success})}{P(\text{failure})}=\frac{\pi(x)}{1-\pi(x)}.$$
+
+Use algebra to see that:
+
+$$ \text{odds}(x)=e^{\beta_0+\beta_1 x}\quad\text{ and }\quad\log(\text{odds}(x))=\beta_0+\beta_1 x.$$
+
+
+
+## Odds and Logistic Regression {.smaller}
+
+**Logit form:**
+
+$$
+\log\!\left(\frac{\pi}{1-\pi}\right)=\beta_0+\beta_1 x
+$$
+
+::: {.fragment}
+
+
+$\Rightarrow$ The logistic model assumes a **linear relationship** between the predictor and $\log(\text{odds})$.
+
+$$
+\log(\text{odds})=\beta_0+\beta_1 x
+$$
+
+:::
+
+
+::: {.fragment}
+
+so
+
+$$
+\text{odds}=e^{\beta_0+\beta_1 x}
+$$
+
+:::
+
+## Golf Putts  Odds {.smaller}
+
+
+$$
+\widehat{\text{odds}}
+=
+\frac{\#\text{made}}{\#\text{missed}}
+=
+\frac{\hat{p}}{1-\hat{p}}
+\qquad \text{(from sample)}
+$$
+
+<table style="width:100%; border-collapse:collapse; table-layout:fixed; margin-left:auto; margin-right:auto; text-align:center;">
+  <colgroup>
+    <col style="width:20%;">
+    <col style="width:16%;">
+    <col style="width:16%;">
+    <col style="width:16%;">
+    <col style="width:16%;">
+    <col style="width:16%;">
+  </colgroup>
+  <tr>
+    <th style="border:2px solid black; padding:18px;">Length</th>
+    <th style="border:2px solid black; padding:18px;">3</th>
+    <th style="border:2px solid black; padding:18px;">4</th>
+    <th style="border:2px solid black; padding:18px;">5</th>
+    <th style="border:2px solid black; padding:18px;">6</th>
+    <th style="border:2px solid black; padding:18px;">7</th>
+  </tr>
+  <tr>
+    <td style="border:2px solid black; padding:28px;">$\widehat{\text{odds}}$-sample</td>
+    <td style="border:2px solid black; padding:28px;">4.94</td>
+    <td style="border:2px solid black; padding:28px;"></td>
+    <td style="border:2px solid black; padding:28px;"></td>
+    <td style="border:2px solid black; padding:28px;"></td>
+    <td style="border:2px solid black; padding:28px;"></td>
+  </tr>
+  <tr>
+    <td style="border:2px solid black; padding:28px;">$\widehat{\text{odds}}$- model</td>
+    <td style="border:2px solid black; padding:28px;">4.75</td>
+    <td style="border:2px solid black; padding:28px;"></td>
+    <td style="border:2px solid black; padding:28px;"></td>
+    <td style="border:2px solid black; padding:28px;"></td>
+    <td style="border:2px solid black; padding:28px;"></td>
+  </tr>
+</table>
+
+
+$$
+\widehat{\text{odds}}
+=
+e^{\,`r b0` \; + \; (`r b1`)\,\text{Length}} \qquad \text{(from model)}
+$$
+
+
+
+## Golf Putts Log(Odds) {.smaller}
+
+$$
+\log(\widehat{\text{odds}})
+=
+\log\!\left(\frac{\hat{p}}{1-\hat{p}}\right)
+\qquad \text{(from sample)}
+$$
+
+<table style="width:100%; border-collapse:collapse; table-layout:fixed; margin-left:auto; margin-right:auto; text-align:center;">
+  <colgroup>
+    <col style="width:20%;">
+    <col style="width:16%;">
+    <col style="width:16%;">
+    <col style="width:16%;">
+    <col style="width:16%;">
+    <col style="width:16%;">
+  </colgroup>
+  <tr>
+    <th style="border:2px solid black; padding:18px;">Length</th>
+    <th style="border:2px solid black; padding:18px;">3</th>
+    <th style="border:2px solid black; padding:18px;">4</th>
+    <th style="border:2px solid black; padding:18px;">5</th>
+    <th style="border:2px solid black; padding:18px;">6</th>
+    <th style="border:2px solid black; padding:18px;">7</th>
+  </tr>
+  <tr>
+    <td style="border:2px solid black; padding:28px;">$\log(\widehat{\text{odds}})$ - sample</td>
+    <td style="border:2px solid black; padding:28px;">1.598</td>
+    <td style="border:2px solid black; padding:28px;"></td>
+    <td style="border:2px solid black; padding:28px;"></td>
+    <td style="border:2px solid black; padding:28px;"></td>
+    <td style="border:2px solid black; padding:28px;"></td>
+  </tr>
+  <tr>
+    <td style="border:2px solid black; padding:28px;">$\log(\widehat{\text{odds}})$ - model</td>
+    <td style="border:2px solid black; padding:28px;">1.558</td>
+    <td style="border:2px solid black; padding:28px;"></td>
+    <td style="border:2px solid black; padding:28px;"></td>
+    <td style="border:2px solid black; padding:28px;"></td>
+    <td style="border:2px solid black; padding:28px;"></td>
+  </tr>
+</table>
+
+
+$$
+\log(\widehat{\text{odds}})
+=
+3.257 - 0.56614 \cdot \text{Length}
+\qquad \text{(from model)}
+$$
+
+
+
+
+
+## Golf Putts Probabilities: Logit form {.smaller}
+
+* Compute logits and fit on the next page to assess how well the model fits
+
+
+```{r}
+#| eval: false
+# Empirical logits from grouped data
+Putts2 <- Putts2 |>
+  mutate(
+    logit_phat = log(p_hat / (1 - p_hat))
+  )
+# Function for the linear predictor (logit scale)
+logit_hat <- makeFun(mod_putt, type = "link")
+
+# Plot empirical logits + fitted logit line
+gf_point(logit_phat ~ Length, data = Putts2) |>
+  gf_fun(logit_hat,
+         color = "red") |>
+  gf_labs(y = "Logit(Proportion Made)", x = "Length (ft)")
+```
+
+
+## Golf Putts Probabilities: Logit form {.smaller}
+
+* The model appears to fit very well!
+
+```{r}
+#| echo: false
+# Empirical logits from grouped data
+Putts2 <- Putts2 |>
+  mutate(
+    logit_phat = log(p_hat / (1 - p_hat))
+  )
+# Function for the linear predictor (logit scale)
+logit_hat <- makeFun(mod_putt, type = "link")
+
+# Plot empirical logits + fitted logit line
+gf_point(logit_phat ~ Length, data = Putts2) |>
+  gf_fun(logit_hat,
+         color = "red") |>
+  gf_labs(y = "Logit(Proportion Made)", x = "Length (ft)")
+```
+
+
+## {.smaller}
+### Ordinary vs Logistic Regression Models
+
+| **Ordinary Regression** | **Logistic Regression** |
+|--------------------------|--------------------------|
+| Response is quantitative. | Response is binary. |
+| Outcomes are normal with mean $\mu$ and SD $\sigma$. | Outcomes are Bernoulli with $P(\text{success})=\pi$. |
+| Outcomes are independent. | Outcomes are independent. |
+| $\mu$ depends only on $X$. | $\pi$ depends only on $X$. |
+| $\mu$ is linear in $X$ with parameters $\beta_0,\beta_1$. | $\text{logit}(\pi)$ is a linear function of $X$ with parameters $\beta_0,\beta_1$. |
+
+
+

@@ -1,0 +1,287 @@
+\documentclass[11pt]{article}
+
+\usepackage{amsmath,amsthm,amssymb}
+%\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{array}
+    \graphicspath{{chap3_files/}}
+
+%\usepackage[text={6.5in,9.0in},centering]{geometry}
+\usepackage{geometry}
+\geometry{text={6.5in,8.5in}, top=1.5in, centering}
+\usepackage{fancyhdr}
+\usepackage[pdftex]{hyperref}
+\usepackage{pdfsync}
+
+\usepackage{enumitem}
+\newlist{legal}{enumerate}{10}
+\setlist[legal]{label*=\arabic*.}
+
+\usepackage{comment}
+\excludecomment{answer}
+%\newenvironment{answer}{\vspace{1ex}\begin{sloppypar}\noindent \textbf{Answer:}}{\end{sloppypar}\vspace{1ex}}
+
+\excludecomment{mynote}
+%\newenvironment{mynote}{\begin{sloppypar}$<<$Note:$>>$\noindent\begin{quote}\it\large}{\end{quote}$<<$End Note:$>>$\end{sloppypar}}
+
+
+\DeclareSymbolFontAlphabet{\mathcalold}{symbols}
+\newcommand{\asum}[1]{\ensuremath{#1_1+#1_2+\cdots+#1_n}}
+\newcommand{\avec}[1]{\ensuremath{#1_1,#1_2,\ldots,#1_n}}
+\newcommand{\avecn}[2]{\ensuremath{#1_1,#1_2,\ldots,#1_{#2}}}
+\newcommand{\asumn}[2]{\ensuremath{#1_1+#1_2+\cdots+#1_{#2}}}
+\newcommand{\Bayes}{Bayes's}
+\newcommand{\bd}{\begin{description}}
+\newcommand{\bi}{\begin{itemize}}
+\newcommand{\bnum}{\begin{enumerate}}
+\newcommand{\bs}[1]{\ensuremath{\boldsymbol{#1}}}
+\newcommand{\cnj}{\ensuremath{\phantom{}_nC_j}}
+\newcommand{\cnja}[2]{\ensuremath{\phantom{}_#1C_#2}}
+\newcommand{\cpdf}[3][p]{\ensuremath{\pdf[#1]{\left.#2\,\right|\,#3}}}
+\newcommand{\dbar}{\ensuremath{\bar d}}
+\newcommand{\df}{\ensuremath{\mbox{df}}}
+\newcommand{\dfb}{\ensuremath{\mbox{df(between)}}}
+\newcommand{\dft}{\ensuremath{\mbox{df(total)}}}
+\newcommand{\dfw}{\ensuremath{\mbox{df(within)}}}
+\newcommand{\dis}{\displaystyle}
+\newcommand{\ed}{\end{description}}
+\newcommand{\enum}{\end{enumerate}}
+\newcommand{\ei}{\end{itemize}}
+\newcommand{\eps}{\ensuremath{\epsilon}}
+\newcommand{\ie}{\emph{i.e.}}
+\newcommand{\field}[1]{\mathbb{#1}}
+\newcommand{\mc}[1]{{\ensuremath{\mathcal{#1}}}}
+\newcommand{\mcc}[1]{\multicolumn{1}{c}{#1}}
+\newcommand{\mcl}[1]{\multicolumn{1}{l}{#1}}
+\newcommand{\mco}[1]{{\ensuremath{\mathcalold{#1}}}}
+\newcommand{\mcr}[1]{\multicolumn{1}{r}{#1}}
+\newcommand{\mr}[1]{{\ensuremath{\mathrm{#1}}}}
+\newcommand{\MS}{\ensuremath{\mbox{SS}}}
+\newcommand{\MSb}{\ensuremath{\mbox{MS(between)}}}
+\newcommand{\MSt}{\ensuremath{\mbox{MS(total)}}}
+\newcommand{\MSw}{\ensuremath{\mbox{MS(within)}}}
+\newcommand{\mb}[1]{{\ensuremath{\mathbf{#1}}}}
+\newcommand{\mul}[3]{\multicolumn{#1}{#2}{#3}}
+\newcommand{\model}{\mco I}
+\newcommand{\MOE}{\ensuremath{\mbox{MOE}}}
+\newcommand{\mud}{\ensuremath{\mu_d}}
+\newcommand{\norm}[3]{\ensuremath{\mco N\left(#1\,\big|\,#2,\,#3\right)}}
+\newcommand{\ntil}{\ensuremath{\tilde n}}
+\newcommand{\pdf}[2][p]{\ensuremath{#1\left(#2\right)}}
+\newcommand{\pfrac}[2]{\left(\frac{#1}{#2}\right)}
+\newcommand{\phat}{\ensuremath{\hat p}}
+\newcommand{\pstar}{\ensuremath{p^*}}
+\newcommand{\ptil}{\ensuremath{\tilde p}}
+\newcommand{\pval}{\ensuremath{\mbox{$P$-value}}}
+\newcommand{\qhat}{\ensuremath{\hat q}}
+\newcommand{\R}{\textsf{R}}
+\newcommand{\simnorm}[2]{\ensuremath{\sim \mco N\left(#1,\,#2\right)}}
+\newcommand{\SE}{\ensuremath{\mbox{SE}}}
+\newcommand{\SEdiff}{\ensuremath{\mbox{SE}_{\bar{y}_1-\bar{y}_2}}}
+\newcommand{\SEDiff}{\ensuremath{\mbox{SE}_{\bar{Y}_1-\bar{Y}_2}}}
+\renewcommand{\SS}{\ensuremath{\mbox{SS}}}
+\newcommand{\SSb}{\ensuremath{\mbox{SS(between)}}}
+\newcommand{\SSt}{\ensuremath{\mbox{SS(total)}}}
+\newcommand{\SSw}{\ensuremath{\mbox{SS(within)}}}
+\newcommand{\sumin}{\ensuremath{\sum_{i=1}^{n}}}
+\newcommand{\xbar}{\ensuremath{\bar x}}
+\newcommand{\ybar}{\ensuremath{\bar y}}
+\newcommand{\ybari}{\ensuremath{\bar y_{i\cdot}}}
+\newcommand{\ybardd}{\ensuremath{\bar y_{\cdot\cdot}}}
+\newcommand{\yij}{\ensuremath{y_{ij}}}
+\newcommand{\Xbar}{\ensuremath{\bar X}}
+\newcommand{\Ybar}{\ensuremath{\bar Y}}
+%\renewcommand{\Pr}{{\ensuremath{\mathrm{Pr}(#1)}}}
+
+
+   \newtheoremstyle{example}{\topsep}{\topsep}%
+     {}%         Body font
+     {}%         Indent amount (empty = no indent, \parindent = para indent)
+     {\bfseries}% Thm head font
+     {}%        Punctuation after thm head
+     {\newline}%     Space after thm head (\newline = linebreak)
+     {\thmname{#1}\thmnumber{ #2}\thmnote{ #3}}%         Thm head spec
+\theoremstyle{example}
+\newtheorem{example}{Example}[subsection]
+
+
+\fancypagestyle{exam}{\lhead{\textsc{Math 360}}
+    \chead{\large{\textsc{Chapter 9: Logistic Regression Part I}}}
+    \rhead{\textsc{Stats 2}}
+    \lfoot{} \cfoot{} \rfoot{}
+\renewcommand{\headrulewidth}{1.5pt}
+\renewcommand{\footrulewidth}{0pt}}
+
+\fancypagestyle{plain}{\lhead{\textsc{Math 360}}
+    \chead{\thepage}
+    \rhead{\textsc{Stats 2}}
+    \lfoot{} \cfoot{} \rfoot{}
+\renewcommand{\headrulewidth}{1.5pt}
+\renewcommand{\footrulewidth}{0pt}}
+
+\newcommand{\mks}[1]{[\emph{#1 points}]}
+
+
+
+
+\begin{document}
+\pagestyle{plain}
+
+<<setup, include=FALSE,cache=FALSE>>=
+## set global chunk options
+opts_chunk$set(fig.path='fig/fig-', cache=TRUE,cache.path='cache/cach-', fig.align='center', fig.show='hold', par=TRUE, prompt=FALSE,fig.width=6,fig.height=4,message=FALSE,warning=FALSE)
+## I use = but I can replace it with <-; set code/output width to be 68
+options( width=60)
+opts_knit$set(concordance = TRUE)
+## tune details of base graphics (http://yihui.name/knitr/hooks)
+knit_hooks$set(par=function(before, options, envir){
+if (before && options$fig.show!='none') par(mar=c(4,4,.1,.1),cex.lab=.95,cex.axis=.9,mgp=c(2,.7,0),tcl=-.3)
+})
+@
+
+
+
+<<setup2,echo=FALSE,message=FALSE,warning=FALSE,cache=FALSE>>=
+require(mosaic)
+require(ggplot2)
+require(Stat2Data)
+set.seed(123)
+@
+
+
+\thispagestyle{exam}
+
+
+\section*{Overview}
+
+In all of our regression and ANOVA models so far, the response variables ($Y$) have been quantitiative. What if we wish to model a categorical variable?
+
+Categorical response variables:
+\begin{enumerate}
+        \item Binary response
+        \begin{itemize}
+                \item Smoking: smoker or non-smoker
+                \item Survival: survives or dies
+                \item Grad school application: acceptance or rejection
+        \end{itemize}
+        \item Ordinal response
+        \begin{itemize}
+                \item Opinion poll response: Agree/neutral/disagree
+                \item Frequency: Often/seldom/never
+        \end{itemize}
+        \item Nominal response
+        \begin{itemize}
+                \item Poltical preference: Dem/Ind/Rep
+                \item Brand choice: Skippy/Jif/Peter Pan/etc.
+        \end{itemize}
+\end{enumerate}
+\subsection*{Binary Logistic Regression}
+
+\subsubsection*{Predicting Putting Success}
+
+When a golfer attempts a putt, two outcomes are possible: Success, the ball drops into the hole; or Failure, the ball misses the hole. Not suprisingly, one important factor in whether or not a golfer is successful in sinking a putt is the distance from the golf ball to the hole.
+
+The STAT2 text contains a dataset about putting represented using two different formats:
+\begin{itemize}
+        \item \textbf{Putts1} in cases-and-variables or ``raw'' format (also known as disaggregated format);
+        \item \textbf{Putts2} in summary or table format (aggregated format)
+\end{itemize}
+
+Both formats are commonly encountered when dealing with the prediction of binary reponse variables and \R\ is well suited to handle both. 
+
+To got a better understanding, let's inspect the two datasets. First, we look at the \textbf{Putts1} raw data:
+
+<<putt1>>=
+data(Putts1)
+str(Putts1)
+head(Putts1)
+tail(Putts1)
+@
+
+Next, consider the \textbf{Putts2}  file in summary or table format:
+<<putt2>>=
+data(Putts2)
+str(Putts2)
+Putts2
+@
+
+Note that the 5 observations are really just rows of a data table so this data frame is very different from what we have seen before.
+
+<<putts4>>=
+Putts2$propmake<-Putts2$Made/Putts2$Trials
+qplot(Length,propmake,geom=c("point","smooth"),data=Putts2,method="lm")
+regmod<-lm(propmake~Length,data=Putts2)
+summary(regmod)
+@
+
+But consider predicted probabilities from the model for a 1 foot putt? For a 10 foot putt? Are they sensible?
+
+\subsubsection*{Considering the Raw Data}
+
+Now consider the case-by-variables form and proceed to plot and fit the logistic regression model. Use jittering to see where the makes and misses are concentrated.
+
+<<putts5>>=
+qplot(Length,Made,data=Putts1,position = position_jitter(h=0.1))+
+        geom_smooth()
+@
+
+Note that the logistic funciton is fairly linear over the interval studies.
+
+\subsection*{Fitting the Logistic Model to Raw Data}
+
+Use the \verb|glm()| function to fit the logistic model:
+
+<<putts6>>=
+# First, a failed attempt
+mod.linear<-glm(Made~Length,data=Putts1)
+summary(mod.linear)
+@
+But this is wrong! We forgot about our new family! By default, this fits a linear regression model.
+
+Try again:
+<<putts7>>=
+mod.logreg<-glm(Made~Length,data=Putts1,family=binomial)
+summary(mod.logreg)
+@
+
+
+Plotting empirical probabilities and fitted probabilities from the logistic regression model. Use the aggregate data to facilitiate computation of empirical probabilities at each  distance. Use raw data (cases by variables) to get 
+
+<<putts8,tidy=TRUE>>=
+# Calculate empirical probabilities and add to Putts2 data
+Putts2$propmake<-Putts2$Made/Putts2$Trials
+ggplot(Putts1,aes(x=Length,y=Made))+
+        geom_smooth(method="glm",method.args=list(family="binomial"),se=F)+
+        geom_point(data=Putts2,aes(x=Length,y=propmake))
+@
+
+To extend the model beyond the observed data, here's a simple variation that also shows how to plot the fitted probability  function using the logistic function form for the probability.
+
+
+<<putts9>>=
+myfun<-function(Length)(exp(3.25684-.56614*Length)/(1+exp(3.25884-.56614*Length)))
+qplot(Length,propmake,data=Putts2,xlim=c(1,20))+
+stat_function(fun=myfun)
+@
+
+
+\subsection*{Getting Values to Replicate Table 9.4 for Putting Data}
+
+Use the aggregated data to easily generate the required values:
+
+<<putts10,tidy=TRUE>>=
+# As above
+emp.probs<-Putts2$Made/Putts2$Trials
+log.emp.odds<-log(emp.probs/(1-emp.probs))
+fitted.logodds<-3.25884-.56614*Putts2$Length
+myfun<-function(x)(exp(x)/(1+exp(x)))
+fitted.probs<-myfun(fitted.logodds)
+#Now display in a table
+fig9.4<-rbind(emp.probs,log.emp.odds,fitted.logodds,fitted.probs)
+colnames(fig9.4)<-Putts2$Length
+fig9.4
+@
+
+
+
+\end{document}

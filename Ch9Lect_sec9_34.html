@@ -3,9 +3,9 @@
   <head>
     <title>Chapter 9: Logistic Regression</title>
     <meta charset="utf-8" />
-    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
-    <link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet" />
-    <script src="libs/panelset-0.2.6/panelset.js"></script>
+    <script src="libs/header-attrs-2.30/header-attrs.js"></script>
+    <link href="libs/panelset-0.3.0/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset-0.3.0/panelset.js"></script>
     <script src="libs/clipboard-2.0.6/clipboard.min.js"></script>
     <link href="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.css" rel="stylesheet" />
     <script src="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.js"></script>
@@ -19,9 +19,15 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
+.title[
 # Chapter 9: Logistic Regression
+]
+.subtitle[
 ## Sections 9.3-9.4
+]
+.date[
 ### Applied Statistics II
+]
 
 ---
 
@@ -137,7 +143,7 @@ class: center, middle, inverse, title-slide
 
 .panel[.panel-name[Code]
 
-```r
+``` r
 Putts2 &lt;- mutate(Putts2, LogitMade = log(Made/Missed))
 lmod_Putts2 &lt;- glm(cbind(Made, Missed) ~ Length, family = binomial, data = Putts2)
 mymod_fun &lt;- makeFun(lmod_Putts2)
@@ -151,7 +157,7 @@ gf_point(LogitMade ~ Length, data = Putts2) %&gt;%
 
 .panel[.panel-name[Output]
 
-&lt;img src="Ch9Lect_sec9_34_files/figure-html/unnamed-chunk-2-1.png" width="90%" /&gt;
+&lt;img src="Ch9Lect_sec9_34_files/figure-html/unnamed-chunk-2-1.png" alt="" width="90%" /&gt;
 
 ]
 ]
@@ -164,7 +170,7 @@ gf_point(LogitMade ~ Length, data = Putts2) %&gt;%
 
 .panel[.panel-name[Code]
 
-```r
+``` r
 # Automate plot with emplogitplot1() function in Stat2Data
 # 
 emplogitplot1(Made ~ Length, data = Putts1, ngroups = "all")
@@ -176,7 +182,7 @@ emplogitplot1(Made ~ Length, data = Putts1, ngroups = "all")
 
 .panel[.panel-name[Output]
 
-&lt;img src="Ch9Lect_sec9_34_files/figure-html/unnamed-chunk-3-1.png" width="90%" /&gt;
+&lt;img src="Ch9Lect_sec9_34_files/figure-html/unnamed-chunk-3-1.png" alt="" width="90%" /&gt;
 
 ]
 ]
@@ -207,7 +213,7 @@ There are 15 different MCAT scort values (18 to 48)
   - Use 5 ad hoc groups (18-30), (31-34), (35-38), (39-42), (43-48)
 
 
-```r
+``` r
 emplogitplot1(Acceptance ~ MCAT, breaks = c(0, 30, 34, 38, 42, 48), data = MedGPA, out = TRUE)
 ```
 
@@ -225,7 +231,7 @@ emplogitplot1(Acceptance ~ MCAT, breaks = c(0, 30, 34, 38, 42, 48), data = MedGP
 
 ### Empirical Logit Plot for MedGPA Data
 
-&lt;img src="Ch9Lect_sec9_34_files/figure-html/unnamed-chunk-6-1.png" width="90%" /&gt;
+&lt;img src="Ch9Lect_sec9_34_files/figure-html/unnamed-chunk-6-1.png" alt="" width="90%" /&gt;
 
 ---
 
@@ -234,7 +240,7 @@ emplogitplot1(Acceptance ~ MCAT, breaks = c(0, 30, 34, 38, 42, 48), data = MedGP
 Specify number of groups and R picks intervals to make group size (rougly) equal
 
 
-```r
+``` r
 emplogitplot1(Acceptance ~ MCAT, ngroups = 5, data = MedGPA, out = TRUE)
 ```
 
@@ -266,7 +272,7 @@ class: center, middle, inverse
 ### Logistic Output for Putting Example (Putts1)
 
 
-```r
+``` r
 lmod_putts &lt;- glm(Made ~ Length, family = binomial, data = Putts1)
 summary(lmod_putts)
 ```
@@ -275,10 +281,6 @@ summary(lmod_putts)
 ## 
 ## Call:
 ## glm(formula = Made ~ Length, family = binomial, data = Putts1)
-## 
-## Deviance Residuals: 
-##     Min       1Q   Median       3Q      Max  
-## -1.8705  -1.1186   0.6181   1.0026   1.4882  
 ## 
 ## Coefficients:
 ##             Estimate Std. Error z value Pr(&gt;|z|)    
@@ -311,7 +313,7 @@ summary(lmod_putts)
 ### Recall: Ordinary Linear Regression Output
 
 
-```r
+``` r
 regmod_putts &lt;- lm(Made ~ Length, data = Putts1)
 summary(regmod_putts)
 ```
@@ -406,7 +408,7 @@ Length      -0.56614    0.06747  -8.391   &lt;2e-16 ***
 **CIs for coefficient**
 
 
-```r
+``` r
 confint(lmod_putts)
 ```
 
@@ -421,7 +423,7 @@ confint(lmod_putts)
 **CIs for Odds Ratio**
 
 
-```r
+``` r
 exp(confint(lmod_putts))
 ```
 
@@ -479,7 +481,7 @@ AIC: 723.89
 - For the **Putts1** data, `\(-2\log(L)=-2\cdot(-359.95)=719.9\)`
 
 
-```r
+``` r
 # Extract log-likelihood but we never need to do this
 logLik(lmod_putts)
 ```
@@ -499,7 +501,7 @@ logLik(lmod_putts)
 **Using GPA**
 
 
-```r
+``` r
 lmmod_gpa &lt;- glm(Acceptance ~ GPA, family = binomial, data = MedGPA)
 summary(lmmod_gpa)
 ```
@@ -518,7 +520,7 @@ Residual deviance: 56.839  on 53  degrees of freedom
 **Using MCAT**
 
 
-```r
+``` r
 lmmod_mcat &lt;- glm(Acceptance ~ MCAT, family = binomial, data = MedGPA)
 summary(lmmod_mcat)
 ```
@@ -561,7 +563,7 @@ Residual deviance: 64.697  on 53  degrees of freedom
 .panelset[
 .panel[.panel-name[R code]
 
-```r
+``` r
 summary(lmod_putts)
 anova(lmod_putts, test = "Chisq")
 ```
@@ -572,10 +574,6 @@ anova(lmod_putts, test = "Chisq")
 ## 
 ## Call:
 ## glm(formula = Made ~ Length, family = binomial, data = Putts1)
-## 
-## Deviance Residuals: 
-##     Min       1Q   Median       3Q      Max  
-## -1.8705  -1.1186   0.6181   1.0026   1.4882  
 ## 
 ## Coefficients:
 ##             Estimate Std. Error z value Pr(&gt;|z|)    
@@ -623,7 +621,7 @@ anova(lmod_putts, test = "Chisq")
 .panelset[
 .panel[.panel-name[R code]
 
-```r
+``` r
 summary(lmod_Putts2)
 anova(lmod_Putts2, test = "Chisq")
 ```
@@ -635,10 +633,6 @@ anova(lmod_Putts2, test = "Chisq")
 ## Call:
 ## glm(formula = cbind(Made, Missed) ~ Length, family = binomial, 
 ##     data = Putts2)
-## 
-## Deviance Residuals: 
-##        1         2         3         4         5  
-##  0.14800   0.24555  -0.84871   0.51388  -0.05149  
 ## 
 ## Coefficients:
 ##             Estimate Std. Error z value Pr(&gt;|z|)    
@@ -721,10 +715,10 @@ anova(lmod_Putts2, test = "Chisq")
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
 <script>var slideshow = remark.create({
-"highlightStyle": "github",
-"highlightLines": true,
-"ratio": "16:9",
-"countIncrementalSlides": false
+  "highlightStyle": "github",
+  "highlightLines": true,
+  "ratio": "16:9",
+  "countIncrementalSlides": false
 });
 if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   window.dispatchEvent(new Event('resize'));
@@ -765,6 +759,19 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     deleted = true;
   });
 })();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
 (function() {
   "use strict"
   // Replace <script> tags in slides area to make them executable
