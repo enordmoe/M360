@@ -235,9 +235,6 @@ Data set: `Putts1`
 
 ## Four probabilities at a fixed value of $x$ {.smaller}
 
-## Four probabilities at a fixed $x$ {.smaller}
-
-For any fixed value of the predictor $x$, there are four probabilities:
 
 |               | **True value** | **Fitted value** |
 |---------------|----------------|------------------|
