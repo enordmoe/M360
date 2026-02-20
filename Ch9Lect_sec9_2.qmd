@@ -1,0 +1,620 @@
+---
+title: "Section 9.2: Logistic Regression and Odds Ratios"
+subtitle: "Statistical Modeling"
+author: "MATH 360"
+format:
+  revealjs:
+    chalkboard: true
+    theme: [default, custom.scss]
+    toc: false
+    toc-depth: 1
+    slideNumber: true
+    html-math-method: mathjax
+    incremental: false
+    transition: fade
+    preview-links: auto
+    notes: true
+title-slide-attributes:
+  data-background-color: "#EA6820"
+from: markdown+emoji
+execute:
+  echo: true
+  cache: false
+editor:
+  markdown:
+    wrap: 72
+---
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(mosaic)
+library(ggformula)
+library(Stat2Data)
+```
+
+## Outline
+
+-   Odds Ratio
+-   Interpreting the logistic slope
+
+## Overview
+
+> In this section we focus on careful interpretation of the logistic
+> slope coefficient in the context of odds and odds ratios.
+
+## Proportions and Odds {.smaller}
+
+::: fragment
+Recall: A goal of logistic regression is to model
+
+$$
+\pi = P(\text{Yes})
+$$
+
+the proportion of "yes" or "success" outcomes for different values of a
+predictor.
+:::
+
+## The Logit Form of the Model
+
+$$
+\log\!\left(\frac{\pi}{1-\pi}\right)
+=
+\beta_0 + \beta_1 x
+$$
+
+::: fragment
+The log of the odds is a linear function of $x$?
+:::
+
+## Where Does This Come From?
+
+::: fragment
+The model is built from **odds**:
+:::
+
+::: fragment
+$$
+\text{odds}
+=
+\frac{\pi}{1-\pi}
+=
+\frac{P(\text{Yes})}{P(\text{No})}
+$$
+:::
+
+::: fragment
+Taking the logarithm gives the **log-odds (logit)**.
+
+$$
+\log\!\left(\frac{\pi}{1-\pi}\right)
+$$
+:::
+
+## Odds Ratio {.smaller}
+
+::: fragment
+A common way to compare two groups is to examine\
+the **ratio of their odds**.
+:::
+
+::: fragment
+<br>
+
+#### Definition
+
+$$
+\text{Odds Ratio}
+=
+OR
+=
+\frac{\text{Odds}_1}{\text{Odds}_2}
+$$
+:::
+
+::: fragment
+$$
+=
+\frac{\dfrac{P_1(\text{Yes})}{P_1(\text{No})}}
+{\dfrac{P_2(\text{Yes})}{P_2(\text{No})}}
+$$
+:::
+
+# Binary Explanatory Variable {.peach-slide}
+
+##  {.smaller}
+
+### Example: Exposure to a Risk Factor
+
+::: fragment
+-   Group 1: **Exposed** to a risk (e.g., smokers)\
+-   Group 2: **Not exposed** (non-smokers)
+:::
+
+## How to Think About Odds (Risk Context) {.smaller}
+
+### Example: Exposure to a Risk Factor
+
+::::::::: columns
+::::: {.column width="50%"}
+::: fragment
+Suppose
+
+-   $P_1(\text{disease}) = 0.30$\
+-   $P_2(\text{disease}) = 0.10$
+:::
+
+::: fragment
+Then the odds are:
+
+-   $\text{Odds}_1 = \frac{0.30}{0.70} = 0.43$\
+-   $\text{Odds}_2 = \frac{0.10}{0.90} = 0.11$
+:::
+:::::
+
+::::: {.column width="50%"}
+::: fragment
+So the odds ratio is
+
+$$
+OR = \frac{0.43}{0.11} \approx 3.9
+$$
+:::
+
+::: fragment
+**Interpretation:**
+
+> The exposed group has **about 4 times the odds** of getting the
+> disease compared to the unexposed group.
+:::
+:::::
+:::::::::
+
+## Interpreting the Odds Ratio
+
+::: fragment
+-   $OR = 1\quad\Rightarrow$ no association\
+-   $OR > 1\quad\Rightarrow$ higher odds in Group 1 (more likely)
+-   $OR < 1\quad\Rightarrow$ lower odds in Group 1 (less likely)
+:::
+
+
+## Example: TMS for Migraines :brain: {.smaller}
+
+::: fragment
+-   **Transcranial Magnetic Stimulation (TMS)** a proposed treatment of
+    migraines that uses a handheld device to deliver a magnetic pulse to
+    the head.
+:::
+
+::: fragment
+-   200 migraine sufferers were randomly assigned to\
+    **TMS treatment** or **placebo (sham)**.
+:::
+
+::: fragment
+-   After applying the device at migraine onset, subjects reported\
+    whether they were **pain-free two hours later**.
+:::
+
+::: fragment
+-   Explanatory variable: Treatment (TMS vs. placebo)\
+-   Response variable: Pain-free? (Yes/No)
+:::
+
+## The Results {.small}
+
+### Transcranial Magnetic Stimulation vs. Placebo
+
+::: fragment
+| Pain Free?  | Yes | No  | Total |
+|-------------|-----|-----|-------|
+| **TMS**     | 39  | 61  | 100   |
+| **Placebo** | 22  | 78  | 100   |
+| **Total**   | 61  | 139 | 200   |
+:::
+
+## 
+
+### Step 1: Compute Odds
+
+::: fragment
+For TMS:
+
+$$
+\text{odds}_{\text{TMS}}
+=\frac{39/100}{61/100}
+=\underline{\hspace{5cm}}
+$$
+:::
+
+::: fragment
+For Placebo:
+
+$$
+\text{odds}_{\text{Placebo}}
+=
+\frac{22/100}{78/100}
+=\underline{\hspace{5cm}}
+$$
+:::
+
+##  {.smaller}
+
+### Step 2: Odds Ratio
+
+::: fragment
+$$
+OR
+=
+\frac{0.639}{0.282}
+=\underline{\hspace{5cm}}
+$$
+:::
+
+::: fragment
+Interpretation:
+
+The odds of being pain-free are $=\underline{\hspace{5cm}}$ times higher
+with TMS than with placebo.
+:::
+
+<br>
+
+::: fragment
+:question: Is this difference (from 1) **statistically significant**?
+:::
+
+::: {.fragment}
+
+
+::: callout-tip
+It turns out using logistic regression to answer to this question is
+just equivalent to a 2-proportion $z$ test from introductory statistics!
+:::
+
+:::
+
+
+# Quantitative  Explanatory Variable {.peach-slide}
+
+## Putting Data Revisited
+
+Build a model to predict the probability a putt is made (success) based on its length (in feet).
+
+
+| Length (ft) | 3 | 4 | 5 | 6 | 7 |
+|-------------|---|---|---|---|---|
+| **Made**    | 84 | 88 | 61 | 61 | 44 |
+| **Missed**  | 17 | 31 | 47 | 64 | 90 |
+| **Total**   | 101 | 119 | 108 | 125 | 134 |
+
+
+Data set: `Putts1`
+
+
+## Putting Data Odds Ratios {.smaller}
+
+
+:::: {.columns}
+::: {.column width="40%"}
+::: {.fragment}
+Odds of making the putt:
+
+- From 6 feet:
+  $$
+  \text{odds}_{6} = 0.953
+  $$
+
+- From 5 feet:
+  $$
+  \text{odds}_{5} = 1.298
+  $$
+:::
+
+
+  
+:::
+::: {.column width="60%"}
+
+::: {.fragment}
+
+#### Odds Ratio (6 feet relative to 5 feet)
+
+$$
+OR
+=
+\frac{\text{odds}_{6}}{\text{odds}_{5}}
+=
+\frac{0.953}{1.298}
+=
+0.73
+$$
+
+:::
+
+
+::: {.fragment}
+#### Interpretation
+
+The odds of making a putt from 6 feet are  
+**$\underline{\hspace{5cm}}$% of the odds** of making it from 5 feet (or **$\underline{\hspace{5cm}}$% less**)
+
+:::
+
+:::
+
+::::::
+
+
+##  {.smaller}
+### Golf Putts Data Odds Ratios
+
+<table style="
+  margin: 0 auto;
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 750px;
+  font-size: 0.95em;
+">
+
+  <colgroup>
+    <col style="width: 140px;">
+    <col style="width: 110px;">
+    <col style="width: 110px;">
+    <col style="width: 110px;">
+    <col style="width: 110px;">
+    <col style="width: 110px;">
+  </colgroup>
+
+  <tr>
+    <th style="border:1px solid #999; padding:6px;">Length (ft)</th>
+    <th style="border:1px solid #999; padding:6px;">3</th>
+    <th style="border:1px solid #999; padding:6px;">4</th>
+    <th style="border:1px solid #999; padding:6px;">5</th>
+    <th style="border:1px solid #999; padding:6px;">6</th>
+    <th style="border:1px solid #999; padding:6px;">7</th>
+  </tr>
+
+  <tr>
+    <td style="border:1px solid #999; padding:6px;">Made</td>
+    <td style="border:1px solid #999; padding:6px;">84</td>
+    <td style="border:1px solid #999; padding:6px;">88</td>
+    <td style="border:1px solid #999; padding:6px;">61</td>
+    <td style="border:1px solid #999; padding:6px;">61</td>
+    <td style="border:1px solid #999; padding:6px;">44</td>
+  </tr>
+
+  <tr>
+    <td style="border:1px solid #999; padding:6px;">Missed</td>
+    <td style="border:1px solid #999; padding:6px;">17</td>
+    <td style="border:1px solid #999; padding:6px;">31</td>
+    <td style="border:1px solid #999; padding:6px;">47</td>
+    <td style="border:1px solid #999; padding:6px;">64</td>
+    <td style="border:1px solid #999; padding:6px;">90</td>
+  </tr>
+
+  <tr>
+    <td style="border:1px solid #999; padding:6px;">Total</td>
+    <td style="border:1px solid #999; padding:6px;">101</td>
+    <td style="border:1px solid #999; padding:6px;">119</td>
+    <td style="border:1px solid #999; padding:6px;">108</td>
+    <td style="border:1px solid #999; padding:6px;">125</td>
+    <td style="border:1px solid #999; padding:6px;">134</td>
+  </tr>
+
+  <tr>
+    <td style="border:1px solid #999; padding:6px;">$\hat{p}$</td>
+    <td style="border:1px solid #999; padding:6px;">0.832</td>
+    <td style="border:1px solid #999; padding:6px;">0.739</td>
+    <td style="border:1px solid #999; padding:6px;">0.565</td>
+    <td style="border:1px solid #999; padding:6px;">&nbsp;</td>
+    <td style="border:1px solid #999; padding:6px;">&nbsp;</td>
+  </tr>
+
+  <tr>
+    <td style="border:1px solid #999; padding:6px;">Odds</td>
+    <td style="border:1px solid #999; padding:6px;">4.941</td>
+    <td style="border:1px solid #999; padding:6px;">2.839</td>
+    <td style="border:1px solid #999; padding:6px;">1.298</td>
+    <td style="border:1px solid #999; padding:6px;">&nbsp;</td>
+    <td style="border:1px solid #999; padding:6px;">&nbsp;</td>
+  </tr>
+
+</table>
+
+<br>
+
+<table style="margin: 0 auto; border-collapse: collapse; font-size: 1.05em;">
+  <tr>
+    <th style="border:1px solid #999; padding:6px 12px; text-align:left;">Odds Ratio</th>
+    <th style="border:1px solid #999; padding:6px 12px;">4 vs 3</th>
+    <th style="border:1px solid #999; padding:6px 12px;">5 vs 4</th>
+    <th style="border:1px solid #999; padding:6px 12px;">6 vs 5</th>
+    <th style="border:1px solid #999; padding:6px 12px;">7 vs 6</th>
+  </tr>
+  <tr>
+    <td style="border:1px solid #999; padding:6px 12px; text-align:left;">$OR$</td>
+    <td style="border:1px solid #999; padding:6px 12px;">0.575</td>
+    <td style="border:1px solid #999; padding:6px 12px;">0.457</td>
+    <td style="border:1px solid #999; padding:6px 12px;">$\boxed{\phantom{0.000}}$</td>
+    <td style="border:1px solid #999; padding:6px 12px;">$\boxed{\phantom{0.000}}$</td>
+  </tr>
+</table>
+
+
+
+##  {.smaller}
+### Odds Ratios for Putts
+
+#### From samples at each distance:
+
+<table style="margin: 0 auto; border-collapse: collapse; table-layout: fixed; width: 700px;">
+  <colgroup>
+    <col style="width: 175px;">
+    <col style="width: 175px;">
+    <col style="width: 175px;">
+    <col style="width: 175px;">
+  </colgroup>
+  <tr>
+    <th style="border:1px solid #999; padding:6px;">4 to 3 feet</th>
+    <th style="border:1px solid #999; padding:6px;">5 to 4 feet</th>
+    <th style="border:1px solid #999; padding:6px;">6 to 5 feet</th>
+    <th style="border:1px solid #999; padding:6px;">7 to 6 feet</th>
+  </tr>
+  <tr>
+    <td style="border:1px solid #999; padding:6px;">0.575</td>
+    <td style="border:1px solid #999; padding:6px;">0.457</td>
+    <td style="border:1px solid #999; padding:6px;"></td>
+    <td style="border:1px solid #999; padding:6px;"></td>
+  </tr>
+</table>
+
+<br>
+
+
+#### From fitted logistic model:
+
+<table style="margin: 0 auto; border-collapse: collapse; table-layout: fixed; width: 700px;">
+  <colgroup>
+    <col style="width: 175px;">
+    <col style="width: 175px;">
+    <col style="width: 175px;">
+    <col style="width: 175px;">
+  </colgroup>
+  <tr>
+    <th style="border:1px solid #999; padding:6px;">4 to 3 feet</th>
+    <th style="border:1px solid #999; padding:6px;">5 to 4 feet</th>
+    <th style="border:1px solid #999; padding:6px;">6 to 5 feet</th>
+    <th style="border:1px solid #999; padding:6px;">7 to 6 feet</th>
+  </tr>
+  <tr>
+    <td style="border:1px solid #999; padding:6px;">0.568</td>
+    <td style="border:1px solid #999; padding:6px;">0.568</td>
+    <td style="border:1px solid #999; padding:6px;"></td>
+    <td style="border:1px solid #999; padding:6px;"></td>
+  </tr>
+</table>
+
+
+##  {.smaller}
+### Logistic Model Odds Ratios for Putts
+
+::: {.fragment}
+
+In a logistic model,  
+> the odds ratio is **constant**  
+> when the predictor increases by 1.
+
+
+#### What is the constant?
+
+:::
+
+
+::: {.fragment}
+
+<br>
+
+Compute the fitted odds ratio:
+
+$$
+\exp(\widehat{\beta_1}) = \exp(-0.5661) = \fbox{0.5677}
+$$
+
+
+:::{.callout-tip}
+
+See logistic model output on the next slide
+
+:::
+
+
+:::
+
+
+## {.smaller}
+### Logistic Model Odds Ratios for Putts
+
+#### Compute in R
+
+
+
+```{r}
+# Fit logistic model (fill in the data name)
+data("Putts1")
+mod <- glm(Made ~ Length, data = Putts1, family = binomial)
+summary(mod)
+```
+
+## {.smaller}
+### Interpreting “Slope” Using the Odds Ratio 
+
+::: {.fragment}
+$$
+\log(\text{odds}) = \beta_0 + \beta_1 x
+$$
+:::
+
+::: {.fragment}
+Exponentiating both sides:
+
+$$
+\text{odds} = e^{\beta_0 + \beta_1 x}
+$$
+:::
+
+::: {.fragment}
+#### What happens when we increase $x$ by 1?
+:::
+
+::: {.fragment}
+$$
+e^{\beta_0 + \beta_1(x+1)}
+=
+e^{\beta_0 + \beta_1 x} \, e^{\beta_1}
+$$
+:::
+
+
+::: {.fragment}
+
+When $x$ increases by 1, the **odds are multiplied by**
+
+$$
+e^{\beta_1}
+$$
+
+(the odds ratio).
+:::
+
+
+
+## 
+### Example (Putts)
+
+The odds of making a putt **decrease by a factor of**
+
+$$
+e^{-0.566} = 0.568
+$$
+
+for every additional foot of length.
+
+
+## Summary
+
+* Logistic regression models **log-odds** as a linear function
+of $x:$
+  $$
+  \log\!\left(\frac{\pi}{1-\pi}\right)
+  =
+  \beta_0 + \beta_1 x
+  $$
+
+* The slope $\beta_1$ is interpreted through the **odds ratio**:
+  $$
+  OR = e^{\beta_1}
+  $$
+
+* A one-unit increase in $x$ **multiplies the odds** by $e^{\beta_1}$.
