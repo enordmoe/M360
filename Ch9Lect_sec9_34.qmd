@@ -1,0 +1,699 @@
+---
+title: "Section 9.3-9.4: Assessing the model and Inference"
+subtitle: "Statistical Modeling"
+author: "MATH 360"
+format:
+  revealjs:
+    chalkboard: true
+    theme: [default, custom.scss]
+    toc: false
+    toc-depth: 1
+    slideNumber: true
+    html-math-method: mathjax
+    incremental: false
+    transition: fade
+    preview-links: auto
+    notes: true
+title-slide-attributes:
+  data-background-color: "#EA6820"
+from: markdown+emoji
+execute:
+  echo: true
+  cache: false
+editor:
+  markdown:
+    wrap: 72
+---
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(mosaic)
+library(ggformula)
+library(Stat2Data)
+```
+
+## Outline
+
+- Conditions for logistic regression
+
+  - Linearity
+  
+  - Empirical logit plot
+  
+- Tests and CIs for slope
+
+- Evaluating overall fit
+
+  - G statistic
+
+  - Disaggregate (long)/Aggregate (short) form in R
+
+
+## Inference Conditions for Logistic Regression {.smaller}
+
+::: {.incremental}
+
+- **Linearity**: The logits (log odds) should have a linear relationship with the predictor.
+
+- **Independence**: No pairing or clustering of data.
+
+
+- **Random**: Either a random sample from a population OR random assignment within an experiment.
+
+
+- **~~Normality~~**: This does not apply.
+
+  - The responses are 0/1.
+
+
+- **~~Constant variance~~**: Does not apply.
+
+  - Variability in $Y$ is highest when $\pi$ is near 1/2 lowest when $\pi$ is near 0 or 1.
+
+
+:::
+
+
+## Checking for Linearity {.smaller}
+
+### Empirical Logit Plot
+
+1. Find the sample proportion $\hat p$ for each value of the predictor.
+
+2. Plot $\log\left(\frac{\hat p}{1-\hat p}\right)$ vs $x$ and look for a linear trend.
+
+::: {.fragment}
+
+<br>
+
+**Note:** When  the predictor has many values (few repeats),  choose intervals of predictor values and plot the group logits versus the group predictor means.
+
+  - The function `emplogitplot1()` in **Stat2Data** is very useful for constructing these plots.
+  
+:::
+
+
+
+
+## Two Forms of Logistic Data {.smaller}
+
+::: {.fragment}
+
+1. **Disaggregate (long) form**: Response variable $Y=$ Success/Failure or 1/0 and each case is a row
+
+  - **Binary (Bernoulli) response** logistic regression
+
+  - e.g., **Putts1** data
+  
+:::
+
+::: {.fragment}
+
+2. **Aggegrate (short) form**: Response variable $Y=$ Count of Successes for a group of data with a common $X$ value
+
+  - **Binomial counts** logistic regression
+  
+  - e.g., **Putts2** has 5 cases for each distance of putt
+
+:::
+
+::: {.fragment}
+
+
+**Note:**The aggregate form simplifies construction of empirical logit plots.
+
+:::
+
+## {.smaller}
+### Empirical Plots Using Putts2 Data
+
+
+```{r}
+data(Putts2)
+Putts2 <- mutate(Putts2, LogitMade = log(Made/Missed))
+# Fit model to aggregated data
+lmod_Putts2 <- glm(cbind(Made, Missed) ~ Length, 
+                   family = binomial, data = Putts2)
+mymod_fun <- makeFun(lmod_Putts2, type = "link")
+gf_point(LogitMade ~ Length, data = Putts2) |> 
+  gf_fun(mymod_fun, color = "red")
+```
+
+
+## {.smaller}
+### `makeFun()` in Logistic Regression: `"link"` vs `"response"` 
+
+::: {.fragment}
+#### Start with a fitted logistic model
+
+$$
+\text{logit}(\widehat\pi)=\widehat\beta_0 + \widehat\beta_1 x
+\qquad\text{where}\qquad
+\text{logit}(\widehat\pi)=\log\left(\frac{
+\widehat \pi}{1-\widehat \pi}\right)
+$$
+
+In R, we fit this with `glm(..., family = binomial)`.
+:::
+
+<br>
+
+::: {.fragment}
+#### `makeFun()` can return predictions on *two* scales
+
+- **Link scale** = the model’s straight-line output (log-odds)
+- **Response scale** = the probability $p$ (between 0 and 1)
+:::
+
+
+---
+## {.smaller}
+### `makeFun()` in Logistic Regression: Link scale
+
+
+::: {.fragment}
+
+#### Option 1: `type = "link"` (log-odds)
+
+```{r, eval=FALSE}
+f_link <- makeFun(mod, type = "link")
+```
+
+This returns
+
+$$
+\log\left(\frac{\widehat{\pi}}{1-\widehat{\pi}}\right)=\widehat\beta_0 + \widehat\beta_1 x
+$$
+
+* output is **log-odds**
+* graph is a **straight line**
+* values can be any real number
+
+:::
+
+## {.smaller}
+### `makeFun()` in Logistic Regression: Response scale
+
+::: {.fragment}
+
+#### Option 2: `type = "response"` (probability)
+
+```{r, eval=FALSE}
+f_prob <- makeFun(mod, type = "response")
+```
+
+This returns
+
+$$
+\widehat{\pi}(x)=\frac{e^{\widehat\beta_0+\widehat\beta_1 x}}{1+e^{\widehat\beta_0+\widehat\beta_1 x}}
+$$
+
+* output is a **probability**
+* graph is an **S-curve**
+* values stay in $[0,1]$
+
+:::
+
+
+## {.smaller}
+### Which `type=` should I use?
+
+::: {.fragment}
+
+* To **plot predicted probabilities** with `gf_fun()`: use `type = "response"`  
+
+* To show the **straight-line structure** logistic regression fits: use `type = "link"`
+
+$$
+\text{line in log-odds} \;\Rightarrow\; \text{S-curve in probability}
+$$
+:::
+
+## {.smaller}
+### Empirical Logit Plot Using Disaggregate Data {.smaller}
+
+####  `emplogitplot1()` function
+
+`ngroups = "all"` uses all unique $x$ values
+
+```{r}
+data(Putts1)
+# Automate plot with emplogitplot1() function in Stat2Data
+emplogitplot1(Made ~ Length, data = Putts1, ngroups = "all")
+```
+
+
+## Empirical Logit Plots {.smaller}
+### Two possible problems:
+
+::: {.incremental}
+
+
+1. Typically, there may be many different x-values with few (or only one) cases at each.
+  
+  * Solution: Group the predictor values into bins of similar values and plot vs. the mean predictor for each bin.
+  
+2. A sample proportion could be 0 or 1 (making log(odds) undefined).
+  
+  * Solution: Define adjusted proportion as
+    
+    $$\hat p_\text{adj}=\frac{\#\text{Yes}+1/2}{\#\text{Yes}+\#\text{No}+1}$$
+
+:::
+
+## {.smaller}
+### Empirical Logit Plot for MedGPA Data
+
+There are 15 different MCAT score values (18 to 48)
+
+  - Use 5 ad hoc groups (18-30), (31-34), (35-38), (39-42), (43-48)
+
+```{r}
+data("MedGPA")
+# out = TRUE outputs dataframe with group info
+emplogitplot1(Acceptance ~ MCAT, breaks = c(0, 30, 34, 38, 42, 48),
+              data = MedGPA, out = TRUE)
+```
+
+## {.smaller}
+#### Empirical Logit Plot for MedGPA Data
+
+* Explicitly specify number of groups and R picks intervals to make group size (roughly) equal.
+
+
+```{r}
+emplogitplot1(Acceptance ~ MCAT, ngroups = 5, 
+              data = MedGPA, out = TRUE)
+```
+
+
+
+# Formal Inference: Tests and Intervals {.peach-slide}
+
+
+## {.smaller}
+### Logistic Output for Putting Example (Putts1)
+
+```{r}
+lmod_Putts1 <- glm(Made ~ Length, data = Putts1, family = binomial)
+# If stars cause problems with render
+options(show.signif.stars = FALSE)
+summary(lmod_Putts1)
+```
+
+
+## Inference with Logistic Models
+
+- What are the the $z$-tests?
+
+- What is the deviance about?
+
+- Is there a test like the overall $F$-test?
+
+- Is there something like a nested $F$-test?
+
+
+## {.smaller}
+### Recall: Ordinary Linear Regression Output
+
+```{r}
+regmod_putts <- lm(Made ~ Length, data = Putts1)
+summary(regmod_putts)
+```
+
+####  Recall
+
+  * $t$-Tests for individual coefficients
+
+  * Residual standard error and $R^2$ to compare models
+
+  * $F$-test for overall fit
+
+
+## {.smaller}
+### Wald’s $z$-Test for Individual Coefficients
+
+::: {.fragment}
+
+**Hypotheses**
+
+- $H_0:\beta_i=0$ versus $H_a:\beta_i\neq 0$
+
+:::
+
+::: {.fragment}
+
+**Test statistic**
+
+- $\displaystyle z=\frac{\hat\beta_i}{SE(\hat\beta_i)}$
+
+:::
+
+::: {.fragment}
+
+
+**P-value**
+
+- $P$-value $=2P(Z>|z|)$
+
+:::
+
+::: {.fragment}
+
+::: {.callout-note}
+
+* Inference relies on large sample normal approximations
+* Closely parallels regression inference procedures
+
+:::
+:::
+
+
+## 
+### Confidence Intervals for Slope and Odds Ratio
+
+- For simple logistic regression, simply use the SE to find a Wald confidence interval for $\beta_1$:
+
+  - Calculate $\hat\beta_i\pm z^*\cdot\text{SE}$
+
+
+
+
+
+## {.smaller}
+### Example: Putting Data
+
+**Logistic Model Output**
+
+```
+Coefficients:
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  3.25684    0.36893   8.828   <2e-16 ***
+Length      -0.56614    0.06747  -8.391   <2e-16 ***
+```
+
+::: {.incremental}
+
+**Calculations**
+
+- **CI for slope**: $-0.566 \pm 1.96(0.06747) \Rightarrow (-0.698, -0.434)$
+
+- **CI for the odds ratio $(e^{\hat\beta_1})$:**   exponentiate the CI for $\beta_1$
+
+  - **CI for OR:** $(e^{-0.698}, e^{-0.434}) \Rightarrow (0.497,0.648)$
+  
+  
+- **Interpretation** in context:
+
+  > "We are 95% confident that the **odds of making** a putt decreases by a factor between 0.50 and 0.65 for every extra foot in length."
+  
+:::
+
+## {.smaller}
+### R commands for CI for Slope and Odds Ratio
+
+**CIs for coefficient**
+
+```{r}
+confint.default(lmod_Putts1)
+```
+
+<br>
+
+**CIs for Odds Ratio**
+
+```{r}
+exp(confint.default(lmod_Putts1))
+```
+
+<br> 
+
+::: {.callout-note}
+
+Use `confint.default()` to get the Wald intervals presented here and in the text.
+
+:::
+
+
+# Estimating Parameters in Logistic Regression {.peach-slide}
+
+
+## {.smaller}
+### The “Likelihood” in Logistic Regression?
+
+::: {.incremental}
+
+* In intro stats, we estimated a single proportion:
+
+$$
+\hat p = \frac{\text{\# Successes}}{n}
+$$
+
+* In logistic regression, each person has their **own probability**:
+
+  $$
+  \hat\pi_i = P(\text{Success} \mid x_i)
+  $$
+
+* If we assume observations are independent, the probability of seeing the **entire dataset** is the product of each individual probability.
+
+* That product is called the **likelihood**.
+
+:::
+
+
+## {.smaller}
+
+### Building the Likelihood
+
+For each data point:
+
+* If $y_i = 1$ (Success), the model assigns probability $\hat\pi_i$
+* If $y_i = 0$ (Failure), the model assigns probability $1 - \hat\pi_i$
+
+::: {.fragment}
+
+
+We can write both cases in one formula:
+
+$$
+L(\beta_0,\beta_1)=
+\prod_{i=1}^{n}
+\hat\pi_i^{y_i}(1-\hat\pi_i)^{1-y_i}
+$$
+
+:::
+
+::: {.fragment}
+
+* If $y_i=1$, this becomes $\hat\pi_i$  
+* If $y_i=0$, this becomes $1-\hat\pi_i$  
+:::
+
+::: {.fragment}
+So:
+
+> The likelihood is the probability that our model assigns to **the data we actually observed.**
+
+:::
+
+
+## {.smaller}
+
+### What Are We Maximizing?
+
+::: {.incremental}
+
+* Different values of $\beta_0$ and $\beta_1$ give different probabilities $\hat\pi_i$.
+
+* Some choices make the observed outcomes very plausible.
+
+* Other choices make them very unlikely.
+
+* **Maximum Likelihood Estimation (MLE)** chooses the coefficients that make the observed data **most probable.**
+
+* In practice we maximize the **log-likelihood**:
+
+  $$
+\log L
+  $$
+
+* The log-likelihood tells us how well the model explains the data.
+
+* Multiplying by $-2$ gives a quantity called the **deviance**:
+
+  $$
+  \text{Deviance} = -2 \log L
+  $$
+
+* Smaller deviance means a better-fitting model.
+
+:::
+
+## {.smaller}
+### Residual Deviance: R Output
+
+- In R output, the quantity $-2\log(L)$ is labeled as the **residual deviance** in R.
+
+```
+Coefficients:
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  3.25684    0.36893   8.828   <2e-16 ***
+Length      -0.56614    0.06747  -8.391   <2e-16 ***
+
+    Null deviance: 800.21  on 586  degrees of freedom
+Residual deviance: 719.89  on 585  degrees of freedom
+AIC: 723.89
+```
+
+::: {.fragment}
+
+- For the **Putts1** data, $-2\log(L)=-2\cdot(-359.95)=719.9$
+
+```{r}
+# Extract log-likelihood but we really never need to do this
+logLik(lmod_Putts1)
+```
+
+
+:::
+
+::: {.fragment}
+
+::: {.callout-note}
+We want deviance to be small (like SSE of linear regression).
+:::
+
+:::
+
+
+
+## {.smaller}
+### Example: Predict Acceptance for MedGPA Data
+#### Using GPA
+
+
+```{r}
+lmmod_gpa <- glm(Acceptance ~ GPA, family = binomial, 
+                 data = MedGPA)
+summary(lmmod_gpa)
+```
+
+## {.smaller}
+### Example: Predict Acceptance for MedGPA Data
+#### Using MCAT
+
+```{r}
+lmmod_mcat <- glm(Acceptance ~ MCAT, family = binomial, 
+                  data = MedGPA)
+summary(lmmod_mcat)
+```
+
+
+## 
+### Example: Predict Acceptance for MedGPA Data
+
+- We prefer the GPA model with:
+
+  - Lower **Residual deviance** (56.84)
+  
+  - Greater **reduction in deviance**: (75.78-64.70) vs (75.78-56.84) 
+  
+
+##  
+### Evaluating Overall Fit: Drop in Deviance Test
+
+::: {.incremental}
+
+- Test for overall fit (simliar to regression ANOVA)
+
+  - $G=$ improvement in $-2\log(L)$ over a model with constant only (null deviance) 
+  
+  - Compare to $\chi^2$ with $k$ degrees of freedom (chi-square)
+  
+  - If desired, obtain $p$-value from R or by using the `pchisq()` function.
+
+- Use `anova()` with `test = "Chisq"` to obtain the drop-in-deviance test from R.
+:::
+
+
+
+## {style="font-size: 60%;"}
+###  Drop-in-Deviance (G) Test: Putts1  (individual) data
+
+```{r}
+summary(lmod_Putts1)
+anova(lmod_Putts1, test = "Chisq")
+```
+
+## {style="font-size: 60%;"}
+###  Drop-in-Deviance (G) Test: Putts2 (aggregate) data
+
+```{r}
+summary(lmod_Putts2)
+anova(lmod_Putts2, test = "Chisq")
+```
+
+
+
+## {.smaller}
+### Test for Overall Model: Logistic Regression
+
+**Drop-in-Deviance Test** - Is there something effective in the model?
+
+:::: {.columns}
+
+::: {.column width="50%"}
+::: {.fragment}
+- **Null hypothesis**
+  - $H_0:\beta_1=0$
+  
+  - $\log\left(\frac{\pi}{1-\pi}\right)=\beta_0$
+  
+  - Same odds for all values of $x$
+  
+  - Likelihood is $L_0$ 
+  
+:::
+
+::: {.fragment}
+- **Alternative hypothesis**
+  - $H_a: \beta_1\neq 0$
+  
+  - $\log\left(\frac{\pi}{1-\pi}\right)=\beta_0+\beta_1 x$
+  
+  - Odds are a linear function of $x$  
+  
+  - Likelihood is $L$
+
+:::
+:::
+
+::: {.column width="50%"}
+::: {.fragment}
+- $G=-2\log(L_0)-(-2\log(L))$ and compare to $\chi^2_1$
+  - Improvement in $-2\log(L)$ when using linear function of $x$.
+:::
+:::
+
+::::
+
+
+##  {.smaller}
+### Summary: Logistic Regression Inference
+
+::: {.incremental}
+
+- **Conditions**: Check linearity via empirical logit plot (log-odds vs $x$ should be linear); independence and random sampling also required; normality and constant variance do **not** apply.
+
+- **Two data forms**: Disaggregate (long) form has one row per case; aggregate (short) form has counts of successes; both can be fit with `glm(..., family = binomial)`.
+
+- **Wald $z$-test**: Tests $H_0: \beta_i = 0$ using $z = \widehat\beta_i / SE(\widehat\beta_i)$; confidence intervals for $\beta_1$ and the odds ratio $(e^{\beta_1})$ via `confint.default()`.
+
+- **Deviance**: Logistic regression uses maximum likelihood estimation; $-2\log(L)$ is the **residual deviance**; smaller is better, analogous to SSE in linear regression.
+
+- **Drop-in-Deviance ($G$) test**: $G = \text{Null deviance} - \text{Residual deviance}$, compared to $\chi^2_k$; use `anova(model, test = "Chisq")` in R to test overall model fit.
+
+:::
+
+

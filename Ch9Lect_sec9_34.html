@@ -1,850 +1,1373 @@
 <!DOCTYPE html>
-<html lang="" xml:lang="">
-  <head>
-    <title>Chapter 9: Logistic Regression</title>
-    <meta charset="utf-8" />
-    <script src="libs/header-attrs-2.30/header-attrs.js"></script>
-    <link href="libs/panelset-0.3.0/panelset.css" rel="stylesheet" />
-    <script src="libs/panelset-0.3.0/panelset.js"></script>
-    <script src="libs/clipboard-2.0.6/clipboard.min.js"></script>
-    <link href="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.css" rel="stylesheet" />
-    <script src="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.js"></script>
-    <script>window.xaringanExtraClipboard(null, {"button":"Copy Code","success":"Copied!","error":"Press Ctrl+C to Copy"})</script>
-    <link href="libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
-    <script src="libs/tile-view-0.2.6/tile-view.js"></script>
-    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
-    <link rel="stylesheet" href="extra.css" type="text/css" />
-  </head>
-  <body>
-    <textarea id="source">
-class: center, middle, inverse, title-slide
+<html lang="en"><head>
+<script src="Ch9Lect_sec9_34_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Ch9Lect_sec9_34_files/libs/quarto-html/tabby.min.js"></script>
+<script src="Ch9Lect_sec9_34_files/libs/quarto-html/popper.min.js"></script>
+<script src="Ch9Lect_sec9_34_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="Ch9Lect_sec9_34_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Ch9Lect_sec9_34_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="Ch9Lect_sec9_34_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.7.32">
+
+  <meta name="author" content="MATH 360">
+  <title>Section 9.3-9.4: Assessing the model and Inference</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="Ch9Lect_sec9_34_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="Ch9Lect_sec9_34_files/libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; font-weight: bold; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="Ch9Lect_sec9_34_files/libs/revealjs/dist/theme/quarto-058ed7857b049b98b55e03cce1641ab5.css">
+  <link href="Ch9Lect_sec9_34_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="Ch9Lect_sec9_34_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="Ch9Lect_sec9_34_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="Ch9Lect_sec9_34_files/libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
+  <link href="Ch9Lect_sec9_34_files/libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
+  <link href="Ch9Lect_sec9_34_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" data-background-color="#EA6820" class="quarto-title-block center">
+  <h1 class="title">Section 9.3-9.4: Assessing the model and Inference</h1>
+  <p class="subtitle">Statistical Modeling</p>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+MATH 360 
+</div>
+</div>
+</div>
+
+</section>
+<section id="outline" class="slide level2">
+<h2>Outline</h2>
+<ul>
+<li><p>Conditions for logistic regression</p>
+<ul>
+<li><p>Linearity</p></li>
+<li><p>Empirical logit plot</p></li>
+</ul></li>
+<li><p>Tests and CIs for slope</p></li>
+<li><p>Evaluating overall fit</p>
+<ul>
+<li><p>G statistic</p></li>
+<li><p>Disaggregate (long)/Aggregate (short) form in R</p></li>
+</ul></li>
+</ul>
+</section>
+<section id="inference-conditions-for-logistic-regression" class="slide level2 smaller">
+<h2>Inference Conditions for Logistic Regression</h2>
+<ul>
+<li class="fragment"><p><strong>Linearity</strong>: The logits (log odds) should have a linear relationship with the predictor.</p></li>
+<li class="fragment"><p><strong>Independence</strong>: No pairing or clustering of data.</p></li>
+<li class="fragment"><p><strong>Random</strong>: Either a random sample from a population OR random assignment within an experiment.</p></li>
+<li class="fragment"><p><strong><del>Normality</del></strong>: This does not apply.</p>
+<ul>
+<li class="fragment">The responses are 0/1.</li>
+</ul></li>
+<li class="fragment"><p><strong><del>Constant variance</del></strong>: Does not apply.</p>
+<ul>
+<li class="fragment">Variability in <span class="math inline">\(Y\)</span> is highest when <span class="math inline">\(\pi\)</span> is near 1/2 lowest when <span class="math inline">\(\pi\)</span> is near 0 or 1.</li>
+</ul></li>
+</ul>
+</section>
+<section id="checking-for-linearity" class="slide level2 smaller">
+<h2>Checking for Linearity</h2>
+<h3 id="empirical-logit-plot">Empirical Logit Plot</h3>
+<ol type="1">
+<li><p>Find the sample proportion <span class="math inline">\(\hat p\)</span> for each value of the predictor.</p></li>
+<li><p>Plot <span class="math inline">\(\log\left(\frac{\hat p}{1-\hat p}\right)\)</span> vs <span class="math inline">\(x\)</span> and look for a linear trend.</p></li>
+</ol>
+<div class="fragment">
+<p><br></p>
+<p><strong>Note:</strong> When the predictor has many values (few repeats), choose intervals of predictor values and plot the group logits versus the group predictor means.</p>
+<ul>
+<li>The function <code>emplogitplot1()</code> in <strong>Stat2Data</strong> is very useful for constructing these plots.</li>
+</ul>
+</div>
+</section>
+<section id="two-forms-of-logistic-data" class="slide level2 smaller">
+<h2>Two Forms of Logistic Data</h2>
+<div class="fragment">
+<ol type="1">
+<li><strong>Disaggregate (long) form</strong>: Response variable <span class="math inline">\(Y=\)</span> Success/Failure or 1/0 and each case is a row</li>
+</ol>
+<ul>
+<li><p><strong>Binary (Bernoulli) response</strong> logistic regression</p></li>
+<li><p>e.g., <strong>Putts1</strong> data</p></li>
+</ul>
+</div>
+<div class="fragment">
+<ol start="2" type="1">
+<li><strong>Aggegrate (short) form</strong>: Response variable <span class="math inline">\(Y=\)</span> Count of Successes for a group of data with a common <span class="math inline">\(X\)</span> value</li>
+</ol>
+<ul>
+<li><p><strong>Binomial counts</strong> logistic regression</p></li>
+<li><p>e.g., <strong>Putts2</strong> has 5 cases for each distance of putt</p></li>
+</ul>
+</div>
+<div class="fragment">
+<p><strong>Note:</strong>The aggregate form simplifies construction of empirical logit plots.</p>
+</div>
+</section>
+<section id="section" class="slide level2 smaller">
+<h2></h2>
+<h3 id="empirical-plots-using-putts2-data">Empirical Plots Using Putts2 Data</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a><span class="fu">data</span>(Putts2)</span>
+<span id="cb1-2"><a href=""></a>Putts2 <span class="ot">&lt;-</span> <span class="fu">mutate</span>(Putts2, <span class="at">LogitMade =</span> <span class="fu">log</span>(Made<span class="sc">/</span>Missed))</span>
+<span id="cb1-3"><a href=""></a><span class="co"># Fit model to aggregated data</span></span>
+<span id="cb1-4"><a href=""></a>lmod_Putts2 <span class="ot">&lt;-</span> <span class="fu">glm</span>(<span class="fu">cbind</span>(Made, Missed) <span class="sc">~</span> Length, </span>
+<span id="cb1-5"><a href=""></a>                   <span class="at">family =</span> binomial, <span class="at">data =</span> Putts2)</span>
+<span id="cb1-6"><a href=""></a>mymod_fun <span class="ot">&lt;-</span> <span class="fu">makeFun</span>(lmod_Putts2, <span class="at">type =</span> <span class="st">"link"</span>)</span>
+<span id="cb1-7"><a href=""></a><span class="fu">gf_point</span>(LogitMade <span class="sc">~</span> Length, <span class="at">data =</span> Putts2) <span class="sc">|&gt;</span> </span>
+<span id="cb1-8"><a href=""></a>  <span class="fu">gf_fun</span>(mymod_fun, <span class="at">color =</span> <span class="st">"red"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+</div>
+<img data-src="Ch9Lect_sec9_34_files/figure-revealjs/unnamed-chunk-1-1.png" width="960" class="r-stretch"></section>
+<section id="section-1" class="slide level2 smaller">
+<h2></h2>
+<h3 id="makefun-in-logistic-regression-link-vs-response"><code>makeFun()</code> in Logistic Regression: <code>"link"</code> vs <code>"response"</code></h3>
+<div class="fragment">
+<h4 id="start-with-a-fitted-logistic-model">Start with a fitted logistic model</h4>
+<p><span class="math display">\[
+\text{logit}(\widehat\pi)=\widehat\beta_0 + \widehat\beta_1 x
+\qquad\text{where}\qquad
+\text{logit}(\widehat\pi)=\log\left(\frac{
+\widehat \pi}{1-\widehat \pi}\right)
+\]</span></p>
+<p>In R, we fit this with <code>glm(..., family = binomial)</code>.</p>
+</div>
+<p><br></p>
+<div class="fragment">
+<h4 id="makefun-can-return-predictions-on-two-scales"><code>makeFun()</code> can return predictions on <em>two</em> scales</h4>
+<ul>
+<li><strong>Link scale</strong> = the model’s straight-line output (log-odds)</li>
+<li><strong>Response scale</strong> = the probability <span class="math inline">\(p\)</span> (between 0 and 1)</li>
+</ul>
+</div>
+</section>
+<section id="section-2" class="slide level2 smaller">
+<h2></h2>
+<h3 id="makefun-in-logistic-regression-link-scale"><code>makeFun()</code> in Logistic Regression: Link scale</h3>
+<div class="fragment">
+<h4 id="option-1-type-link-log-odds">Option 1: <code>type = "link"</code> (log-odds)</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href=""></a>f_link <span class="ot">&lt;-</span> <span class="fu">makeFun</span>(mod, <span class="at">type =</span> <span class="st">"link"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This returns</p>
+<p><span class="math display">\[
+\log\left(\frac{\widehat{\pi}}{1-\widehat{\pi}}\right)=\widehat\beta_0 + \widehat\beta_1 x
+\]</span></p>
+<ul>
+<li>output is <strong>log-odds</strong></li>
+<li>graph is a <strong>straight line</strong></li>
+<li>values can be any real number</li>
+</ul>
+</div>
+</section>
+<section id="section-3" class="slide level2 smaller">
+<h2></h2>
+<h3 id="makefun-in-logistic-regression-response-scale"><code>makeFun()</code> in Logistic Regression: Response scale</h3>
+<div class="fragment">
+<h4 id="option-2-type-response-probability">Option 2: <code>type = "response"</code> (probability)</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href=""></a>f_prob <span class="ot">&lt;-</span> <span class="fu">makeFun</span>(mod, <span class="at">type =</span> <span class="st">"response"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This returns</p>
+<p><span class="math display">\[
+\widehat{\pi}(x)=\frac{e^{\widehat\beta_0+\widehat\beta_1 x}}{1+e^{\widehat\beta_0+\widehat\beta_1 x}}
+\]</span></p>
+<ul>
+<li>output is a <strong>probability</strong></li>
+<li>graph is an <strong>S-curve</strong></li>
+<li>values stay in <span class="math inline">\([0,1]\)</span></li>
+</ul>
+</div>
+</section>
+<section id="section-4" class="slide level2 smaller">
+<h2></h2>
+<h3 id="which-type-should-i-use">Which <code>type=</code> should I use?</h3>
+<div class="fragment">
+<ul>
+<li><p>To <strong>plot predicted probabilities</strong> with <code>gf_fun()</code>: use <code>type = "response"</code></p></li>
+<li><p>To show the <strong>straight-line structure</strong> logistic regression fits: use <code>type = "link"</code></p></li>
+</ul>
+<p><span class="math display">\[
+\text{line in log-odds} \;\Rightarrow\; \text{S-curve in probability}
+\]</span></p>
+</div>
+</section>
+<section id="section-5" class="slide level2 smaller">
+<h2></h2>
+<h3 class="smaller" id="empirical-logit-plot-using-disaggregate-data">Empirical Logit Plot Using Disaggregate Data</h3>
+<h4 id="emplogitplot1-function"><code>emplogitplot1()</code> function</h4>
+<p><code>ngroups = "all"</code> uses all unique <span class="math inline">\(x\)</span> values</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href=""></a><span class="fu">data</span>(Putts1)</span>
+<span id="cb4-2"><a href=""></a><span class="co"># Automate plot with emplogitplot1() function in Stat2Data</span></span>
+<span id="cb4-3"><a href=""></a><span class="fu">emplogitplot1</span>(Made <span class="sc">~</span> Length, <span class="at">data =</span> Putts1, <span class="at">ngroups =</span> <span class="st">"all"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+</div>
+<img data-src="Ch9Lect_sec9_34_files/figure-revealjs/unnamed-chunk-4-1.png" width="960" class="r-stretch"></section>
+<section id="empirical-logit-plots" class="slide level2 smaller">
+<h2>Empirical Logit Plots</h2>
+<h3 id="two-possible-problems">Two possible problems:</h3>
+<ol type="1">
+<li class="fragment">Typically, there may be many different x-values with few (or only one) cases at each.</li>
+</ol>
+<ul>
+<li class="fragment">Solution: Group the predictor values into bins of similar values and plot vs.&nbsp;the mean predictor for each bin.</li>
+</ul>
+<ol start="2" type="1">
+<li class="fragment">A sample proportion could be 0 or 1 (making log(odds) undefined).</li>
+</ol>
+<ul>
+<li class="fragment"><p>Solution: Define adjusted proportion as</p>
+<p><span class="math display">\[\hat p_\text{adj}=\frac{\#\text{Yes}+1/2}{\#\text{Yes}+\#\text{No}+1}\]</span></p></li>
+</ul>
+</section>
+<section id="section-6" class="slide level2 smaller">
+<h2></h2>
+<h3 id="empirical-logit-plot-for-medgpa-data">Empirical Logit Plot for MedGPA Data</h3>
+<p>There are 15 different MCAT score values (18 to 48)</p>
+<ul>
+<li>Use 5 ad hoc groups (18-30), (31-34), (35-38), (39-42), (43-48)</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href=""></a><span class="fu">data</span>(<span class="st">"MedGPA"</span>)</span>
+<span id="cb5-2"><a href=""></a><span class="co"># out = TRUE outputs dataframe with group info</span></span>
+<span id="cb5-3"><a href=""></a><span class="fu">emplogitplot1</span>(Acceptance <span class="sc">~</span> MCAT, <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">30</span>, <span class="dv">34</span>, <span class="dv">38</span>, <span class="dv">42</span>, <span class="dv">48</span>),</span>
+<span id="cb5-4"><a href=""></a>              <span class="at">data =</span> MedGPA, <span class="at">out =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+<div class="cell-output cell-output-stdout">
+<pre><code>  Group Cases XMin XMax    XMean NumYes  Prop AdjProp      Logit
+1     1     2   18   27 22.50000      0 0.000   0.167 -1.6070398
+2     2    18   31   34 32.77778      6 0.333   0.342 -0.6543942
+3     3    15   35   38 36.20000      9 0.600   0.594  0.3805262
+4     4    17   39   41 39.76471     12 0.706   0.694  0.8188869
+5     5     3   45   48 47.00000      3 1.000   0.875  1.9459101</code></pre>
+</div>
+</div>
+<img data-src="Ch9Lect_sec9_34_files/figure-revealjs/unnamed-chunk-5-1.png" width="960" class="r-stretch"></section>
+<section id="section-7" class="slide level2 smaller">
+<h2></h2>
+<h4 id="empirical-logit-plot-for-medgpa-data-1">Empirical Logit Plot for MedGPA Data</h4>
+<ul>
+<li>Explicitly specify number of groups and R picks intervals to make group size (roughly) equal.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href=""></a><span class="fu">emplogitplot1</span>(Acceptance <span class="sc">~</span> MCAT, <span class="at">ngroups =</span> <span class="dv">5</span>, </span>
+<span id="cb7-2"><a href=""></a>              <span class="at">data =</span> MedGPA, <span class="at">out =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+<div class="cell-output cell-output-stdout">
+<pre><code>  Group Cases XMin XMax    XMean NumYes  Prop AdjProp      Logit
+1     1    11   18   32 30.00000      2 0.182   0.208 -1.3370233
+2     2    14   33   35 34.28571      8 0.571   0.567  0.2696216
+3     3    10   36   38 36.80000      5 0.500   0.500  0.0000000
+4     4    13   39   40 39.38462      9 0.692   0.679  0.7491800
+5     5     7   41   48 43.57143      6 0.857   0.812  1.4630584</code></pre>
+</div>
+</div>
+<img data-src="Ch9Lect_sec9_34_files/figure-revealjs/unnamed-chunk-6-1.png" width="960" class="r-stretch"></section>
+<section>
+<section id="formal-inference-tests-and-intervals" class="title-slide slide level1 peach-slide center">
+<h1>Formal Inference: Tests and Intervals</h1>
+
+</section>
+<section id="section-8" class="slide level2 smaller">
+<h2></h2>
+<h3 id="logistic-output-for-putting-example-putts1">Logistic Output for Putting Example (Putts1)</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href=""></a>lmod_Putts1 <span class="ot">&lt;-</span> <span class="fu">glm</span>(Made <span class="sc">~</span> Length, <span class="at">data =</span> Putts1, <span class="at">family =</span> binomial)</span>
+<span id="cb9-2"><a href=""></a><span class="co"># If stars cause problems with render</span></span>
+<span id="cb9-3"><a href=""></a><span class="fu">options</span>(<span class="at">show.signif.stars =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb9-4"><a href=""></a><span class="fu">summary</span>(lmod_Putts1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = Made ~ Length, family = binomial, data = Putts1)
 
-.title[
-# Chapter 9: Logistic Regression
-]
-.subtitle[
-## Sections 9.3-9.4
-]
-.date[
-### Applied Statistics II
-]
-
----
-
-
-
-
-
-
-
-
-
-
-
-&lt;style type="text/css"&gt;
-.highlight-last-item &gt; ul &gt; li,
-.highlight-last-item &gt; ol &gt; li {
-  opacity: 0.5;
-}
-.highlight-last-item &gt; ul &gt; li:last-of-type,
-.highlight-last-item &gt; ol &gt; li:last-of-type {
-  opacity: 1;
-}
-&lt;/style&gt;
-
-# Outline 
-
-- Conditions for logistic regression
-
-  - Linearity
-  
-  - Empirical logit plot
-  
-- Tests and CIs for slope
-
-- Evaluating overall fit
-
-  - G statistic
-
-  - Disaggregate (long)/Aggregate (short) form in R
-
----
-
-## Inference Conditions for Logistic Regression
-
-- **Linearity**: The logits (log odds) should have a linear relationship with the predictor.
-
---
-
-- **Independence**: No pairing or clustering of data.
-
---
-
-- **Random**: Either a random sample from a population OR random assignment within an experiment.
-
---
-
-- **~~Normality~~**: This does not apply.
-
-  - The responses are 0/1.
-
---
-
-- **~~Constant variance~~**: Does not apply.
-
-  - Variability in `\(Y\)` is highest when `\(\pi\)` is near 1/2 lowest when `\(\pi\)` is near 0 or 1.
-
-
----
-
-## Checking Linearity for Logistic Regression
-
-### Empirical Logit Plot
-
-1. Find the sample proportion `\(\hat p\)` for each value of the predictor.
-
-2. Plot `\(\log\left(\frac{\hat p}{1-\hat p}\right)\)` vs `\(x\)` and look for a linear trend.
-
-&lt;br&gt;
-
-**Note:** When  the predictor has many values (few repeats),  choose intervals of predictor values and plot the group logits versus the group predictor means.
-
-  - The function `emplogitplot1()` in **Stat2Data** is very useful for constructing these plots.
-  
----
-
-## Two Forms of Logistic Daa
-
-1. **Disaggregate (long) form**: Response variable `\(Y=\)` Success/Failure or 1/0 and each case is a row
-
-  - **Binary (Bernoulli) response** logistic regression
-
-  - e.g., **Putts1** data
-  
---
-  
-2. **Aggegrate (short) form**: Response variable `\(Y=\)` Count of Successes for a group of data with a common `\(X\)` value
-
-  - **Binomial counts** logistic regression
-  
-  - e.g., **Putts2** has 5 cases for each distance of putt
-
---
-
-&lt;br&gt; 
-
-**Note:**The aggregate form simplifies construction of empirical logit plots.
-
----
-
-### Empirical Plots Using Putts2 Data
-
-.panelset[
-
-.panel[.panel-name[Code]
-
-``` r
-Putts2 &lt;- mutate(Putts2, LogitMade = log(Made/Missed))
-lmod_Putts2 &lt;- glm(cbind(Made, Missed) ~ Length, family = binomial, data = Putts2)
-mymod_fun &lt;- makeFun(lmod_Putts2)
-gf_point(LogitMade ~ Length, data = Putts2) %&gt;%
-  gf_coefline(model = lmod_Putts2, color = "red")
-```
-
-
-
-]
-
-.panel[.panel-name[Output]
-
-&lt;img src="Ch9Lect_sec9_34_files/figure-html/unnamed-chunk-2-1.png" alt="" width="90%" /&gt;
-
-]
-]
-
----
-
-### Empirical Logit Plot Using Putts1
-
-.panelset[
-
-.panel[.panel-name[Code]
-
-``` r
-# Automate plot with emplogitplot1() function in Stat2Data
-# 
-emplogitplot1(Made ~ Length, data = Putts1, ngroups = "all")
-```
-
-
-
-]
-
-.panel[.panel-name[Output]
-
-&lt;img src="Ch9Lect_sec9_34_files/figure-html/unnamed-chunk-3-1.png" alt="" width="90%" /&gt;
-
-]
-]
-
-
----
-
-## Empirical Logit Plots
-
-### Two possible problems:
-
-1. Typically, there may be many different x-values with few (or only one) cases at each.
-  
-  - Solution: Group the predictor values into bins of similar values and plot vs. the mean predictor for each bin.
-  
-2. A sample proportion could be 0 or 1 (making log(odds) undefined).
-  
-  - Solution: Define adjusted proportion as
-    
-    `$$\hat p_\text{adj}=\frac{\#\text{Yes}+1/2}{\#\text{Yes}+\#\text{No}+1}$$`
-
----
-
-### Empirical Logit Plot for MedGPA Data
-
-There are 15 different MCAT scort values (18 to 48)
-
-  - Use 5 ad hoc groups (18-30), (31-34), (35-38), (39-42), (43-48)
-
-
-``` r
-emplogitplot1(Acceptance ~ MCAT, breaks = c(0, 30, 34, 38, 42, 48), data = MedGPA, out = TRUE)
-```
-
-
-```
-##   Group Cases XMin XMax    XMean NumYes  Prop AdjProp      Logit
-## 1     1     2   18   27 22.50000      0 0.000   0.167 -1.6070398
-## 2     2    18   31   34 32.77778      6 0.333   0.342 -0.6543942
-## 3     3    15   35   38 36.20000      9 0.600   0.594  0.3805262
-## 4     4    17   39   41 39.76471     12 0.706   0.694  0.8188869
-## 5     5     3   45   48 47.00000      3 1.000   0.875  1.9459101
-```
-
----
-
-### Empirical Logit Plot for MedGPA Data
-
-&lt;img src="Ch9Lect_sec9_34_files/figure-html/unnamed-chunk-6-1.png" alt="" width="90%" /&gt;
-
----
-
-### Empirical Logit Plot for MedGPA Data
-
-Specify number of groups and R picks intervals to make group size (rougly) equal
-
-
-``` r
-emplogitplot1(Acceptance ~ MCAT, ngroups = 5, data = MedGPA, out = TRUE)
-```
-
-
-```
-##   Group Cases XMin XMax    XMean NumYes  Prop AdjProp      Logit
-## 1     1    11   18   32 30.00000      2 0.182   0.208 -1.3370233
-## 2     2    14   33   35 34.28571      8 0.571   0.567  0.2696216
-## 3     3    10   36   38 36.80000      5 0.500   0.500  0.0000000
-## 4     4    13   39   40 39.38462      9 0.692   0.679  0.7491800
-## 5     5     7   41   48 43.57143      6 0.857   0.812  1.4630584
-```
-
-
---
-
-&lt;br&gt;
-
-**Note:** Means for `\(X\)` values are the actual means of those in the group, not the midpoint of the interval.
-
----
-
-class: center, middle, inverse
-
-# Formal Inference: Tests and Intervals
-
----
-
-### Logistic Output for Putting Example (Putts1)
-
-
-``` r
-lmod_putts &lt;- glm(Made ~ Length, family = binomial, data = Putts1)
-summary(lmod_putts)
-```
-
-```
-## 
-## Call:
-## glm(formula = Made ~ Length, family = binomial, data = Putts1)
-## 
-## Coefficients:
-##             Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)  3.25684    0.36893   8.828   &lt;2e-16 ***
-## Length      -0.56614    0.06747  -8.391   &lt;2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## (Dispersion parameter for binomial family taken to be 1)
-## 
-##     Null deviance: 800.21  on 586  degrees of freedom
-## Residual deviance: 719.89  on 585  degrees of freedom
-## AIC: 723.89
-## 
-## Number of Fisher Scoring iterations: 4
-```
-
----
-
-### Logistic Output for Putting Example (Putts1)
-
-- What are the the `\(z\)`-tests?
-
-- What is the deviance about?
-
-- Is there a test like the overall `\(F\)`-test?
-
----
-
-### Recall: Ordinary Linear Regression Output
-
-
-``` r
-regmod_putts &lt;- lm(Made ~ Length, data = Putts1)
-summary(regmod_putts)
-```
-
-```
-## 
-## Call:
-## lm(formula = Made ~ Length, data = Putts1)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -0.8440 -0.4650  0.1560  0.4087  0.6613 
-## 
-## Coefficients:
-##             Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)  1.22295    0.07155  17.091   &lt;2e-16 ***
-## Length      -0.12633    0.01346  -9.383   &lt;2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 0.4616 on 585 degrees of freedom
-## Multiple R-squared:  0.1308,	Adjusted R-squared:  0.1293 
-## F-statistic: 88.04 on 1 and 585 DF,  p-value: &lt; 2.2e-16
-```
-
-???
-
-- `\(t\)`-Tests for individual coefficients
-
-- Residual standard error and `\(R^2\)` to compare models
-
-- `\(F\)`-test for overall fit
-
-
----
-
-### Wald’s `\(z\)`-Test for Individual Coefficients
-
-**Hypotheses**
-
-- `\(H_0:\beta_i=0\)` versus `\(H_a:\beta_i\neq 0\)`
-  
---
-
-**Test statistic**
-
-- `\(\displaystyle z=\frac{\hat\beta_i}{SE(\hat\beta_i)}\)`
-
---
-
-**P-value**
-
-- `\(P\)`-value `\(=2P(Z&gt;|z|)\)`
-
----
-
-### Confidence Intervals for Slope and Odds Ratio
-
-- For simple logistic regression, use the SE to find a confidence interval for `\(\beta_1\)`:
-
-  - Calculate `\(\hat\beta_i\pm z^*\cdot\text{SE}\)`
-
----
-
-## Example: Putting Data
-
-**Logistic Model Output**
-
-```
 Coefficients:
-            Estimate Std. Error z value Pr(&gt;|z|)    
-(Intercept)  3.25684    0.36893   8.828   &lt;2e-16 ***
-Length      -0.56614    0.06747  -8.391   &lt;2e-16 ***
-```
+            Estimate Std. Error z value Pr(&gt;|z|)
+(Intercept)  3.25684    0.36893   8.828   &lt;2e-16
+Length      -0.56614    0.06747  -8.391   &lt;2e-16
 
-**Calculations**
-
-- **CI for slope**: `\(-0.566 \pm 1.96(0.06747) = (-0.698, -0.434)\)`
-
-- **CI for the odds ratio `\((e^{\hat\beta_1})\)`:** exponentiate the CI for `\(\beta_1\)`
-
-  - **CI for OR:** `\((e^{-0.698}, e^{-0.434})=(0.497,0.648)\)`
-  
-- **Interpretation** in context:
-
-  - "We are 95% confident that the **odds of making** a putt decrease by a factor between 0.50 and 0.65 for every extra foot in length."
-  
----
-
-### R commands for CI for Slope and Odds Ratio
-
-**CIs for coefficient**
-
-
-``` r
-confint(lmod_putts)
-```
-
-```
-##                  2.5 %     97.5 %
-## (Intercept)  2.5492465  3.9972923
-## Length      -0.7010561 -0.4362681
-```
-
-&lt;br&gt;
-
-**CIs for Odds Ratio**
-
-
-``` r
-exp(confint(lmod_putts))
-```
-
-```
-##                  2.5 %     97.5 %
-## (Intercept) 12.7974573 54.4505172
-## Length       0.4960611  0.6464444
-```
-
-
----
-
-class: center, middle, inverse
-
-# Estimating Parameters in Logistic Regression
-
----
-
-## Estimating Parameters in Logistic Regression
-
-- **Maximum Likelihood Estimation**: Parameters are chosen to maximize the *likelihood* of the observed sample.
-
-- **The likelihood function:** `$$L=\prod \hat\pi_i^{y_i}(1-\hat\pi)^{1-y_i}$$`
-
-  - If the `\(i\)`th data point is YES `\((y_i=1)\)`, calculate `\(\hat\pi_i\)`
-
-  - If the `\(i\)`th data point is NO `\((y_i=0)\)`, calculate `\(1-\hat\pi_i\)`
-
-&lt;br&gt;
-
-- Want `\(L\)` to be as large as possible
-
-  - Coefficients of the logistic regression model are chosen to make `\(\log(L)\)` as large as possible
-  
-  - `\(\hat\beta_1\)` is the **maximum likelihood estimator** of `\(\beta_1\)`
-  
----
-
-### Residual Deviance: R Output
-
-- In assessing the overall fit, we often look at `\(-2\log(L)\)`, labeled as the **residual deviance** in R.
-
-```
-Coefficients:
-            Estimate Std. Error z value Pr(&gt;|z|)    
-(Intercept)  3.25684    0.36893   8.828   &lt;2e-16 ***
-Length      -0.56614    0.06747  -8.391   &lt;2e-16 ***
----
+(Dispersion parameter for binomial family taken to be 1)
 
     Null deviance: 800.21  on 586  degrees of freedom
 Residual deviance: 719.89  on 585  degrees of freedom
 AIC: 723.89
-```
 
-- For the **Putts1** data, `\(-2\log(L)=-2\cdot(-359.95)=719.9\)`
+Number of Fisher Scoring iterations: 4</code></pre>
+</div>
+</div>
+</section>
+<section id="inference-with-logistic-models" class="slide level2">
+<h2>Inference with Logistic Models</h2>
+<ul>
+<li><p>What are the the <span class="math inline">\(z\)</span>-tests?</p></li>
+<li><p>What is the deviance about?</p></li>
+<li><p>Is there a test like the overall <span class="math inline">\(F\)</span>-test?</p></li>
+<li><p>Is there something like a nested <span class="math inline">\(F\)</span>-test?</p></li>
+</ul>
+</section>
+<section id="section-9" class="slide level2 smaller">
+<h2></h2>
+<h3 id="recall-ordinary-linear-regression-output">Recall: Ordinary Linear Regression Output</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href=""></a>regmod_putts <span class="ot">&lt;-</span> <span class="fu">lm</span>(Made <span class="sc">~</span> Length, <span class="at">data =</span> Putts1)</span>
+<span id="cb11-2"><a href=""></a><span class="fu">summary</span>(regmod_putts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = Made ~ Length, data = Putts1)
 
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-0.8440 -0.4650  0.1560  0.4087  0.6613 
 
-``` r
-# Extract log-likelihood but we never need to do this
-logLik(lmod_putts)
-```
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)
+(Intercept)  1.22295    0.07155  17.091   &lt;2e-16
+Length      -0.12633    0.01346  -9.383   &lt;2e-16
 
-```
-## 'log Lik.' -359.9456 (df=2)
-```
-
-
-- **Usage note:** We want deviance to be small (like SSE of linear regression).
-
-
----
-
-### Example: Predict Acceptance for MedGPA Data
-
-**Using GPA**
-
-
-``` r
-lmmod_gpa &lt;- glm(Acceptance ~ GPA, family = binomial, data = MedGPA)
-summary(lmmod_gpa)
-```
-
-```
+Residual standard error: 0.4616 on 585 degrees of freedom
+Multiple R-squared:  0.1308,    Adjusted R-squared:  0.1293 
+F-statistic: 88.04 on 1 and 585 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<h4 id="recall">Recall</h4>
+<ul>
+<li><p><span class="math inline">\(t\)</span>-Tests for individual coefficients</p></li>
+<li><p>Residual standard error and <span class="math inline">\(R^2\)</span> to compare models</p></li>
+<li><p><span class="math inline">\(F\)</span>-test for overall fit</p></li>
+</ul>
+</section>
+<section id="section-10" class="slide level2 smaller">
+<h2></h2>
+<h3 id="walds-z-test-for-individual-coefficients">Wald’s <span class="math inline">\(z\)</span>-Test for Individual Coefficients</h3>
+<div class="fragment">
+<p><strong>Hypotheses</strong></p>
+<ul>
+<li><span class="math inline">\(H_0:\beta_i=0\)</span> versus <span class="math inline">\(H_a:\beta_i\neq 0\)</span></li>
+</ul>
+</div>
+<div class="fragment">
+<p><strong>Test statistic</strong></p>
+<ul>
+<li><span class="math inline">\(\displaystyle z=\frac{\hat\beta_i}{SE(\hat\beta_i)}\)</span></li>
+</ul>
+</div>
+<div class="fragment">
+<p><strong>P-value</strong></p>
+<ul>
+<li><span class="math inline">\(P\)</span>-value <span class="math inline">\(=2P(Z&gt;|z|)\)</span></li>
+</ul>
+</div>
+<div class="fragment">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Note</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li>Inference relies on large sample normal approximations</li>
+<li>Closely parallels regression inference procedures</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="section-11" class="slide level2">
+<h2></h2>
+<h3 id="confidence-intervals-for-slope-and-odds-ratio">Confidence Intervals for Slope and Odds Ratio</h3>
+<ul>
+<li><p>For simple logistic regression, simply use the SE to find a Wald confidence interval for <span class="math inline">\(\beta_1\)</span>:</p>
+<ul>
+<li>Calculate <span class="math inline">\(\hat\beta_i\pm z^*\cdot\text{SE}\)</span></li>
+</ul></li>
+</ul>
+</section>
+<section id="section-12" class="slide level2 smaller">
+<h2></h2>
+<h3 id="example-putting-data">Example: Putting Data</h3>
+<p><strong>Logistic Model Output</strong></p>
+<pre><code>Coefficients:
             Estimate Std. Error z value Pr(&gt;|z|)    
-(Intercept)  -19.207      5.629  -3.412 0.000644 ***
-GPA            5.454      1.579   3.454 0.000553 ***
----
+(Intercept)  3.25684    0.36893   8.828   &lt;2e-16 ***
+Length      -0.56614    0.06747  -8.391   &lt;2e-16 ***</code></pre>
+<p><strong>Calculations</strong></p>
+<ul>
+<li class="fragment"><p><strong>CI for slope</strong>: <span class="math inline">\(-0.566 \pm 1.96(0.06747) \Rightarrow (-0.698, -0.434)\)</span></p></li>
+<li class="fragment"><p><strong>CI for the odds ratio <span class="math inline">\((e^{\hat\beta_1})\)</span>:</strong> exponentiate the CI for <span class="math inline">\(\beta_1\)</span></p>
+<ul>
+<li class="fragment"><strong>CI for OR:</strong> <span class="math inline">\((e^{-0.698}, e^{-0.434}) \Rightarrow (0.497,0.648)\)</span></li>
+</ul></li>
+<li class="fragment"><p><strong>Interpretation</strong> in context:</p>
+<blockquote>
+<p>“We are 95% confident that the <strong>odds of making</strong> a putt decreases by a factor between 0.50 and 0.65 for every extra foot in length.”</p>
+</blockquote></li>
+</ul>
+</section>
+<section id="section-13" class="slide level2 smaller">
+<h2></h2>
+<h3 id="r-commands-for-ci-for-slope-and-odds-ratio">R commands for CI for Slope and Odds Ratio</h3>
+<p><strong>CIs for coefficient</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href=""></a><span class="fu">confint.default</span>(lmod_Putts1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                2.5 %     97.5 %
+(Intercept)  2.533746  3.9799310
+Length      -0.698382 -0.4339014</code></pre>
+</div>
+</div>
+<p><br></p>
+<p><strong>CIs for Odds Ratio</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href=""></a><span class="fu">exp</span>(<span class="fu">confint.default</span>(lmod_Putts1))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                 2.5 %     97.5 %
+(Intercept) 12.6006177 53.5133410
+Length       0.4973894  0.6479761</code></pre>
+</div>
+</div>
+<p><br></p>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Note</strong></p>
+</div>
+<div class="callout-content">
+<p>Use <code>confint.default()</code> to get the Wald intervals presented here and in the text.</p>
+</div>
+</div>
+</div>
+</section></section>
+<section>
+<section id="estimating-parameters-in-logistic-regression" class="title-slide slide level1 peach-slide center">
+<h1>Estimating Parameters in Logistic Regression</h1>
+
+</section>
+<section id="section-14" class="slide level2 smaller">
+<h2></h2>
+<h3 id="the-likelihood-in-logistic-regression">The “Likelihood” in Logistic Regression?</h3>
+<ul>
+<li class="fragment">In intro stats, we estimated a single proportion:</li>
+</ul>
+<p><span class="math display">\[
+\hat p = \frac{\text{\# Successes}}{n}
+\]</span></p>
+<ul>
+<li class="fragment"><p>In logistic regression, each person has their <strong>own probability</strong>:</p>
+<p><span class="math display">\[
+\hat\pi_i = P(\text{Success} \mid x_i)
+\]</span></p></li>
+<li class="fragment"><p>If we assume observations are independent, the probability of seeing the <strong>entire dataset</strong> is the product of each individual probability.</p></li>
+<li class="fragment"><p>That product is called the <strong>likelihood</strong>.</p></li>
+</ul>
+</section>
+<section id="section-15" class="slide level2 smaller">
+<h2></h2>
+<h3 id="building-the-likelihood">Building the Likelihood</h3>
+<p>For each data point:</p>
+<ul>
+<li>If <span class="math inline">\(y_i = 1\)</span> (Success), the model assigns probability <span class="math inline">\(\hat\pi_i\)</span></li>
+<li>If <span class="math inline">\(y_i = 0\)</span> (Failure), the model assigns probability <span class="math inline">\(1 - \hat\pi_i\)</span></li>
+</ul>
+<div class="fragment">
+<p>We can write both cases in one formula:</p>
+<p><span class="math display">\[
+L(\beta_0,\beta_1)=
+\prod_{i=1}^{n}
+\hat\pi_i^{y_i}(1-\hat\pi_i)^{1-y_i}
+\]</span></p>
+</div>
+<div class="fragment">
+<ul>
+<li>If <span class="math inline">\(y_i=1\)</span>, this becomes <span class="math inline">\(\hat\pi_i\)</span><br>
+</li>
+<li>If <span class="math inline">\(y_i=0\)</span>, this becomes <span class="math inline">\(1-\hat\pi_i\)</span><br>
+</li>
+</ul>
+</div>
+<div class="fragment">
+<p>So:</p>
+<blockquote>
+<p>The likelihood is the probability that our model assigns to <strong>the data we actually observed.</strong></p>
+</blockquote>
+</div>
+</section>
+<section id="section-16" class="slide level2 smaller">
+<h2></h2>
+<h3 id="what-are-we-maximizing">What Are We Maximizing?</h3>
+<ul>
+<li class="fragment"><p>Different values of <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> give different probabilities <span class="math inline">\(\hat\pi_i\)</span>.</p></li>
+<li class="fragment"><p>Some choices make the observed outcomes very plausible.</p></li>
+<li class="fragment"><p>Other choices make them very unlikely.</p></li>
+<li class="fragment"><p><strong>Maximum Likelihood Estimation (MLE)</strong> chooses the coefficients that make the observed data <strong>most probable.</strong></p></li>
+<li class="fragment"><p>In practice we maximize the <strong>log-likelihood</strong>:</p>
+<p><span class="math display">\[
+\log L
+\]</span></p></li>
+<li class="fragment"><p>The log-likelihood tells us how well the model explains the data.</p></li>
+<li class="fragment"><p>Multiplying by <span class="math inline">\(-2\)</span> gives a quantity called the <strong>deviance</strong>:</p>
+<p><span class="math display">\[
+\text{Deviance} = -2 \log L
+\]</span></p></li>
+<li class="fragment"><p>Smaller deviance means a better-fitting model.</p></li>
+</ul>
+</section>
+<section id="section-17" class="slide level2 smaller">
+<h2></h2>
+<h3 id="residual-deviance-r-output">Residual Deviance: R Output</h3>
+<ul>
+<li>In R output, the quantity <span class="math inline">\(-2\log(L)\)</span> is labeled as the <strong>residual deviance</strong> in R.</li>
+</ul>
+<pre><code>Coefficients:
+            Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)  3.25684    0.36893   8.828   &lt;2e-16 ***
+Length      -0.56614    0.06747  -8.391   &lt;2e-16 ***
+
+    Null deviance: 800.21  on 586  degrees of freedom
+Residual deviance: 719.89  on 585  degrees of freedom
+AIC: 723.89</code></pre>
+<div class="fragment">
+<ul>
+<li>For the <strong>Putts1</strong> data, <span class="math inline">\(-2\log(L)=-2\cdot(-359.95)=719.9\)</span></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href=""></a><span class="co"># Extract log-likelihood but we really never need to do this</span></span>
+<span id="cb19-2"><a href=""></a><span class="fu">logLik</span>(lmod_Putts1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>'log Lik.' -359.9456 (df=2)</code></pre>
+</div>
+</div>
+</div>
+<div class="fragment">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Note</strong></p>
+</div>
+<div class="callout-content">
+<p>We want deviance to be small (like SSE of linear regression).</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="section-18" class="slide level2 smaller">
+<h2></h2>
+<h3 id="example-predict-acceptance-for-medgpa-data">Example: Predict Acceptance for MedGPA Data</h3>
+<h4 id="using-gpa">Using GPA</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href=""></a>lmmod_gpa <span class="ot">&lt;-</span> <span class="fu">glm</span>(Acceptance <span class="sc">~</span> GPA, <span class="at">family =</span> binomial, </span>
+<span id="cb21-2"><a href=""></a>                 <span class="at">data =</span> MedGPA)</span>
+<span id="cb21-3"><a href=""></a><span class="fu">summary</span>(lmmod_gpa)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = Acceptance ~ GPA, family = binomial, data = MedGPA)
+
+Coefficients:
+            Estimate Std. Error z value Pr(&gt;|z|)
+(Intercept)  -19.207      5.629  -3.412 0.000644
+GPA            5.454      1.579   3.454 0.000553
+
+(Dispersion parameter for binomial family taken to be 1)
+
     Null deviance: 75.791  on 54  degrees of freedom
 Residual deviance: 56.839  on 53  degrees of freedom
-```
+AIC: 60.839
 
+Number of Fisher Scoring iterations: 4</code></pre>
+</div>
+</div>
+</section>
+<section id="section-19" class="slide level2 smaller">
+<h2></h2>
+<h3 id="example-predict-acceptance-for-medgpa-data-1">Example: Predict Acceptance for MedGPA Data</h3>
+<h4 id="using-mcat">Using MCAT</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href=""></a>lmmod_mcat <span class="ot">&lt;-</span> <span class="fu">glm</span>(Acceptance <span class="sc">~</span> MCAT, <span class="at">family =</span> binomial, </span>
+<span id="cb23-2"><a href=""></a>                  <span class="at">data =</span> MedGPA)</span>
+<span id="cb23-3"><a href=""></a><span class="fu">summary</span>(lmmod_mcat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = Acceptance ~ MCAT, family = binomial, data = MedGPA)
 
+Coefficients:
+            Estimate Std. Error z value Pr(&gt;|z|)
+(Intercept) -8.71245    3.23645  -2.692  0.00710
+MCAT         0.24596    0.08938   2.752  0.00592
 
-**Using MCAT**
+(Dispersion parameter for binomial family taken to be 1)
 
-
-``` r
-lmmod_mcat &lt;- glm(Acceptance ~ MCAT, family = binomial, data = MedGPA)
-summary(lmmod_mcat)
-```
-
-```
-            Estimate Std. Error z value Pr(&gt;|z|)   
-(Intercept) -8.71245    3.23645  -2.692  0.00710 **
-MCAT         0.24596    0.08938   2.752  0.00592 **
----
     Null deviance: 75.791  on 54  degrees of freedom
 Residual deviance: 64.697  on 53  degrees of freedom
-```
+AIC: 68.697
 
----
+Number of Fisher Scoring iterations: 4</code></pre>
+</div>
+</div>
+</section>
+<section id="section-20" class="slide level2">
+<h2></h2>
+<h3 id="example-predict-acceptance-for-medgpa-data-2">Example: Predict Acceptance for MedGPA Data</h3>
+<ul>
+<li><p>We prefer the GPA model with:</p>
+<ul>
+<li><p>Lower <strong>Residual deviance</strong> (56.84)</p></li>
+<li><p>Greater <strong>reduction in deviance</strong>: (75.78-64.70) vs (75.78-56.84)</p></li>
+</ul></li>
+</ul>
+</section>
+<section id="section-21" class="slide level2">
+<h2></h2>
+<h3 id="evaluating-overall-fit-drop-in-deviance-test">Evaluating Overall Fit: Drop in Deviance Test</h3>
+<ul>
+<li class="fragment"><p>Test for overall fit (simliar to regression ANOVA)</p>
+<ul>
+<li class="fragment"><p><span class="math inline">\(G=\)</span> improvement in <span class="math inline">\(-2\log(L)\)</span> over a model with constant only (null deviance)</p></li>
+<li class="fragment"><p>Compare to <span class="math inline">\(\chi^2\)</span> with <span class="math inline">\(k\)</span> degrees of freedom (chi-square)</p></li>
+<li class="fragment"><p>If desired, obtain <span class="math inline">\(p\)</span>-value from R or by using the <code>pchisq()</code> function.</p></li>
+</ul></li>
+<li class="fragment"><p>Use <code>anova()</code> with <code>test = "Chisq"</code> to obtain the drop-in-deviance test from R.</p></li>
+</ul>
+</section>
+<section id="section-22" class="slide level2" style="font-size: 60%;">
+<h2></h2>
+<h3 id="drop-in-deviance-g-test-putts1-individual-data">Drop-in-Deviance (G) Test: Putts1 (individual) data</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href=""></a><span class="fu">summary</span>(lmod_Putts1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = Made ~ Length, family = binomial, data = Putts1)
 
-### Example: Predict Acceptance for MedGPA Data
+Coefficients:
+            Estimate Std. Error z value Pr(&gt;|z|)
+(Intercept)  3.25684    0.36893   8.828   &lt;2e-16
+Length      -0.56614    0.06747  -8.391   &lt;2e-16
 
-- We prefer the GPA model with:
+(Dispersion parameter for binomial family taken to be 1)
 
-  - Lower **Residual deviance** (56.84)
+    Null deviance: 800.21  on 586  degrees of freedom
+Residual deviance: 719.89  on 585  degrees of freedom
+AIC: 723.89
+
+Number of Fisher Scoring iterations: 4</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href=""></a><span class="fu">anova</span>(lmod_Putts1, <span class="at">test =</span> <span class="st">"Chisq"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Analysis of Deviance Table
+
+Model: binomial, link: logit
+
+Response: Made
+
+Terms added sequentially (first to last)
+
+       Df Deviance Resid. Df Resid. Dev  Pr(&gt;Chi)
+NULL                     586     800.21          
+Length  1   80.317       585     719.89 &lt; 2.2e-16</code></pre>
+</div>
+</div>
+</section>
+<section id="section-23" class="slide level2" style="font-size: 60%;">
+<h2></h2>
+<h3 id="drop-in-deviance-g-test-putts2-aggregate-data">Drop-in-Deviance (G) Test: Putts2 (aggregate) data</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href=""></a><span class="fu">summary</span>(lmod_Putts2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = cbind(Made, Missed) ~ Length, family = binomial, 
+    data = Putts2)
+
+Coefficients:
+            Estimate Std. Error z value Pr(&gt;|z|)
+(Intercept)  3.25684    0.36893   8.828   &lt;2e-16
+Length      -0.56614    0.06747  -8.391   &lt;2e-16
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 81.3865  on 4  degrees of freedom
+Residual deviance:  1.0692  on 3  degrees of freedom
+AIC: 30.175
+
+Number of Fisher Scoring iterations: 3</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href=""></a><span class="fu">anova</span>(lmod_Putts2, <span class="at">test =</span> <span class="st">"Chisq"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Analysis of Deviance Table
+
+Model: binomial, link: logit
+
+Response: cbind(Made, Missed)
+
+Terms added sequentially (first to last)
+
+       Df Deviance Resid. Df Resid. Dev  Pr(&gt;Chi)
+NULL                       4     81.387          
+Length  1   80.317         3      1.069 &lt; 2.2e-16</code></pre>
+</div>
+</div>
+</section>
+<section id="section-24" class="slide level2 smaller">
+<h2></h2>
+<h3 id="test-for-overall-model-logistic-regression">Test for Overall Model: Logistic Regression</h3>
+<p><strong>Drop-in-Deviance Test</strong> - Is there something effective in the model?</p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div class="fragment">
+<ul>
+<li><strong>Null hypothesis</strong>
+<ul>
+<li><p><span class="math inline">\(H_0:\beta_1=0\)</span></p></li>
+<li><p><span class="math inline">\(\log\left(\frac{\pi}{1-\pi}\right)=\beta_0\)</span></p></li>
+<li><p>Same odds for all values of <span class="math inline">\(x\)</span></p></li>
+<li><p>Likelihood is <span class="math inline">\(L_0\)</span></p></li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li><strong>Alternative hypothesis</strong>
+<ul>
+<li><p><span class="math inline">\(H_a: \beta_1\neq 0\)</span></p></li>
+<li><p><span class="math inline">\(\log\left(\frac{\pi}{1-\pi}\right)=\beta_0+\beta_1 x\)</span></p></li>
+<li><p>Odds are a linear function of <span class="math inline">\(x\)</span></p></li>
+<li><p>Likelihood is <span class="math inline">\(L\)</span></p></li>
+</ul></li>
+</ul>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="fragment">
+<ul>
+<li><span class="math inline">\(G=-2\log(L_0)-(-2\log(L))\)</span> and compare to <span class="math inline">\(\chi^2_1\)</span>
+<ul>
+<li>Improvement in <span class="math inline">\(-2\log(L)\)</span> when using linear function of <span class="math inline">\(x\)</span>.</li>
+</ul></li>
+</ul>
+</div>
+</div></div>
+</section>
+<section id="section-25" class="slide level2 smaller">
+<h2></h2>
+<h3 id="summary-logistic-regression-inference">Summary: Logistic Regression Inference</h3>
+<ul>
+<li class="fragment"><p><strong>Conditions</strong>: Check linearity via empirical logit plot (log-odds vs <span class="math inline">\(x\)</span> should be linear); independence and random sampling also required; normality and constant variance do <strong>not</strong> apply.</p></li>
+<li class="fragment"><p><strong>Two data forms</strong>: Disaggregate (long) form has one row per case; aggregate (short) form has counts of successes; both can be fit with <code>glm(..., family = binomial)</code>.</p></li>
+<li class="fragment"><p><strong>Wald <span class="math inline">\(z\)</span>-test</strong>: Tests <span class="math inline">\(H_0: \beta_i = 0\)</span> using <span class="math inline">\(z = \widehat\beta_i / SE(\widehat\beta_i)\)</span>; confidence intervals for <span class="math inline">\(\beta_1\)</span> and the odds ratio <span class="math inline">\((e^{\beta_1})\)</span> via <code>confint.default()</code>.</p></li>
+<li class="fragment"><p><strong>Deviance</strong>: Logistic regression uses maximum likelihood estimation; <span class="math inline">\(-2\log(L)\)</span> is the <strong>residual deviance</strong>; smaller is better, analogous to SSE in linear regression.</p></li>
+<li class="fragment"><p><strong>Drop-in-Deviance (<span class="math inline">\(G\)</span>) test</strong>: <span class="math inline">\(G = \text{Null deviance} - \text{Residual deviance}\)</span>, compared to <span class="math inline">\(\chi^2_k\)</span>; use <code>anova(model, test = "Chisq")</code> in R to test overall model fit.</p></li>
+</ul>
+
+</section></section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="Ch9Lect_sec9_34_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="Ch9Lect_sec9_34_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="Ch9Lect_sec9_34_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="Ch9Lect_sec9_34_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="Ch9Lect_sec9_34_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="Ch9Lect_sec9_34_files/libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
+  <script src="Ch9Lect_sec9_34_files/libs/revealjs/plugin/quarto-support/support.js"></script>
   
-  - Greater **reduction in deviance**: (75.78-64.70) vs (75.78-56.84) 
-  
----
-  
-### Evaluating Overall Fit: Drop in Deviance Test
 
-- Test for overall fit (simlilar to regression ANOVA)
+  <script src="Ch9Lect_sec9_34_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="Ch9Lect_sec9_34_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="Ch9Lect_sec9_34_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="Ch9Lect_sec9_34_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
 
-  - `\(G=\)` improvement in `\(-2\log(L)\)` over a model with constant only (null deviance) 
-  
-  - Compare to `\(\chi^2\)` with `\(k\)` degrees of freedom (chi-square)
-  
-  - Obtain `\(p\)`-value from R or by using the `pchisq()` function.
-  
----
+  <script>
 
-###  Drop in Deviance (G) Test: Putts1 data
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': true,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleChalkboard(event)\"><kbd>b</kbd> Toggle Chalkboard</a></li>\n<li class=\"slide-tool-item\" data-item=\"6\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleNotesCanvas(event)\"><kbd>c</kbd> Toggle Notes Canvas</a></li>\n<li class=\"slide-tool-item\" data-item=\"7\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.downloadDrawings(event)\"><kbd>d</kbd> Download Drawings</a></li>\n<li class=\"slide-tool-item\" data-item=\"8\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'chalkboard': {"buttons":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
 
-.panelset[
-.panel[.panel-name[R code]
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
 
-``` r
-summary(lmod_putts)
-anova(lmod_putts, test = "Chisq")
-```
-]
-.panel[.panel-name[summary output]
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
 
-```
-## 
-## Call:
-## glm(formula = Made ~ Length, family = binomial, data = Putts1)
-## 
-## Coefficients:
-##             Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)  3.25684    0.36893   8.828   &lt;2e-16 ***
-## Length      -0.56614    0.06747  -8.391   &lt;2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## (Dispersion parameter for binomial family taken to be 1)
-## 
-##     Null deviance: 800.21  on 586  degrees of freedom
-## Residual deviance: 719.89  on 585  degrees of freedom
-## AIC: 723.89
-## 
-## Number of Fisher Scoring iterations: 4
-```
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
 
-]
-.panel[.panel-name[anova output]
+        // Display a presentation progress bar
+        progress: true,
 
-```
-## Analysis of Deviance Table
-## 
-## Model: binomial, link: logit
-## 
-## Response: Made
-## 
-## Terms added sequentially (first to last)
-## 
-## 
-##        Df Deviance Resid. Df Resid. Dev  Pr(&gt;Chi)    
-## NULL                     586     800.21              
-## Length  1   80.317       585     719.89 &lt; 2.2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-```
-]
-]
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
 
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
 
----
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
 
-###  Drop in Deviance (G) Test: Putts2 (aggregate) data
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
 
-.panelset[
-.panel[.panel-name[R code]
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
 
-``` r
-summary(lmod_Putts2)
-anova(lmod_Putts2, test = "Chisq")
-```
-]
-.panel[.panel-name[summary output]
+        // Push each slide change to the browser history
+        history: true,
 
-```
-## 
-## Call:
-## glm(formula = cbind(Made, Missed) ~ Length, family = binomial, 
-##     data = Putts2)
-## 
-## Coefficients:
-##             Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)  3.25684    0.36893   8.828   &lt;2e-16 ***
-## Length      -0.56614    0.06747  -8.391   &lt;2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## (Dispersion parameter for binomial family taken to be 1)
-## 
-##     Null deviance: 81.3865  on 4  degrees of freedom
-## Residual deviance:  1.0692  on 3  degrees of freedom
-## AIC: 30.175
-## 
-## Number of Fisher Scoring iterations: 3
-```
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
 
-]
-.panel[.panel-name[anova output]
+        // Enable the slide overview mode
+        overview: true,
 
-```
-## Analysis of Deviance Table
-## 
-## Model: binomial, link: logit
-## 
-## Response: cbind(Made, Missed)
-## 
-## Terms added sequentially (first to last)
-## 
-## 
-##        Df Deviance Resid. Df Resid. Dev  Pr(&gt;Chi)    
-## NULL                       4     81.387              
-## Length  1   80.317         3      1.069 &lt; 2.2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-```
-]
-]
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
 
+        // Vertical centering of slides
+        center: false,
 
----
+        // Enables touch navigation on devices with touch input
+        touch: true,
 
-### Test for Overall Model: Logistic Regression
+        // Loop the presentation
+        loop: false,
 
-**Drop-in-Deviance Test**
+        // Change the presentation direction to be RTL
+        rtl: false,
 
-- Is there something effective in the model?
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
 
-.pull-left[
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
 
-- **Null hypothesis**
+        // Turns fragments on and off globally
+        fragments: true,
 
-  - `\(H_0:\beta_1=0\)`
-  
-  - `\(\log\left(\frac{\pi}{1-\pi}\right)=\beta_0\)`
-  
-  - Same odds for all values of `\(x\)`
-  
-  
-- **Alternative hypothesis**
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
 
-  - `\(H_0: \beta_1\neq 0\)`
-  
-  - `\(\log\left(\frac{\pi}{1-\pi}\right)=\beta_0+\beta_1 x\)`
-  
-  - Odds are a linear function of `\(x\)`
-  
-]
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
 
---
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
 
-.pull-right[
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
 
-- `\(G=-2\log(L_0)-(-2\log(L))\)` and compare to `\(\chi^2_1\)`
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
 
-  - Improvement in `\(-2\log(L)\)` when using linear function of `\(x\)`.
-  
-]
-    </textarea>
-<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
-<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
-<script>var slideshow = remark.create({
-  "highlightStyle": "github",
-  "highlightLines": true,
-  "ratio": "16:9",
-  "countIncrementalSlides": false
-});
-if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
-  window.dispatchEvent(new Event('resize'));
-});
-(function(d) {
-  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
-  if (!r) return;
-  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
-  d.head.appendChild(s);
-})(document);
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
 
-(function(d) {
-  var el = d.getElementsByClassName("remark-slides-area");
-  if (!el) return;
-  var slide, slides = slideshow.getSlides(), els = el[0].children;
-  for (var i = 1; i < slides.length; i++) {
-    slide = slides[i];
-    if (slide.properties.continued === "true" || slide.properties.count === "false") {
-      els[i - 1].className += ' has-continuation';
-    }
-  }
-  var s = d.createElement("style");
-  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
-  d.head.appendChild(s);
-})(document);
-// delete the temporary CSS (for displaying all slides initially) when the user
-// starts to view slides
-(function() {
-  var deleted = false;
-  slideshow.on('beforeShowSlide', function(slide) {
-    if (deleted) return;
-    var sheets = document.styleSheets, node;
-    for (var i = 0; i < sheets.length; i++) {
-      node = sheets[i].ownerNode;
-      if (node.dataset["target"] !== "print-only") continue;
-      node.parentNode.removeChild(node);
-    }
-    deleted = true;
-  });
-})();
-// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
-// screen reader (see PR #262)
-(function(d) {
-  let res = {};
-  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
-    const t = tr.querySelector('td:nth-child(2)').innerText;
-    tr.querySelectorAll('td:first-child .key').forEach(key => {
-      const k = key.innerText;
-      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
-    });
-  });
-  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
-})(document);
-(function() {
-  "use strict"
-  // Replace <script> tags in slides area to make them executable
-  var scripts = document.querySelectorAll(
-    '.remark-slides-area .remark-slide-container script'
-  );
-  if (!scripts.length) return;
-  for (var i = 0; i < scripts.length; i++) {
-    var s = document.createElement('script');
-    var code = document.createTextNode(scripts[i].textContent);
-    s.appendChild(code);
-    var scriptAttrs = scripts[i].attributes;
-    for (var j = 0; j < scriptAttrs.length; j++) {
-      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
-    }
-    scripts[i].parentElement.replaceChild(s, scripts[i]);
-  }
-})();
-(function() {
-  var links = document.getElementsByTagName('a');
-  for (var i = 0; i < links.length; i++) {
-    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
-      links[i].target = '_blank';
-    }
-  }
-})();
-// adds .remark-code-has-line-highlighted class to <pre> parent elements
-// of code chunks containing highlighted lines with class .remark-code-line-highlighted
-(function(d) {
-  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
-  const preParents = [];
-  const findPreParent = function(line, p = 0) {
-    if (p > 1) return null; // traverse up no further than grandparent
-    const el = line.parentElement;
-    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
-  };
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
 
-  for (let line of hlines) {
-    let pre = findPreParent(line);
-    if (pre && !preParents.includes(pre)) preParents.push(pre);
-  }
-  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
-})(document);</script>
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
 
-<script>
-slideshow._releaseMath = function(el) {
-  var i, text, code, codes = el.getElementsByTagName('code');
-  for (i = 0; i < codes.length;) {
-    code = codes[i];
-    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
-      text = code.textContent;
-      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
-          /^\$\$(.|\s)+\$\$$/.test(text) ||
-          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
-        code.outerHTML = code.innerHTML;  // remove <code></code>
-        continue;
-      }
-    }
-    i++;
-  }
-};
-slideshow._releaseMath(document);
-</script>
-<!-- dynamically load mathjax for compatibility with self-contained -->
-<script>
-(function () {
-  var script = document.createElement('script');
-  script.type = 'text/javascript';
-  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
-  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
-    script.src  = script.src.replace(/^https?:/, '');
-  document.getElementsByTagName('head')[0].appendChild(script);
-})();
-</script>
-  </body>
-</html>
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'fade',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1050,
+
+        height: 700,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, RevealChalkboard, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    
+    <script>
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+      // slide changes (different for each slide format).
+      (function () {
+        // dispatch for htmlwidgets
+        function fireSlideEnter() {
+          const event = window.document.createEvent("Event");
+          event.initEvent("slideenter", true, true);
+          window.document.dispatchEvent(event);
+        }
+
+        function fireSlideChanged(previousSlide, currentSlide) {
+          fireSlideEnter();
+
+          // dispatch for shiny
+          if (window.jQuery) {
+            if (previousSlide) {
+              window.jQuery(previousSlide).trigger("hidden");
+            }
+            if (currentSlide) {
+              window.jQuery(currentSlide).trigger("shown");
+            }
+          }
+        }
+
+        // hookup for slidy
+        if (window.w3c_slidy) {
+          window.w3c_slidy.add_observer(function (slide_num) {
+            // slide_num starts at position 1
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+          });
+        }
+
+      })();
+    </script>
+
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+            const codeEl = trigger.previousElementSibling.cloneNode(true);
+            for (const childEl of codeEl.children) {
+              if (isCodeAnnotation(childEl)) {
+                childEl.remove();
+              }
+            }
+            return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>
