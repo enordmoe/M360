@@ -593,7 +593,7 @@ $$
 ## 
 ### Example (Putts)
 
-The odds of making a putt **decrease by a factor of**
+The odds of making a putt **are multiplied by** the factor
 
 $$
 e^{-0.566} = 0.568
