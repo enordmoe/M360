@@ -441,7 +441,7 @@ Use `confint.default()` to get the Wald intervals presented here and in the text
 ## {.smaller}
 ### The “Likelihood” in Logistic Regression?
 
-::: {.incremental}
+::: {.fragment}
 
 * In intro stats, we estimated a single proportion:
 
@@ -449,11 +449,20 @@ $$
 \hat p = \frac{\text{\# Successes}}{n}
 $$
 
+:::
+
+::: {.fragment}
+
 * In logistic regression, each person has their **own probability**:
 
   $$
   \hat\pi_i = P(\text{Success} \mid x_i)
   $$
+
+:::
+
+::: {.fragment}
+
 
 * If we assume observations are independent, the probability of seeing the **entire dataset** is the product of each individual probability.
 
@@ -526,7 +535,7 @@ So:
   \text{Deviance} = -2 \log L
   $$
 
-* Smaller deviance means a better-fitting model.
+* Maximizing likelihood $\Longleftrightarrow$ Minimizing deviance
 
 :::
 
@@ -648,7 +657,7 @@ anova(lmod_Putts2, test = "Chisq")
 - **Null hypothesis**
   - $H_0:\beta_1=0$
   
-  - $\log\left(\frac{\pi}{1-\pi}\right)=\beta_0$
+  - Equivalently, $\log\left(\frac{\pi}{1-\pi}\right)=\beta_0$
   
   - Same odds for all values of $x$
   

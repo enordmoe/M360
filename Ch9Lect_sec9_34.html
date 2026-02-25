@@ -628,20 +628,28 @@ Length       0.4973894  0.6479761</code></pre>
 <section id="section-14" class="slide level2 smaller">
 <h2></h2>
 <h3 id="the-likelihood-in-logistic-regression">The “Likelihood” in Logistic Regression?</h3>
+<div class="fragment">
 <ul>
-<li class="fragment">In intro stats, we estimated a single proportion:</li>
+<li>In intro stats, we estimated a single proportion:</li>
 </ul>
 <p><span class="math display">\[
 \hat p = \frac{\text{\# Successes}}{n}
 \]</span></p>
+</div>
+<div class="fragment">
 <ul>
-<li class="fragment"><p>In logistic regression, each person has their <strong>own probability</strong>:</p>
+<li><p>In logistic regression, each person has their <strong>own probability</strong>:</p>
 <p><span class="math display">\[
 \hat\pi_i = P(\text{Success} \mid x_i)
 \]</span></p></li>
-<li class="fragment"><p>If we assume observations are independent, the probability of seeing the <strong>entire dataset</strong> is the product of each individual probability.</p></li>
-<li class="fragment"><p>That product is called the <strong>likelihood</strong>.</p></li>
 </ul>
+</div>
+<div class="fragment">
+<ul>
+<li><p>If we assume observations are independent, the probability of seeing the <strong>entire dataset</strong> is the product of each individual probability.</p></li>
+<li><p>That product is called the <strong>likelihood</strong>.</p></li>
+</ul>
+</div>
 </section>
 <section id="section-15" class="slide level2 smaller">
 <h2></h2>
@@ -691,7 +699,7 @@ L(\beta_0,\beta_1)=
 <p><span class="math display">\[
 \text{Deviance} = -2 \log L
 \]</span></p></li>
-<li class="fragment"><p>Smaller deviance means a better-fitting model.</p></li>
+<li class="fragment"><p>Maximizing likelihood <span class="math inline">\(\Longleftrightarrow\)</span> Minimizing deviance</p></li>
 </ul>
 </section>
 <section id="section-17" class="slide level2 smaller">
@@ -906,7 +914,7 @@ Length  1   80.317         3      1.069 &lt; 2.2e-16</code></pre>
 <li><strong>Null hypothesis</strong>
 <ul>
 <li><p><span class="math inline">\(H_0:\beta_1=0\)</span></p></li>
-<li><p><span class="math inline">\(\log\left(\frac{\pi}{1-\pi}\right)=\beta_0\)</span></p></li>
+<li><p>Equivalently, <span class="math inline">\(\log\left(\frac{\pi}{1-\pi}\right)=\beta_0\)</span></p></li>
 <li><p>Same odds for all values of <span class="math inline">\(x\)</span></p></li>
 <li><p>Likelihood is <span class="math inline">\(L_0\)</span></p></li>
 </ul></li>
