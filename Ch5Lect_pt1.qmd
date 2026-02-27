@@ -1,5 +1,5 @@
 ---
-title: "Chapter 5: Analysis of Variance"
+title: "Chapter 5: Introduction to ANOVA"
 subtitle: "Statistical Modeling"
 author: "MATH 360"
 format:
@@ -74,7 +74,7 @@ Analysis of data from:
 
 ::: {.fragment}
 
--   Condition: $\sigma_1=\sigma_2=\cdots=\sigma_I$
+-   Condition: $\sigma = \sigma_1=\sigma_2=\cdots=\sigma_I$
 
 :::
 
