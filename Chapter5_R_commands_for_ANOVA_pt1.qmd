@@ -1,0 +1,157 @@
+---
+title: 'Basic R Commands for ANOVA: Part 1'
+format: 
+    html: 
+      toc: true
+      html-math-method: katex
+      number-depth: 3
+      theme: flatly
+      self-contained: true
+execute:
+  warning: false
+editor: visual
+---
+
+```{r}
+#| label: setup
+#| include: false
+#| warning: false
+knitr::opts_chunk$set(echo = TRUE)
+options(digits=6)
+library(mosaic)
+library(Lock5Data)
+library(Stat2Data)
+```
+
+(Note: This introductory R guide for ANOVA is adapted from the *Lock5 with R companion to Statistics:Unlocking the Power of Data* by Randall Pruim and Lana Park.)
+
+## Analysis of Variance
+
+### Overview
+
+-   Two variables: categorical explanatory and quantitative response
+
+    -   Can be used in either experimental or observational designs.
+
+-   Main Question: Does the population mean response depend on the (treatment) group?
+
+    -   $H_0$: the population group means are all equal ($\mu_1 = \mu_2=\cdots=\mu_I$\
+    -   $H_a$: the population group means are not all equal
+
+-   If categorical variable has only 2 values, we already have a method: 2-sample $t$-test
+
+    -   ANOVA allows for 3 or more groups (sub-populations)
+
+-   $F$ statistic compares within group variation (how different are individuals in the same group?) to between group variation (how different are the different group means?)
+
+-   ANOVA assumes that each group is normally distributed with the same (population) standard deviation.
+
+    -   Check normality from data plots; normality more critical for small samples. In practice, watch out for clear skewness or extreme outliers if the sample size is small.\
+    -   Check equal standard deviation using 2:1 ratio rule (largest standard deviation at most twice the smallest standard deviation).
+
+### Null and Alternative Hypotheses
+
+#### Example: Ants on a Sandwich
+
+Are some kinds of sandwiches likely to attract ants more than others?
+
+```{r}
+favstats(Ants ~ Filling, data = SandwichAnts)
+```
+
+**Summary Plots**
+
+Obtain an overview using a boxplot:
+
+```{r}
+gf_boxplot(Ants ~ Filling, data = SandwichAnts)
+```
+
+Get more details by using dotplots:
+
+```{r}
+gf_dotplot(~Ants | Filling ~ ., data = SandwichAnts, dotsize = 0.5)
+```
+
+Can also overlay the mean on the dotplots, but things are getting pretty complicated now!
+
+```{r}
+gf_jitter(Filling ~ Ants, data = SandwichAnts, height = 0.05) %>%
+  gf_summary(fun.x=mean, geom = "point", shape = 18, size =3,
+             color = "red")
+```
+
+We see there is variability *between* the means as well as *within* the groups. The question is whether the variability in means is too great to be explained by chance variability.
+
+### Carrying out ANOVA and Partitioning Variability
+
+#### Example (cont'd)
+
+```{r}
+Ants.Model <- lm(Ants ~ Filling, data = SandwichAnts)
+anova(Ants.Model)
+```
+
+The $p$-value listed in this output (`Pr(>F)=0.01105`) is the $p$-value for our null hypothesis that the mean population response is the same in each treatment group. In this case, our test would provide fairly strong evidence against the null hypothesis in favor of the alternative that there is a difference somewhere among the means.
+
+In the future sections we'll look at this test in more detail, but notice that if you know the assumptions of a test, the null hypothesis being tested, and the $p$-value, you can generally interpret the results even if you don't know all the details of how the test statistic is computed.
+
+### The F-Statistic
+
+The ANOVA test statistic (called $F$) is based on three ingredients:
+
+1.  how different the group means are (between group differences)\
+2.  the amount of variability within each group (within group differences)\
+3.  sample size
+
+Each of these is involved in the calculation of $F$.
+
+### The F-distribution
+
+Under certain conditions, the $F$ statistic has a known distribution (called the $F$ distribution). Those conditions are\
+1. The null hypothesis is true (i.e., each group has the same mean)\
+2. Each group is sampled from a normal population\
+3. Each population group has the same standard deviation
+
+When these conditions are met, we can use the $F$-distribution to compute the $p$-value without generating the randomization distribution.
+
+-   $F$ distributions have two parameters: the degrees of freedom for the numerator and for the denominator. In our example, this is 2 for the numerator and 7 for the denominator.
+
+-   When $H_0$ is true, the numerator and denominator both have a mean of 1, so F will tend to be close to 1.
+
+-   When $H_0$ is false, there is more variability between the groups, so the numerator tends to be larger.
+
+-   This means we find evidence against the null hypothesis when $F$ gets large giving a small right-tail area.
+
+### More Examples of ANOVA
+
+Use ANOVA to explore whether pulse rate is related to Award desired.
+
+```{r}
+head(StudentSurvey,3)
+```
+
+**Summary statistics of pulse**
+
+```{r}
+favstats(~Pulse, data = StudentSurvey)
+```
+
+Summary statistics by award sought:
+
+```{r}
+favstats(Pulse ~ Award, data = StudentSurvey)
+```
+
+Carry out the ANOVA:
+
+```{r}
+anova(lm(Pulse ~ Award, StudentSurvey))
+```
+
+The low $p$-value is evidence that mean pulse rates differ across groups, assuming the conditions for the ANOVA hold.
+
+```{r}
+gf_boxplot(Pulse ~ Award, data = StudentSurvey, outlier.shape = NA) %>%
+  gf_jitter(width = .1)
+```
