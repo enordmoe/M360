@@ -1,0 +1,237 @@
+---
+title: "Chapter 5: Analysis of Variance"
+subtitle: "Statistical Modeling"
+author: "MATH 360"
+format:
+  revealjs:
+    chalkboard: true
+    theme: [default, custom.scss]
+    toc: false
+    toc-depth: 1
+    slideNumber: true
+    html-math-method: mathjax
+    incremental: false
+    transition: fade
+    preview-links: auto
+    notes: true
+title-slide-attributes:
+  data-background-color: "#EA6820"
+from: markdown+emoji
+execute:
+  echo: true
+  cache: false
+editor:
+  markdown:
+    wrap: 72
+---
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(mosaic)
+library(ggformula)
+library(Stat2Data)
+library(DiagrammeR)
+```
+
+## Outline
+
+::: incremental
+-   Overview of Analysis of Variance
+-   The Basic ANOVA
+-   The ANOVA Model
+-   The ANOVA Table
+-   Conditions
+:::
+
+## Why do ANOVA?
+
+::: incremental
+-   Investigate the relationship between
+    -   a quantitative response variable $y$ and
+    -   a categorical explanatory variable $x$ with $I>2$ categories
+-   Determine whether any of $I$ means $\mu_i$ differ from the others
+-   Assess whether the variability **between** groups is more than the
+    variability **within** groups
+:::
+
+## Contexts
+
+Analysis of data from:
+
+::: incremental
+-   One-way randomized experiments in which we wish to compare $I$
+    treatment groups
+-   Observational studies in which we wish to compare $I$ "populations"
+    defined by a categorical variable
+:::
+
+## {.smaller}
+### Analysis of Variance Sampling Model 
+
+* Draw samples from $I$ **independent** populations to compare population means $\mu_1,\mu_2,\ldots,\mu_I$:
+
+![](figures/sampling_model.png){fig-align="center" height="400"}
+
+::: {.fragment}
+
+-   Condition: $\sigma_1=\sigma_2=\cdots=\sigma_I$
+
+:::
+
+## {.smaller}
+### The Big Picture of ANOVA 
+
+::: {.incremental}
+
+-   **Key question:** Is variability **across** populations greater than
+    variability **within** populations?
+    -   Variability **between** vs **within** 
+-   **Hypothesis test:** 
+    -   $H_0:\mu_1=\mu_2=\cdots=\mu_I$ 
+    -   $H_a:$ The $\mu_i$'s are not all equal 
+-   **Test statistic (**$F$): ratio of the variability **among** sample
+    means to the variability **within** samples 
+    -   Large test statistic $\Rightarrow$ evidence against $H_0$
+-   Results are summarized in the ANOVA table
+
+:::
+
+
+## {.smaller}
+### In Linear Model Terms 
+
+::: {.fragment}
+
+
+**Single Mean Model** 
+
+$$
+Y=\mu+\epsilon
+$$
+
+:::
+
+::: fragment
+
+versus
+
+**Separate Means Model** 
+\begin{align*}
+Y &= \mu_i + \epsilon \qquad \text{or, equivalently}\\[1ex]
+  &= \mu + \alpha_i + \epsilon
+\end{align*}
+
+:::
+
+::: {.fragment}
+
+-   Use ANOVA to decide between these.
+
+:::
+
+## {style="font-size: 60%;"}
+### The One-Way ANOVA Model
+
+-   For experiments, the one-way ANOVA model can be expressed in terms of **treatment or group effects**:
+
+::: fragment
+
+$$
+\begin{array}{ccccccc}
+Y&=&\mu &+& \alpha_i &+&\epsilon \\[1ex]
+\text{Response} & & \text{Grand} & & \text{Group} & & \text{Random}\\
+& & \text{Mean} & & \text{effect} & & \text{Error}
+\end{array}
+$$
+:::
+
+::: {.fragment}
+
+where  
+-   $\mu$ is the **grand population mean**   
+-   $\alpha_i$ is the $i$th group effect, $\alpha_i=\mu_i-\mu$  
+-   $\epsilon$ is the random error term   
+
+:::
+
+::: {.fragment}
+
+-   The mean of group $i$ is $\mu_i=\mu+\alpha_i$   
+
+-   Two equivalent ANOVA hypothesis statements:   
+
+    -   $H_0:\mu_1=\mu_2=\cdots=\mu_I$   
+    -   $H_0:\alpha_1=\alpha_2=\cdots=\alpha_I=0$   
+
+:::
+
+## {.smaller}
+### Approach: Apportioning Variability
+
+![](figures/sumofsquares.png){fig-align="center" height="520"}
+
+## {.smaller}
+### ANOVA Model Conditions
+
+For the one-way ANOVA model 
+$$
+Y=\mu+\alpha_i+\epsilon
+$$
+
+::: fragment
+**Conditions on the effects** $\alpha_i$
+
+-   The effects $\alpha_i$ are constant and additive
+:::
+
+::: fragment
+**Conditions on the residuals** $\epsilon$  
+-   The residuals are random and independent    
+-   The residuals have constant variability across groups
+    (homoscedasticity)   
+-   The residuals are Normally distributed   
+:::
+
+## {.smaller}
+### Mean Square Error
+
+In ANOVA, the **mean square** measures variability as the ratio of **sum of squares** to **degrees of freedom**.
+
+\begin{align*}
+\text{MSE} &= \frac{\text{SSE}}{\text{df}_{\text{Error}}} \\
+&= \frac{(n_1-1)s_1^2 + \cdots + (n_I-1)s_I^2}{n-I}
+\end{align*}
+
+::: {.fragment}
+
+-   The **pooled standard deviation** ($s_p$) estimates the common group-specific standard deviation:    
+
+$$
+    s_p=\sqrt{\text{MSE}}
+$$
+
+:::
+
+## {.smaller}
+### ANOVA Table 
+
+To test for differences between $I$ group means, the hypotheses are:
+\begin{align*}
+H_0 &: \alpha_1=\alpha_2=\cdots=\alpha_I=0 \\
+H_a &: \text{At least one } \alpha_i \ne 0
+\end{align*}
+
+::: fragment
+| Source | df | SS | MS | F |
+|---------------|--------------:|--------------:|--------------:|--------------:|
+| Model | $I-1$ | $\text{SSGroups}$ | $\text{MSGroups}$ | $F=\dfrac{\text{MSGroups}}{\text{MSE}}$ |
+| Error | $n-I$ | $\text{SSE}$ | $\text{MSE}$ |  |
+| Total | $n-1$ | $\text{SSTotal}$ |  |  |
+:::
+
+<br>
+
+::: fragment
+$p$-value $=P\!\left(F^{\,I-1}_{\,n-I} > F\right)$ if the ANOVA
+conditions hold.
+:::
