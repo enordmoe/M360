@@ -1,0 +1,518 @@
+---
+title: "Chapter 5: One-Way ANOVA"
+subtitle: "Section 5.3: Fitting the Model"
+author: "MATH 360"
+format:
+  revealjs:
+    chalkboard: true
+    theme: [default, custom.scss]
+    toc: false
+    toc-depth: 1
+    slideNumber: true
+    html-math-method: mathjax
+    incremental: false
+    transition: fade
+    preview-links: auto
+    notes: true
+title-slide-attributes:
+  data-background-color: "#EA6820"
+from: markdown+emoji
+execute:
+  echo: true
+  cache: false
+editor:
+  markdown:
+    wrap: 72
+---
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(mosaic)
+library(Stat2Data)
+```
+
+## Outline
+
+::: incremental
+-   One-way ANOVA model
+-   Fitting the model
+-   Sums of overlays
+-   Partitioning variability
+-   ANOVA table
+-   One-way ANOVA inference (P-value)
+:::
+
+## ANOVA for Difference in $I$ Means {.smaller}
+
+### Data: Samples from $I$ different groups
+
+::::: columns
+::: {.column width="55%"}
+#### For each group $i = 1, \dots, I$
+
+$$
+\begin{array}{c|c|c}
+n_1 & \bar{y}_1 & s_1 \\
+n_2 & \bar{y}_2 & s_2 \\
+\vdots & \vdots & \vdots \\
+n_I & \bar{y}_I & s_I
+\end{array}
+$$
+:::
+
+::: {.column width="45%"}
+#### Summary statistics
+
+$$
+\begin{array}{c|c|c}
+n & \bar{y} & s_y
+\end{array}
+$$
+
+\vspace{0.5em}
+
+**Combine all groups** to obtain overall summaries.
+:::
+:::::
+
+::: fragment
+#### Test
+
+$$
+H_0 : \mu_1 = \mu_2 = \cdots = \mu_I
+$$
+
+$$
+H_a : \text{At least one } \mu_i \neq \mu_j
+$$
+:::
+
+## One-Way ANOVA Model {.smaller}
+
+For an observation from group $i$:
+
+$$
+Y = \mu_i + \varepsilon,
+\qquad \varepsilon \sim N(0,\sigma_\varepsilon).
+$$
+
+::: fragment
+Interpretation:
+
+-   $\mu_i$ is the mean response for group $i$.
+-   $\varepsilon$ is the within-group (random) error.
+:::
+
+::: fragment
+Fitted values:
+
+-   Under $H_0$ (all means equal): $\hat\mu_i = \bar y$ (overall mean)
+-   Under $H_a$ (means can differ): $\hat\mu_i = \bar y_i$ (group mean)
+:::
+
+##  {.smaller}
+
+### Example: FourExams (Model estimation)
+
+:::::: columns
+::: {.column width="55%"}
+#### Scores
+
+|            |                    |
+|------------|--------------------|
+| **Exam 1** | 62, 94, 68, 86, 50 |
+| **Exam 2** | 87, 95, 93, 97, 63 |
+| **Exam 3** | 74, 86, 82, 70, 28 |
+| **Exam 4** | 77, 89, 73, 79, 47 |
+:::
+
+::: {.column width="5%"}
+<!-- Empty spacer column -->
+:::
+
+::: {.column .fragment width="38%"}
+#### Summary statistics
+
+| Exam        | \$n_i\$ | \$\\bar y_i\$ | \$s_i\$   |
+|:------------|---------|---------------|-----------|
+| 1           | 5       | 72.0          | 17.89     |
+| 2           | 5       | 87.0          | 13.93     |
+| 3           | 5       | 68.0          | 23.24     |
+| 4           | 5       | 73.0          | 15.68     |
+| **Overall** | **20**  | **75.0**      | **18.11** |
+:::
+::::::
+
+:::: fragment
+Is there a significant difference in average grade **among** the four
+exams?
+
+::: fragment
+**Test:**
+
+$$
+H_0:\ \mu_1=\mu_2=\mu_3=\mu_4
+$$
+
+$$
+H_a:\ \text{Some }\mu_i\neq \mu_j
+$$
+:::
+::::
+
+##  {.smaller}
+
+### Alternate Form: One-Way ANOVA Model
+
+#### Model
+
+$$
+Y = \mu + \alpha_i + \varepsilon
+$$
+
+-   $\mu$ = grand mean\
+-   $\alpha_i$ = effect of group $i$\
+-   $\varepsilon$ = random error
+
+##  {.smaller}
+
+### Alternate Form: One-Way ANOVA Model (cont'd)
+
+#### Relationship to group means
+
+$$
+\mu_i = \mu + \alpha_i
+$$
+
+Estimators:
+
+$$
+\hat{\mu} = \bar{y}
+\qquad
+\hat{\alpha}_i = \bar{y}_i - \bar{y}
+$$
+
+:::::: fragment
+#### Equivalent hypothesis statements
+
+::::: columns
+::: {.column width="50%"}
+$$
+H_0:\ \mu_1 = \mu_2 = \cdots = \mu_I
+$$
+
+$$
+H_a:\ \text{At least one } \mu_i \neq \mu_j
+$$
+:::
+
+::: {.column .fragment width="50%"}
+$$
+H_0:\ \alpha_1 = \alpha_2 = \cdots = \alpha_I = 0
+$$
+
+$$
+H_a:\ \text{At least one } \alpha_i \neq 0
+$$
+:::
+:::::
+::::::
+
+##  {.smaller}
+
+### Example: FourExams (Effects estimation) {.smaller}
+
+:::::: columns
+::: {.column width="55%"}
+#### Scores
+
+|            |                    |
+|------------|--------------------|
+| **Exam 1** | 62, 94, 68, 86, 50 |
+| **Exam 2** | 87, 95, 93, 97, 63 |
+| **Exam 3** | 74, 86, 82, 70, 28 |
+| **Exam 4** | 77, 89, 73, 79, 47 |
+:::
+
+::: {.column width="5%"}
+<!-- Empty spacer column -->
+:::
+
+::: {.column .fragment width="38%"}
+#### Summary statistics
+
+| Exam        | \$n_i\$ | \$\\bar y_i\$ | \$s_i\$   |
+|:------------|---------|---------------|-----------|
+| 1           | 5       | 72.0          | 17.89     |
+| 2           | 5       | 87.0          | 13.93     |
+| 3           | 5       | 68.0          | 23.24     |
+| 4           | 5       | 73.0          | 15.68     |
+| **Overall** | **20**  | **75.0**      | **18.11** |
+:::
+::::::
+
+::: fragment
+#### Estimated group effects
+
+$$
+\hat{\mu} = \bar{y} = 75.0
+$$
+
+$$
+\hat{\alpha}_i = \bar{y}_i - \bar{y}
+$$
+
+$$
+\hat{\alpha}_1 = -3
+\qquad
+\hat{\alpha}_2 = 12
+\qquad
+\hat{\alpha}_3 = -7
+\qquad
+\hat{\alpha}_4 = \underline{\hspace{1.5cm}}
+$$
+:::
+
+##  {.peach-slide}
+
+### MRI Overlays: A metaphor for ANOVA effects
+
+![](figures/mri_img.jpg){fig-align="center"}
+
+## 
+
+### Sum of Overlays
+
+Start with the effects model:
+
+$$
+Y = \mu + \alpha_i + \varepsilon.
+$$
+
+::: fragment
+Decompose each response into **three overlays**:
+
+$$
+\text{Response}
+=
+\underbrace{\bar{y}}_{\text{Grand average}}
++
+\underbrace{(\bar{y}_i - \bar{y})}_{\text{Treatment effect}}
++\quad
+\underbrace{(y - \bar{y}_i)}_{\text{Residual}}
+$$
+:::
+
+##  {.smaller}
+
+### Sum of Overlays: FourExams
+
+$$
+y_{ij} = \bar{y} + (\bar{y}_i - \bar{y}) + (y_{ij} - \bar{y}_i),
+\qquad
+\bar{y} = 75.0
+$$
+
+::: fragment
+$$
+\begin{array}{r r r r}
+\text{Observed} & \text{Grand} & \text{Effect} & \text{Residual} \\
+62 & 75.0 & -3 & -10 \\
+94 & 75.0 & -3 & \hline{\} \\
+\vdots & \vdots & \vdots & \vdots \\
+87 & 75.0 & 12 & 0 \\
+95 & 75.0 & 12 & 8 \\
+\vdots & \vdots & \vdots & \vdots
+\end{array}
+$$
+:::
+
+##  {.smaller}
+
+### Sum of Overlays: FourExams
+
+$$
+y_{ij} = \bar{y} + (\bar{y}_i - \bar{y}) + (y_{ij} - \bar{y}_i),
+\qquad
+\bar{y} = 75.0
+$$
+
+::: fragment
+$$
+\begin{array}{l r r r r}
+ & \text{Observed} & \text{Grand} & \text{Effect} & \text{Residual} \\[4pt]
+\text{Exam \#1} & 62 & 75.0 & -3 & -10 \\
+\text{Exam \#1} & 94 & 75.0 & -3 & \underline{\hspace{2.5cm}} \\
+ & \vdots & \vdots & \vdots & \vdots \\[6pt]
+\text{Exam \#2} & 87 & 75.0 & 12 & 0 \\
+\text{Exam \#2} & 95 & 75.0 & 12 & \underline{\hspace{2.5cm}} \\
+ & \vdots & \vdots & \vdots & \vdots
+\end{array}
+$$
+:::
+
+## {.smaller}
+### Computing Overlays with  a Spreasheet
+
+Click on the spreadsheet to open:
+
+[![](figures/gsheets_overlay.png){fig-align="center"}](https://docs.google.com/spreadsheets/d/1rymzpTQdpBoJNq84eEL3uMUz8SoLBH_EMD4RQAD0FYs/edit?usp=sharing)
+
+## Partitioning Variability {.smaller}
+
+### Big idea
+
+$$
+\textbf{Data} = \textbf{Model} + \textbf{Error}
+$$
+
+For a one-way ANOVA:
+
+::: {.fragment}
+
+::: {.incremental}
+
+- **Total variation in the response**
+- equals
+- **Variation explained by group differences**
+- plus
+- **Unexplained variation (residuals)**
+
+:::
+:::
+
+::: {.fragment}
+
+### Question
+
+How do we *measure* these sources of variability?
+
+:::
+
+##  {.smaller}
+### Partitioning Variability for a One-Way ANOVA
+
+::: {.fragment}
+
+
+#### From observations:
+
+$$
+y_{ij} = \bar{y} + (\bar{y}_i - \bar{y}) + (y_{ij} - \bar{y}_i)
+$$
+
+:::
+
+::: {.fragment}
+
+
+#### Square and sum over all observations:
+
+$$
+\sum (y_{ij} - \bar{y})^2
+=
+\sum (\bar{y}_i - \bar{y})^2
++
+\sum (y_{ij} - \bar{y}_i)^2
+$$
+
+- Left: **Total variation**
+- First term: **Between-group variation (treatment effects)**
+- Second term: **Within-group variation (residuals)**
+
+:::
+
+::: {.fragment}
+
+#### In ANOVA notation:
+
+$$
+\text{SSTotal}
+=
+\text{SSGroups}
++
+\text{SSE}
+$$
+
+:::
+
+
+## {.smaller}
+### ANOVA Table (for $I$ Group Means)
+
+Hypotheses:
+
+$$
+H_0: \mu_1 = \mu_2 = \cdots = \mu_I
+\qquad\text{vs.}\qquad
+H_a: \text{some } \mu_i \ne \mu_j.
+$$
+
+::: {.fragment}
+
+| Source | d.f. | Sum of Squares | Mean Square | $F$ |
+|---------------|--------------:|--------------:|--------------:|--------------:|
+| Groups | $I-1$ | $SS_{\text{Groups}}$ | $MS_{\text{Groups}} = \dfrac{SS_{\text{Groups}}}{I-1}$ | $\dfrac{MS_{\text{Groups}}}{MSE}$ |
+| Error | $n-I$ | $SSE$ | $MSE = \dfrac{SSE}{n-I}$ |  |
+| Total | $n-1$ | $SS_{\text{Total}}$ |  |  |
+
+:::
+
+<div style="height: 2ex;"></div>
+
+::: {.fragment}
+
+Large $F$ indicates **between-group variability** is large relative to **within-group variability**.
+
+:::
+
+
+Here is a clean RevealJS Quarto slide using a **live R code chunk** (not a static code image). This will run and display real output.
+
+## {.smaller}
+### One-Way ANOVA in R 
+
+`factor()` is needed to treat the numeric **Exam** variable as categories.
+
+::: {.fragment}
+
+```{r}
+FourExamsData <- read.csv("https://people.kzoo.edu/enordmoe/math360/FourExamsData.csv")
+ExamAnova <- lm(Grade ~ factor(Exam), data = FourExamsData)
+anova(ExamAnova)
+```
+
+:::
+<div style="height: 2ex;"></div>
+
+
+::: {.fragment}
+
+::: {.incremental}
+
+* If $F \approx 1$, the group means are not very different relative to the variation within groups.
+
+* The **F-ratio** compares between-group variability to within-group variability.
+
+:::
+
+:::
+
+## 
+### Summary
+
+::: {.incremental}
+
+- We compare **several group means** using a single statistical model.
+
+- Each observation is viewed as:  
+  **overall average + group effect + random noise**.
+
+- Total variability in the data splits into:  
+  **between-group variation** and **within-group variation**.
+
+- The F-statistic asks:  
+  Are group differences large relative to ordinary random variation?
+
+:::
+
