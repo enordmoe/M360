@@ -133,7 +133,7 @@ Fitted values:
 ::: {.column .fragment width="38%"}
 #### Summary statistics
 
-| Exam        | \$n_i\$ | \$\\bar y_i\$ | \$s_i\$   |
+| Exam        | $n_i$ | $\bar y_i$ | $s_i$   |
 |:------------|---------|---------------|-----------|
 | 1           | 5       | 72.0          | 17.89     |
 | 2           | 5       | 87.0          | 13.93     |
@@ -241,7 +241,7 @@ $$
 ::: {.column .fragment width="38%"}
 #### Summary statistics
 
-| Exam        | \$n_i\$ | \$\\bar y_i\$ | \$s_i\$   |
+| Exam        | $n_i$ | $\bar y_i$ | $s_i$   |
 |:------------|---------|---------------|-----------|
 | 1           | 5       | 72.0          | 17.89     |
 | 2           | 5       | 87.0          | 13.93     |
@@ -303,29 +303,7 @@ $$
 $$
 :::
 
-##  {.smaller}
 
-### Sum of Overlays: FourExams
-
-$$
-y_{ij} = \bar{y} + (\bar{y}_i - \bar{y}) + (y_{ij} - \bar{y}_i),
-\qquad
-\bar{y} = 75.0
-$$
-
-::: fragment
-$$
-\begin{array}{r r r r}
-\text{Observed} & \text{Grand} & \text{Effect} & \text{Residual} \\
-62 & 75.0 & -3 & -10 \\
-94 & 75.0 & -3 & \hline{\} \\
-\vdots & \vdots & \vdots & \vdots \\
-87 & 75.0 & 12 & 0 \\
-95 & 75.0 & 12 & 8 \\
-\vdots & \vdots & \vdots & \vdots
-\end{array}
-$$
-:::
 
 ##  {.smaller}
 
@@ -466,8 +444,6 @@ Large $F$ indicates **between-group variability** is large relative to **within-
 
 :::
 
-
-Here is a clean RevealJS Quarto slide using a **live R code chunk** (not a static code image). This will run and display real output.
 
 ## {.smaller}
 ### One-Way ANOVA in R 

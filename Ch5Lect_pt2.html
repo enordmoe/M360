@@ -307,9 +307,9 @@ Y = \mu_i + \varepsilon,
 <thead>
 <tr class="header">
 <th style="text-align: left;">Exam</th>
-<th>$n_i$</th>
-<th>$\bar y_i$</th>
-<th>$s_i$</th>
+<th><span class="math inline">\(n_i\)</span></th>
+<th><span class="math inline">\(\bar y_i\)</span></th>
+<th><span class="math inline">\(s_i\)</span></th>
 </tr>
 </thead>
 <tbody>
@@ -441,9 +441,9 @@ H_a:\ \text{At least one } \alpha_i \neq 0
 <thead>
 <tr class="header">
 <th style="text-align: left;">Exam</th>
-<th>$n_i$</th>
-<th>$\bar y_i$</th>
-<th>$s_i$</th>
+<th><span class="math inline">\(n_i\)</span></th>
+<th><span class="math inline">\(\bar y_i\)</span></th>
+<th><span class="math inline">\(s_i\)</span></th>
 </tr>
 </thead>
 <tbody>
@@ -534,28 +534,6 @@ y_{ij} = \bar{y} + (\bar{y}_i - \bar{y}) + (y_{ij} - \bar{y}_i),
 \]</span></p>
 <div class="fragment">
 <p><span class="math display">\[
-\begin{array}{r r r r}
-\text{Observed} &amp; \text{Grand} &amp; \text{Effect} &amp; \text{Residual} \\
-62 &amp; 75.0 &amp; -3 &amp; -10 \\
-94 &amp; 75.0 &amp; -3 &amp; \hline{\} \\
-\vdots &amp; \vdots &amp; \vdots &amp; \vdots \\
-87 &amp; 75.0 &amp; 12 &amp; 0 \\
-95 &amp; 75.0 &amp; 12 &amp; 8 \\
-\vdots &amp; \vdots &amp; \vdots &amp; \vdots
-\end{array}
-\]</span></p>
-</div>
-</section>
-<section id="section-7" class="slide level2 smaller">
-<h2></h2>
-<h3 id="sum-of-overlays-fourexams-1">Sum of Overlays: FourExams</h3>
-<p><span class="math display">\[
-y_{ij} = \bar{y} + (\bar{y}_i - \bar{y}) + (y_{ij} - \bar{y}_i),
-\qquad
-\bar{y} = 75.0
-\]</span></p>
-<div class="fragment">
-<p><span class="math display">\[
 \begin{array}{l r r r r}
 &amp; \text{Observed} &amp; \text{Grand} &amp; \text{Effect} &amp; \text{Residual} \\[4pt]
 \text{Exam \#1} &amp; 62 &amp; 75.0 &amp; -3 &amp; -10 \\
@@ -568,7 +546,7 @@ y_{ij} = \bar{y} + (\bar{y}_i - \bar{y}) + (y_{ij} - \bar{y}_i),
 \]</span></p>
 </div>
 </section>
-<section id="section-8" class="slide level2 smaller">
+<section id="section-7" class="slide level2 smaller">
 <h2></h2>
 <h3 id="computing-overlays-with-a-spreasheet">Computing Overlays with a Spreasheet</h3>
 <p>Click on the spreadsheet to open:</p>
@@ -599,7 +577,7 @@ y_{ij} = \bar{y} + (\bar{y}_i - \bar{y}) + (y_{ij} - \bar{y}_i),
 <p>How do we <em>measure</em> these sources of variability?</p>
 </div>
 </section>
-<section id="section-9" class="slide level2 smaller">
+<section id="section-8" class="slide level2 smaller">
 <h2></h2>
 <h3 id="partitioning-variability-for-a-one-way-anova">Partitioning Variability for a One-Way ANOVA</h3>
 <div class="fragment">
@@ -634,7 +612,7 @@ y_{ij} = \bar{y} + (\bar{y}_i - \bar{y}) + (y_{ij} - \bar{y}_i)
 \]</span></p>
 </div>
 </section>
-<section id="section-10" class="slide level2 smaller">
+<section id="section-9" class="slide level2 smaller">
 <h2></h2>
 <h3 id="anova-table-for-i-group-means">ANOVA Table (for <span class="math inline">\(I\)</span> Group Means)</h3>
 <p>Hypotheses:</p>
@@ -692,9 +670,8 @@ H_a: \text{some } \mu_i \ne \mu_j.
 <div class="fragment">
 <p>Large <span class="math inline">\(F\)</span> indicates <strong>between-group variability</strong> is large relative to <strong>within-group variability</strong>.</p>
 </div>
-<p>Here is a clean RevealJS Quarto slide using a <strong>live R code chunk</strong> (not a static code image). This will run and display real output.</p>
 </section>
-<section id="section-11" class="slide level2 smaller">
+<section id="section-10" class="slide level2 smaller">
 <h2></h2>
 <h3 id="one-way-anova-in-r">One-Way ANOVA in R</h3>
 <p><code>factor()</code> is needed to treat the numeric <strong>Exam</strong> variable as categories.</p>
@@ -723,7 +700,7 @@ Residuals    16   5200  325.00               </code></pre>
 </ul>
 </div>
 </section>
-<section id="section-12" class="slide level2">
+<section id="section-11" class="slide level2">
 <h2></h2>
 <h3 id="summary">Summary</h3>
 <ul>
