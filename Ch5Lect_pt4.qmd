@@ -1,0 +1,262 @@
+---
+title: "Chapter 5: One-Way ANOVA"
+subtitle: "Section 5.6: Identifying Appropriate Transformations"
+author: "MATH 360"
+format:
+  revealjs:
+    chalkboard: true
+    theme: [default, custom.scss]
+    toc: false
+    toc-depth: 1
+    slideNumber: true
+    html-math-method: mathjax
+    incremental: false
+    transition: fade
+    preview-links: auto
+    notes: true
+title-slide-attributes:
+  data-background-color: "#EA6820"
+from: markdown+emoji
+execute:
+  echo: true
+  cache: false
+  warning: false
+  message: false
+editor:
+  markdown:
+    wrap: 72
+---
+
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(mosaic)
+library(Stat2Data)
+```
+
+
+## Overview
+
+- Transforming the response for ANOVA
+  - Checking conditions
+  - Diagnostic plot for spread to suggest transformation
+
+
+##  {style="font-size: 60%;"}
+### Example: Box Areas (1 of 3)
+
+**Data:** `Boxes` dataset (constructed in Quarto file on Moodle)
+
+- 20 boxes for each Width of 1, 4, 10, 12
+- Random Length between 1 and 20 for each box
+- Area = Length $\times$ Width
+
+::: {.fragment}
+
+```{r}
+Boxes <- read.csv("http://people.kzoo.edu/enordmoe/math360/Boxes.csv")
+favstats(areas ~ widths, data = Boxes) |> 
+  select(widths, mean, sd, n)|>
+  knitr::kable(digits = 2)
+```
+
+:::
+
+
+::: {.fragment}
+
+::: {.callout-warning}
+
+**Big differences in SDs across groups** $\Longrightarrow$ equal variance condition is violated.
+
+:::
+
+:::
+
+
+## Example: Box Areas (2 of 3)
+
+```{r}
+gf_boxplot(factor(widths) ~ areas, data = Boxes)
+```
+
+::: {.fragment}
+
+:::{.callout-note}
+
+* Boxplots show dramatically increasing spread as Width increases  
+  — the SD for Width 20 is roughly 18 times larger than for Width 1.
+
+:::
+
+:::
+
+---
+
+## {.smaller}
+### Diagnostic Plot for Addressing Unequal Variability
+
+
+- Compute group means $(\bar{y}_i)$ and SDs $(s_i)$
+- Plot $\log(s_i)$ versus $\log(\bar{y}_i)$
+- Fit a line to the scatterplot and find the slope
+- Try a transformation of $Y^p$, where $p = 1 - \text{slope}$
+
+::: {.fragment}
+
+
+| slope | $p = 1 - \text{slope}$ | Transformation | Response |
+|------:|:----------------------:|:---------------|:--------:|
+| $-1$ | $2$ | square | $Y^2$ |
+| $0$ | $1$ | no change | $Y$ |
+| $0.5$ | $0.5$ | square root | $\sqrt{Y}$ |
+|$\Longrightarrow\quad$ $1$ | $0$ | logarithm | $\log(Y)$ |
+| $2$ | $-1$ | reciprocal | $1/Y$ |
+
+:::
+
+
+## {.smaller}
+### Diagnostic Plot for Boxes (Area by Width)
+
+```{r}
+# Compute group means and SDs, then plot log(s_i) vs log(y_bar_i)
+stats <- favstats(areas ~ widths, data = Boxes)
+gf_point(log(sd) ~ log(mean), data = stats) |>
+  gf_lm()
+```
+
+::: {.fragment}
+
+
+*The slope of the fitted line is approximately **1.01**.*
+
+$$p = 1 - \text{slope} = 1 - 1.01 \approx 0$$
+
+:::
+
+::: {.fragment}
+
+::: {.callout-tip}
+
+**Conclusion:** $p \approx 0$ suggests a **log transformation**.
+
+:::
+
+:::
+
+---
+
+## Log(Area) versus Width
+
+```{r}
+favstats(log(areas) ~ widths, data = Boxes) |> 
+  select(widths, mean, sd, n)|>
+  knitr::kable(digits = 2)
+```
+
+
+::: {.fragment}
+
+::: {.callout-note}
+
+SDs across groups are now very similar $\Rightarrow$ the equal variance condition is satisfied after the log transformation.
+
+:::
+
+:::
+
+## {.smaller}
+### Example: Box Areas (3 of 3)
+
+```{r}
+gf_boxplot(factor(widths) ~ log(areas), data = Boxes)
+```
+
+::: {.fragment}
+
+*After the log transformation, the four groups show comparable spread.  The boxplots have similar widths across all Width values.*
+
+:::
+
+
+##  {.smaller}
+### Why Does the Log Transformation Work for Boxes?
+
+Starting from the original relationship:
+
+$$\text{Area} = \text{Width} \times \text{Length}$$
+
+Taking logarithms of both sides:
+
+$$\log(\text{Area}) = \log(\text{Width}) + \log(\text{Length})$$
+
+| Term | Role in ANOVA |
+|------|---------------|
+| $\log(\text{Area})$ | Response variable |
+| $\log(\text{Width})$ | Constant for each group (the "treatment effect") |
+| $\log(\text{Length})$ | Random component (uniform length within each group) |
+
+
+
+## {.smaller}
+### Why Does the Log Transformation Work? (cont.)
+
+
+Because $\text{Length}$ is drawn uniformly at random from the same distribution for every width group:
+
+::: {.fragment}
+
+- $\log(\text{Length})$ has the **same distribution** in every group
+- $\log(\text{Width})$ is just a **constant shift** per group
+
+:::
+
+::: {.fragment}
+
+* This is exactly the structure assumed by the one-way ANOVA model: equal variance across groups with group-specific means.
+
+:::
+
+::: {.fragment}
+
+::: {.callout-note}
+
+This diagnostic plot may also help suggest a transformation that addresses **skewness**, not just unequal variability.
+
+:::
+
+:::
+
+
+## 
+### Try it yourself
+
+Apply the diagnostic plot to the **Olives** dataset (Problem 5.44) to investigate the dissipation of fenthion residue in olives over time.
+
+
+<br>
+
+::: {.fragment}
+
+
+::: {.callout-warning}
+**Caveat:** If the plot of $\log(s_i)$ versus $\log(\bar{y}_i)$ is **not very linear**, a power transformation might not be very helpful.
+:::
+
+:::
+
+
+## Summary Choosing a Transformation
+
+::: {.incremental}
+
+- **Unequal spreads often occur because variability grows with the mean.**  
+  When larger group means also have larger standard deviations, the equal variance assumption for ANOVA may fail.
+
+- **A diagnostic plot reveals this relationship.**  
+  Plot $\log(s_i)$ versus $\log(\bar{y}_i)$; the slope shows how the spread changes as the mean increases.
+
+- **A power transformation can stabilize the spreads.**  
+  Transform the response using $Y^p$ with $p = 1 - \text{slope}$ to make group standard deviations more nearly equal.
+
+:::
