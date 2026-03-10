@@ -1,0 +1,428 @@
+---
+title: "Two-Way ANOVA: From Additive Models to Interactions"
+subtitle: "Math 360 Statistical Modeling — Class Notes"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    toc-float: true
+    number-sections: true
+    theme: flatly
+    embed-resources: true
+    fig-width: 7
+    fig-height: 4.5
+execute:
+  warning: false
+  message: false
+  echo: true
+---
+
+```{r setup, include=FALSE}
+library(mosaic)
+library(tidyverse)
+```
+
+---
+
+
+## The Gummy Bear Data
+
+On Monday we launched gummy bears and recorded how far each one traveled under
+combinations of two factors: **height** of the ramp (3 levels) and **position**
+of the launcher on the ramp (3 levels), with 3 replications per treatment
+combination: 27 launches in total.
+
+### Read and inspect the data
+
+> **Substitute your own data file path below.** Your data should have the same
+> four columns as shown here: `height`, `position`, `replication`, and `distance`.
+
+```{r read-data}
+gummy <- read_csv("http://people.kzoo.edu/enordmoe/math360/gummybears2waydata.csv")
+glimpse(gummy)
+```
+
+::: callout-important
+**Before we go further:** `height` and `position` are currently stored as
+integers (1, 2, 3). For ANOVA, they must be treated as **categorical** (factor)
+variables, not numeric ones. We will convert them now.
+:::
+
+```{r factor-convert}
+gummy <- gummy |>
+  mutate(
+    height   = factor(height,   labels = c("Low", "Medium", "High")),
+    position = factor(position, labels = c("One", "Two",    "Three"))
+  )
+glimpse(gummy)
+```
+
+---
+
+## The Two-Way ANOVA Setup
+
+### Why two-way?
+
+In one-way ANOVA we had a single categorical explanatory variable (factor) with
+$k$ levels. Now we have **two factors**:
+* $A$ (Height, with $I$ levels) 
+* $B$ (Position, with $J$ levels).  
+
+Each unique combination of a level of $A$ with a level of $B$ is called a treatment **cell**.  Here we have $I = 3$, $J = 3$, so $3 \times 3 = 9$ cells.
+
+### Balanced design
+
+Our experiment is **balanced**: each cell contains three replications $K=3$, for a grand total $n=IJK = (3)(3)(3)=27$. Balanced designs greatly simplify the algebra and interpretation.
+
+### The two models we will build
+
+| Model | Question it answers |
+|---|---|
+| **Additive (no interaction)** | Do *height* and *position* have separate, independent effects on distance? |
+| **Interaction** | Does the effect of height *depend on*  the *position* of the  launcher (and vice versa)? |
+ We will fit the simpler model first, check whether its assumptions are plausible, and then decide whether we need the richer interaction model.
+
+---
+
+## Exploratory Analysis
+
+### Cell means and standard deviations
+
+```{r favstats-cells}
+favstats(distance ~ height + position, data = gummy)
+```
+
+It is helpful to arrange these as a grid. Here's a concise way to do this with Base R:
+
+```{r}
+tapply(gummy$distance, list(gummy$height, gummy$position), mean)
+```
+
+
+Scan across each row (fixed height, varying position) and down each column (fixed position, varying height).
+
+- Do the row means increase or decrease consistently?
+- Do the column means?
+- Are any cells noticeably out of line with the rest?
+
+### Design (main-effects) plot
+
+The `plot.design()` function shows the **marginal means,** the mean distance averaged over all levels of the *other* factor, for each level of each factor.
+
+```{r plot-design, fig.cap="Main-effects plot: Marginal Means for height and position"}
+plot.design(distance ~ height + position, data = gummy)
+```
+
+**What to look for:** Large differences in marginal means suggest strong main effects. If the differences are much larger for one factor than the other, that factor likely has a stronger effect on distance.
+
+### Interaction plot
+
+The **interaction plot** reveals whether the two factors operate independently.
+
+```{r interaction-plot, fig.cap="Interaction plot: mean distance by height, grouped by position"}
+gf_summary(distance ~ height, color = ~position, 
+           group = ~position, fun = mean, geom = "line", 
+           xlab = "Height", ylab = "Mean Distance", 
+           data = gummy)
+```
+
+**What to look for:**
+
+- **Parallel lines** $\Rightarrow$ the factors act *additively*; the effect of height is the same regardless of position.
+- **Non-parallel (crossing or converging) lines** $\Rightarrow$ evidence of an **interaction**; the effect of one factor changes depending on the level of the other.
+
+::: callout-tip
+**Discussion:** What do you see in the interaction plot for your group's gummy data?
+Are the lines roughly parallel, or do they cross/converge?
+:::
+
+---
+
+## The Two-Way Additive Model
+
+### Model notation
+
+The **two-way additive model** (also called the *main-effects model*) can be
+written:
+
+$$
+Y_{ijk} = \mu + \alpha_i + \beta_j + \varepsilon_{ijk}
+$$
+
+where
+
+| Symbol | Meaning |
+|---|---|
+| $Y_{ijk}$ | Observed distance for Height level $i$, Position level $j$, replication $k$ |
+| $\mu$ | Overall (grand) mean |
+| $\alpha_i$ | **Main effect of Height** level $i$ (deviation from $\mu$) |
+| $\beta_j$ | **Main effect of Position** level $j$ (deviation from $\mu$) |
+| $\varepsilon_{ijk}$ | Random error, assumed $\sim N(0, \sigma^2)$ |
+
+The key assumption here is that the effect of Height ($\alpha_i$) is the
+**same at every level of Position**, and vice versa. That is, the effect is "additive."
+
+Once again, $\sum_i \alpha_i = 0$ and $\sum_j \beta_j = 0$, the effects add to 0 to allow estimation of the model.
+
+### Fit the additive model
+
+```{r mod-add}
+mod_add <- aov(distance ~ height + position, data = gummy)
+summary(mod_add)
+```
+
+### Reading the ANOVA table
+
+The table partitions the total variability in distance into three pieces:
+
+| Source | SS | df | MS | F |
+|---|---|---|---|---|
+| Height | $SS_A$ | $I-1 = 2$ | $MS_A$ | $MS_A / MS_E$ |
+| Position | $SS_B$ | $J-1 = 2$ | $MS_B$ | $MS_B / MS_E$ |
+| Residuals | $SS_E$ | $(n - I - J + 1)$ | $MS_E$ | — |
+
+The *F*-statistic for each factor tests whether that factor's marginal means are all equal, **after accounting for the other factor**.
+
+::: callout-note
+**Degrees of freedom check:** With $n = 27$, $I = 3$, $I = 3$:
+
+- Height: $df = 3 - 1 = 2$
+- Position: $df = 3 - 1 = 2$
+- Residuals: $df = 27 - 3 - 3 + 1 = 22$
+- Total: $df = n-1 = 26$ ✓
+:::
+
+### Residual diagnostics for the additive model
+
+Before accepting the model, we  check the three key conditions:
+
+1. **Constant variance** (residuals spread equally across fitted values)
+2. **Normality** of residuals
+3. **Independence** (ideally, guaranteed by randomization of treatment order)
+
+```{r diag-add, fig.cap="Residual diagnostics: additive model"}
+#| layout-ncol: 2
+gf_point(resid(mod_add) ~ fitted(mod_add),
+         xlab = "Fitted Values", ylab = "Residuals",
+         title = "Residuals vs. Fitted") |>
+  gf_hline(yintercept = ~0, linetype = "dashed", color = "gray50")
+
+gf_qq(~resid(mod_add), title = "Normal Q-Q Plot of Residuals") |>
+  gf_qqline(color = "steelblue")
+```
+
+::: callout-tip
+**Discussion:**  
+Do the residuals fan out as fitted values increase (suggesting non-constant variance)?   
+Does the Q-Q plot follow the reference line closely?
+:::
+
+### Model effects
+
+The `model.tables()` function extracts the estimated effects $\hat\alpha_i$ and $\hat\beta_j$:
+
+```{r effects-add}
+model.tables(mod_add, type = "effects")
+```
+
+And the cell means predicted by the additive model:
+
+```{r means-add}
+model.tables(mod_add, type = "means")
+```
+
+---
+
+## The Two-Way Interaction Model
+
+### Why consider an interaction?
+
+If the lines in the interaction plot are *not* parallel, the additive model is
+**misspecified**; it will leave systematic patterns in the residuals and produce misleading tests. We need to add a term that captures how the two factors work together.
+
+### Model notation
+
+The **interaction model** adds a term $(\alpha\beta)_{ij}$ for each cell and thus requires replications in each cell:
+
+$$
+Y_{ijk} = \mu + \alpha_i + \beta_j + (\alpha\beta)_{ij} + \varepsilon_{ijk}
+$$
+
+| Symbol | Meaning |
+|---|---|
+| $(\alpha\beta)_{ij}$ | Interaction effect for cell $(i,j)$: extra deviation beyond what the main effects alone predict |
+
+This model has the constraint that $\sum_i (\alpha\beta)_{ij} = 0$ for all $j$, and
+$\sum_j (\alpha\beta)_{ij} = 0$ for all $i$.
+
+Conceptually: if there is **no interaction**, then $(\alpha\beta)_{ij} = 0$ for all cells and the model collapses back to the additive one which is "nested" in this model.
+
+### Degrees of freedom
+
+Adding the interaction term "uses up" additional degrees of freedom:
+
+| Source | df |
+|---|---|
+| Height ($A$) | $I - 1 = 2$ |
+| Position ($B$) | $J - 1 = 2$ |
+| Height × Position | $(I-1)(J-1) = 4$ |
+| Residuals | $IJ(K-1) = 9 \times 2 = 18$ |
+| **Total** | $n-1=26$ |
+
+Adding the interaction term uses up 4 more degrees of freedom, leaving fewer for estimating error, which makes it harder to detect real effects. So we only add it if the data give us good reason to.
+
+### Fit the interaction model
+
+As we saw earlier in the term, putting the `*` operator between two factors in the model specification automatically includes both main effects **and** their interaction:
+
+```{r mod-int}
+mod_int <- aov(distance ~ height * position, data = gummy)
+summary(mod_int)
+```
+
+::: callout-note
+Recall that `height * position` is shorthand for `height + position + height:position`. You can also write the interaction term explicitly as `height:position`.
+:::
+
+### Interpreting the interaction F-test
+
+The `height:position` row tests $H_0$: all $(\alpha\beta)_{ij} = 0$
+(i.e., the additive model is adequate) against $H_a$: at least one
+interaction term is nonzero.
+
+- **Large F, small p-value** ⇒ retain the interaction model.
+- **Small F, large p-value** ⇒ the additive model may be sufficient.
+
+::: callout-tip
+**Discussion:** What does the interaction F-test tell you about your gummy bears data?
+:::
+
+### Residual diagnostics for the interaction model
+
+```{r diag-int, fig.cap="Residual diagnostics: interaction model"}
+#| layout-ncol: 2
+gf_point(resid(mod_int) ~ fitted(mod_int),
+         xlab = "Fitted Values", ylab = "Residuals",
+         title = "Residuals vs. Fitted") |>
+  gf_hline(yintercept = ~0, linetype = "dashed", color = "gray50")
+
+gf_qq(~resid(mod_int), title = "Normal Q-Q Plot of Residuals") |>
+  gf_qqline(color = "steelblue")
+```
+
+Compare these plots to those from the additive model. Does adding the interaction term clean up any systematic pattern in *your* residuals?
+
+### Interaction effects
+
+```{r effects-int}
+model.tables(mod_int, type = "effects")
+```
+
+Scan the interaction effects table. Large positive values indicate cells where the observed mean *exceeds* what the main effects alone predict; large negative values indicate cells that *fall short*. Non-trivial values here are a sign that interaction is real and meaningful. But interaction effects may be hard to detect with just 3 replications per cell.
+
+::: callout-tip
+**Try it:** What happens if you replace `type = "effects"` with `type = "means"` in the `model.tables()` for the interaction model?
+:::
+
+---
+
+## Model Comparison and Selection
+
+To decide formally between the additive and interaction models, we can compare them directly. The interaction F-test in the `summary()` output already does this, but let's see it explicitly:
+
+```{r model-compare}
+anova(mod_add, mod_int)
+```
+
+The extra-sum-of-squares F-test asks: does adding the interaction term significantly reduce the residual sum of squares (taking into account the degrees of freedom required)?
+
+### Which model should we use?
+
+Use the following decision process:
+
+1. **Look at the interaction plot.** Are the lines noticeably non-parallel?
+2. **Check the interaction F-test p-value.** Is it below your chosen $\alpha$?
+3. **Compare residual diagnostics.** Does the interaction model satisfy
+   conditions better?
+
+If the interaction is statistically significant *and* practically meaningful, use the interaction model. Otherwise, the simpler additive model is preferred.
+
+---
+
+## Post-Hoc Comparisons with Tukey's Method
+
+When we reject the null hypothesis of equal means, we often want to know *which* groups differ. Tukey's HSD (Honestly Significant Difference) method controls the family-wise error rate across all pairwise comparisons.
+
+::: callout-important
+**When is Tukey's method appropriate here?**
+
+- For the **additive model**: Tukey comparisons for `height` and `position`
+  separately are straightforward and interpretable.
+- For the **interaction model**: comparisons are most meaningful for the
+  *cell means* (all Height × Position combinations). With 9 cells there are
+  $\binom{9}{2} = 36$ pairwise comparisons. Use judgment about which to report since not all will be of interest.
+:::
+
+### Tukey comparisons for the additive model
+
+```{r tukey-add}
+TukeyHSD(mod_add)
+```
+
+```{r tukey-add-plot, fig.cap="Tukey 95% family-wise CI: additive model", fig.height=5}
+par(las = 1, mar = c(5, 8, 4, 2)) # to allow space for labels
+plot(TukeyHSD(mod_add))
+par(las = 0, mar = c(5, 4, 4, 2))   # restore defaults
+```
+
+Intervals that **do not include zero** correspond to pairs of groups whose means differ significantly at the family-wise 5% level.
+
+### Tukey comparisons for cell means (interaction model)
+
+If the interaction is significant, it makes more sense to compare individual *cells* (Height × Position combinations):
+
+```{r tukey-int-cells}
+TukeyHSD(mod_int, which = "height:position")
+```
+
+```{r tukey-int-plot, fig.cap="Tukey 95% family-wise CI: interaction cells", fig.height=9}
+par(las = 1, mar = c(5, 14, 4, 2))
+plot(TukeyHSD(mod_int, which = "height:position"))
+par(las = 0, mar = c(5, 4, 4, 2))
+```
+
+::: callout-tip
+**Discussion:** Focus on the comparisons that are most interesting to your group. Which Height × Position combinations produce
+significantly different distances?
+:::
+
+---
+
+## Summary and Big Ideas
+
+### The two-way ANOVA framework
+
+| | Additive model | Interaction model |
+|---|---|---|
+| **Formula** | `aov(Y ~ A + B)` | `aov(Y ~ A * B)` |
+| **Key assumption** | Effects of A and B are independent and simply add | The effect of A may differ across levels of B |
+| **Interaction term** | Absent | $(\alpha\beta)_{ij}$ |
+| **Residual df** | $n - I - J + 1$ | $IJ(K-1)$ |
+| **Interaction plot** | Lines parallel | Lines non-parallel |
+| **Post-hoc** | Tukey on A and B separately | Tukey on A:B cells |
+
+### Key takeaways
+
+1. **Two factors, two questions.** Two-way ANOVA simultaneously tests the main effects of two factors and, in the interaction model, whether those factors act independently.
+
+2. **Start with the interaction model.** Fitting the interaction model first and testing whether the interaction term is needed is the safest strategy.
+
+3. **Parallel lines = additive.** The interaction plot is the most intuitive
+   diagnostic for deciding which model is appropriate.
+
+4. **More parameters = harder to detect real effects** Adding an interaction costs $(I-1)(J-1)$ degrees of freedom. Only retain the interaction if the data support it.
+
+5. **Tukey's method scales up.** The same family-wise error rate logic from one-way ANOVA applies here, just applied to a larger set of comparisons when the interaction is present.
+
+6. **Conditions still matter.** The same three conditions required for one-way ANOVA (constant variance, normality, independence) apply to two-way ANOVA. Always check residual plots.
+
